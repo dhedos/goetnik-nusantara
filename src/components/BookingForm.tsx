@@ -11,8 +11,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { SERVICES, OWNER_WHATSAPP, BUSINESS_NAME } from '@/lib/constants';
-import { Send, Phone } from 'lucide-react';
+import { useFirestore, useCollection, useDoc } from '@/firebase';
+import { collection, addDoc, doc } from 'firebase/firestore';
+import { Send } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
+import { BUSINESS_NAME_DEFAULT, OWNER_WHATSAPP_DEFAULT } from '@/lib/constants';
 
 const formSchema = z.object({
   fullName: z.string().min(3, "Nama lengkap harus diisi"),
@@ -24,6 +27,12 @@ const formSchema = z.object({
 
 export function BookingForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const firestore = useFirestore();
+  const { data: services } = useCollection(firestore ? collection(firestore, 'services') : null);
+  const { data: settings } = useDoc(firestore ? doc(firestore, 'settings', 'business') : null);
+
+  const businessName = settings?.name || BUSINESS_NAME_DEFAULT;
+  const ownerWhatsapp = settings?.whatsapp || OWNER_WHATSAPP_DEFAULT;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -36,10 +45,19 @@ export function BookingForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!firestore) return;
     setIsSubmitting(true);
     
-    const message = `*PESANAN BARU - ${BUSINESS_NAME}*
+    try {
+      // Save to Firestore
+      await addDoc(collection(firestore, 'bookings'), {
+        ...values,
+        status: 'Pending',
+        createdAt: new Date().toISOString(),
+      });
+
+      const message = `*PESANAN BARU - ${businessName}*
 ---
 *Nama:* ${values.fullName}
 *WA:* ${values.whatsapp}
@@ -47,14 +65,19 @@ export function BookingForm() {
 *Layanan:* ${values.service}
 *Catatan:* ${values.notes || '-'}
 ---
-_Dikirim via Website ${BUSINESS_NAME}_`;
+_Dikirim via Website ${businessName}_`;
 
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${OWNER_WHATSAPP}?text=${encodedMessage}`;
-    
-    // Redirect to WhatsApp
-    window.open(whatsappUrl, '_blank');
-    setIsSubmitting(false);
+      const encodedMessage = encodeURIComponent(message);
+      const whatsappUrl = `https://wa.me/${ownerWhatsapp}?text=${encodedMessage}`;
+      
+      window.open(whatsappUrl, '_blank');
+      toast({ title: "Berhasil", description: "Pesanan Anda telah dikirim dan disimpan." });
+      form.reset();
+    } catch (e) {
+      toast({ variant: "destructive", title: "Gagal", description: "Terjadi kesalahan saat menyimpan pesanan." });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -118,7 +141,7 @@ _Dikirim via Website ${BUSINESS_NAME}_`;
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {SERVICES.map((s) => (
+                          {services?.map((s: any) => (
                             <SelectItem key={s.id} value={s.name}>{s.name}</SelectItem>
                           ))}
                         </SelectContent>
@@ -171,10 +194,6 @@ _Dikirim via Website ${BUSINESS_NAME}_`;
                     </>
                   )}
                 </Button>
-                
-                <p className="text-center text-xs text-muted-foreground">
-                  Dengan mengklik tombol, Anda akan diarahkan ke aplikasi WhatsApp.
-                </p>
               </form>
             </Form>
           </CardContent>

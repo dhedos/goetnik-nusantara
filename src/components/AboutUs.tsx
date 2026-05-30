@@ -1,11 +1,17 @@
-
 "use client";
 
-import { ADVANTAGES, BUSINESS_NAME } from '@/lib/constants';
+import { ADVANTAGES, BUSINESS_NAME_DEFAULT } from '@/lib/constants';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { useFirestore, useDoc } from '@/firebase';
+import { doc } from 'firebase/firestore';
 
 export function AboutUs() {
+  const firestore = useFirestore();
+  const { data: settings } = useDoc(firestore ? doc(firestore, 'settings', 'business') : null);
+  
+  const businessName = settings?.name || BUSINESS_NAME_DEFAULT;
+
   return (
     <section id="tentang" className="py-24 px-4 bg-secondary/20">
       <div className="max-w-7xl mx-auto">
@@ -15,7 +21,7 @@ export function AboutUs() {
               <Badge variant="outline" className="mb-4 py-1 px-4 border-primary text-primary">Tentang Kami</Badge>
               <h2 className="text-4xl md:text-5xl font-bold font-headline mb-6">Partner Teknologi <span className="text-primary">Terpercaya</span> Anda</h2>
               <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-                Di <strong>{BUSINESS_NAME}</strong>, kami percaya bahwa teknologi harus memudahkan hidup Anda, bukan menambah beban. Kami hadir sebagai solusi satu atap untuk segala kebutuhan perangkat digital dan identitas visual Anda.
+                Di <strong>{businessName}</strong>, kami percaya bahwa teknologi harus memudahkan hidup Anda, bukan menambah beban. Kami hadir sebagai solusi satu atap untuk segala kebutuhan perangkat digital dan identitas visual Anda.
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed">
                 Dimulai dari semangat untuk membantu UMKM dan individu dalam bertransformasi digital, kami kini telah melayani ratusan klien dengan tingkat kepuasan tinggi. Fokus kami adalah kualitas, kecepatan, dan kejujuran.

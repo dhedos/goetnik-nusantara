@@ -1,12 +1,17 @@
-
 "use client";
 
-import { BUSINESS_NAME } from '@/lib/constants';
+import { BUSINESS_NAME_DEFAULT } from '@/lib/constants';
 import { Cpu, Facebook, Instagram, Twitter, Linkedin } from 'lucide-react';
 import Link from 'next/link';
+import { useFirestore, useDoc } from '@/firebase';
+import { doc } from 'firebase/firestore';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
+  const firestore = useFirestore();
+  const { data: settings } = useDoc(firestore ? doc(firestore, 'settings', 'business') : null);
+  
+  const businessName = settings?.name || BUSINESS_NAME_DEFAULT;
 
   return (
     <footer className="bg-card/30 border-t border-border/50 pt-16 pb-8 px-4">
@@ -54,7 +59,7 @@ export function Footer() {
       </div>
 
       <div className="max-w-7xl mx-auto pt-8 border-t border-border/50 text-center text-muted-foreground text-sm">
-        <p>© {currentYear} {BUSINESS_NAME}. All Rights Reserved. Built with Precision & Care.</p>
+        <p>© {currentYear} {businessName}. All Rights Reserved. Built with Precision & Care.</p>
       </div>
     </footer>
   );

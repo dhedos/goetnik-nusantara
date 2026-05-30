@@ -1,16 +1,25 @@
-
 import { Monitor, HardDrive, Palette, Globe, CheckCircle, Clock, ShieldCheck } from 'lucide-react';
 
-export const BUSINESS_NAME = "TechFlow Mandiri";
-export const OWNER_WHATSAPP = "6281234567890"; // Ganti dengan nomor asli
-export const BUSINESS_ADDRESS = "Jl. Teknologi Raya No. 42, Kota Digital, Indonesia";
-export const BUSINESS_EMAIL = "hello@techflowmandiri.com";
+export const BUSINESS_NAME_DEFAULT = "TechFlow Mandiri";
+export const OWNER_WHATSAPP_DEFAULT = "6281234567890";
+export const BUSINESS_ADDRESS_DEFAULT = "Jl. Teknologi Raya No. 42, Kota Digital, Indonesia";
+export const BUSINESS_EMAIL_DEFAULT = "hello@techflowmandiri.com";
 
-export const SERVICES = [
+export const ICON_MAP: Record<string, any> = {
+  Monitor,
+  HardDrive,
+  Palette,
+  Globe,
+  CheckCircle,
+  Clock,
+  ShieldCheck
+};
+
+export const SERVICES_DEFAULT = [
   {
     id: "os-install",
     name: "Instal Ulang OS/Software",
-    icon: Monitor,
+    iconName: "Monitor",
     price: "Rp 100.000+",
     description: "Layanan instalasi Windows/macOS/Linux beserta driver dan aplikasi standar. Sistem bersih, cepat, dan bebas virus.",
     features: ["Aktivasi Original", "Driver Terbaru", "Backup Data", "Aplikasi Standar"]
@@ -18,7 +27,7 @@ export const SERVICES = [
   {
     id: "hardware-service",
     name: "Service Hardware Laptop",
-    icon: HardDrive,
+    iconName: "HardDrive",
     price: "Cek Kerusakan",
     description: "Perbaikan komponen laptop seperti LCD, keyboard, baterai, hingga perbaikan motherboard tingkat lanjut.",
     features: ["Suku Cadang Berkualitas", "Garansi Perbaikan", "Pengecekan Gratis", "Pengerjaan Cepat"]
@@ -26,7 +35,7 @@ export const SERVICES = [
   {
     id: "design-graphic",
     name: "Jasa Desain Grafis",
-    icon: Palette,
+    iconName: "Palette",
     price: "Rp 50.000+",
     description: "Pembuatan logo profesional, banner promosi, poster acara, dan identitas brand untuk bisnis Anda.",
     features: ["Revisi Sampai Puas", "File High Res", "Konsep Unik", "Waktu Kilat"]
@@ -34,7 +43,7 @@ export const SERVICES = [
   {
     id: "web-app",
     name: "Pembuatan Web/Aplikasi",
-    icon: Globe,
+    iconName: "Globe",
     price: "Rp 1.500.000+",
     description: "Pengembangan website landing page, profil perusahaan, hingga aplikasi web kustom untuk kebutuhan bisnis modern.",
     features: ["Responsive Design", "SEO Friendly", "Panel Admin", "Gratis Domain/Hosting*"]

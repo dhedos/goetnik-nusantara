@@ -1,12 +1,22 @@
+
 "use client";
 
-import { BUSINESS_ADDRESS, BUSINESS_EMAIL, OWNER_WHATSAPP } from '@/lib/constants';
-import { MapPin, Phone, Mail, MessageCircle, ExternalLink } from 'lucide-react';
+import { useFirestore, useDoc } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import { MapPin, MessageCircle, Mail, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT } from '@/lib/constants';
 
 export function Contact() {
+  const firestore = useFirestore();
+  const { data: settings } = useDoc(firestore ? doc(firestore, 'settings', 'business') : null);
+
+  const address = settings?.address || BUSINESS_ADDRESS_DEFAULT;
+  const email = settings?.email || BUSINESS_EMAIL_DEFAULT;
+  const whatsapp = settings?.whatsapp || OWNER_WHATSAPP_DEFAULT;
+
   return (
     <section id="kontak" className="py-24 px-4 bg-background border-t border-border/30">
       <div className="max-w-7xl mx-auto">
@@ -27,7 +37,7 @@ export function Contact() {
                   </div>
                   <div>
                     <h4 className="font-bold mb-1">Lokasi Kami</h4>
-                    <p className="text-muted-foreground text-sm">{BUSINESS_ADDRESS}</p>
+                    <p className="text-muted-foreground text-sm">{address}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -39,9 +49,9 @@ export function Contact() {
                   </div>
                   <div>
                     <h4 className="font-bold mb-1">WhatsApp Aktif</h4>
-                    <p className="text-muted-foreground text-sm">+{OWNER_WHATSAPP}</p>
+                    <p className="text-muted-foreground text-sm">+{whatsapp}</p>
                     <Button variant="link" className="p-0 h-auto text-primary mt-2" asChild>
-                      <a href={`https://wa.me/${OWNER_WHATSAPP}`} target="_blank">Chat Sekarang <ExternalLink size={12} className="ml-1" /></a>
+                      <a href={`https://wa.me/${whatsapp}`} target="_blank">Chat Sekarang <ExternalLink size={12} className="ml-1" /></a>
                     </Button>
                   </div>
                 </CardContent>
@@ -54,7 +64,7 @@ export function Contact() {
                   </div>
                   <div>
                     <h4 className="font-bold mb-1">Email Dukungan</h4>
-                    <p className="text-muted-foreground text-sm">{BUSINESS_EMAIL}</p>
+                    <p className="text-muted-foreground text-sm">{email}</p>
                   </div>
                 </CardContent>
               </Card>

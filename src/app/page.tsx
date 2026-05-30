@@ -10,12 +10,18 @@ import { ServiceCard } from '@/components/ServiceCard';
 import { AboutUs } from '@/components/AboutUs';
 import { Contact } from '@/components/Contact';
 import { Footer } from '@/components/Footer';
-import { SERVICES, BUSINESS_NAME } from '@/lib/constants';
+import { useFirestore, useCollection, useDoc } from '@/firebase';
+import { collection, doc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, ChevronRight, Play } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { ICON_MAP } from '@/lib/constants';
 
 export default function Home() {
+  const firestore = useFirestore();
+  const { data: services } = useCollection(firestore ? collection(firestore, 'services') : null);
+  const { data: settings } = useDoc(firestore ? doc(firestore, 'settings', 'business') : null);
+
   const heroImage = PlaceHolderImages.find(img => img.id === 'hero-tech');
   const serviceImageIds = ['service-os', 'service-repair', 'service-design', 'service-web'];
 
@@ -67,31 +73,6 @@ export default function Home() {
                   <Link href="#layanan">Lihat Layanan</Link>
                 </Button>
               </div>
-              
-              <div className="flex items-center gap-6 pt-8">
-                <div className="flex -space-x-4">
-                  {[1,2,3,4].map(i => (
-                    <div key={i} className="w-12 h-12 rounded-full border-2 border-background overflow-hidden">
-                      <Image 
-                        src={`https://picsum.photos/seed/${i+50}/100/100`} 
-                        alt="User Avatar" 
-                        width={48} 
-                        height={48} 
-                        className="object-cover"
-                      />
-                    </div>
-                  ))}
-                  <div className="w-12 h-12 rounded-full border-2 border-background bg-primary flex items-center justify-center text-xs font-bold text-primary-foreground">
-                    +1k
-                  </div>
-                </div>
-                <div className="text-sm">
-                  <p className="font-bold">1,240+ Pelanggan Puas</p>
-                  <div className="flex text-yellow-500">
-                    {[1,2,3,4,5].map(i => <ChevronRight key={i} size={12} className="rotate-90" />)}
-                  </div>
-                </div>
-              </div>
             </div>
 
             <div className="hidden lg:block animate-in fade-in zoom-in duration-1000 delay-300">
@@ -106,11 +87,6 @@ export default function Home() {
                         height={600}
                         className="w-full h-auto"
                       />
-                  </div>
-                  <div className="absolute -bottom-8 -right-8 p-6 bg-accent rounded-3xl shadow-2xl animate-bounce duration-[3000ms]">
-                    <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center text-white">
-                      <Play fill="currentColor" size={24} />
-                    </div>
                   </div>
                 </div>
               </div>
@@ -133,11 +109,15 @@ export default function Home() {
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {SERVICES.map((service, index) => (
+              {services?.map((service: any, index: number) => (
                 <div key={service.id} className="animate-in fade-in slide-in-from-bottom-8 duration-500" style={{ animationDelay: `${index * 100}ms` }}>
                   <ServiceCard 
-                    {...service} 
-                    imageId={serviceImageIds[index]}
+                    name={service.name}
+                    price={service.price}
+                    description={service.description}
+                    features={service.features || []}
+                    icon={ICON_MAP[service.iconName] || ICON_MAP.Monitor}
+                    imageId={serviceImageIds[index % serviceImageIds.length]}
                   />
                 </div>
               ))}

@@ -1,0 +1,62 @@
+
+{
+  "entities": {
+    "Service": {
+      "title": "Service",
+      "description": "A service package offered by the business.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "price": { "type": "string" },
+        "description": { "type": "string" },
+        "iconName": { "type": "string" },
+        "features": { "type": "array", "items": { "type": "string" } },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "price", "description", "iconName"]
+    },
+    "Booking": {
+      "title": "Booking",
+      "description": "A service request from a customer.",
+      "type": "object",
+      "properties": {
+        "fullName": { "type": "string" },
+        "whatsapp": { "type": "string" },
+        "address": { "type": "string" },
+        "service": { "type": "string" },
+        "notes": { "type": "string" },
+        "status": { "type": "string", "enum": ["Pending", "Selesai"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["fullName", "whatsapp", "address", "service", "status"]
+    },
+    "BusinessSettings": {
+      "title": "BusinessSettings",
+      "description": "General settings for the business.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "whatsapp": { "type": "string" },
+        "address": { "type": "string" },
+        "email": { "type": "string" }
+      }
+    }
+  },
+  "auth": {
+    "providers": ["email"]
+  },
+  "firestore": {
+    "/services/{serviceId}": {
+      "schema": "Service",
+      "description": "Collection of available service packages."
+    },
+    "/bookings/{bookingId}": {
+      "schema": "Booking",
+      "description": "Collection of customer bookings."
+    },
+    "/settings/business": {
+      "schema": "BusinessSettings",
+      "description": "Singleton document for business settings."
+    }
+  }
+}
