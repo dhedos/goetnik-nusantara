@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -8,6 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '@/components/ui/card';
 import { Sparkles, Loader2, MessageSquare, AlertCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { useFirestore, useCollection } from '@/firebase';
+import { collection } from 'firebase/firestore';
 
 export function AIAssistant() {
   const [description, setDescription] = useState('');
@@ -15,12 +16,25 @@ export function AIAssistant() {
   const [result, setResult] = useState<AIServiceRecommendationOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const firestore = useFirestore();
+  const { data: services } = useCollection(firestore ? collection(firestore, 'services') : null);
+
   const handleDiagnose = async () => {
-    if (!description.trim()) return;
+    if (!description.trim() || !services) return;
+    
     setLoading(true);
     setError(null);
     try {
-      const response = await recommendService({ problemDescription: description });
+      // Extract only needed fields for the AI
+      const availableServices = services.map(s => ({
+        name: s.name,
+        description: s.description
+      }));
+
+      const response = await recommendService({ 
+        problemDescription: description,
+        availableServices
+      });
       setResult(response);
     } catch (err) {
       setError('Gagal menganalisis masalah. Silakan coba lagi.');
@@ -42,7 +56,7 @@ export function AIAssistant() {
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold font-headline mb-4">Bingung Pilih Layanan?</h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Ceritakan masalah teknis Anda, dan asisten AI kami akan merekomendasikan paket layanan yang paling tepat untuk Anda.
+            Ceritakan masalah teknis Anda, dan asisten AI kami akan merekomendasikan paket layanan yang paling tepat dari daftar layanan aktif kami.
           </p>
         </div>
 
@@ -63,7 +77,7 @@ export function AIAssistant() {
             <Button 
               className="w-full py-6 text-lg rounded-xl font-bold shadow-xl shadow-primary/20 transition-all hover:scale-[1.01]"
               onClick={handleDiagnose}
-              disabled={loading || !description.trim()}
+              disabled={loading || !description.trim() || !services}
             >
               {loading ? (
                 <>
