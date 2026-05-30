@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useUser, useFirestore, useCollection, useDoc } from '@/firebase';
+import { useUser, useFirestore, useCollection, useDoc, useAuth } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -11,12 +11,14 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc } from 'firebase/firestore';
-import { Loader2, Plus, Trash2, Save, LogOut, CheckCircle2, Clock } from 'lucide-react';
+import { signOut } from 'firebase/auth';
+import { Loader2, Plus, Trash2, Save, LogOut, CheckCircle2, Clock, Globe } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { SERVICES_DEFAULT, BUSINESS_NAME_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT } from '@/lib/constants';
+import { BUSINESS_NAME_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT } from '@/lib/constants';
 
 export default function AdminDashboard() {
   const { user, loading: authLoading } = useUser();
+  const auth = useAuth();
   const firestore = useFirestore();
   const router = useRouter();
   const { data: services, loading: servicesLoading } = useCollection(firestore ? collection(firestore, 'services') : null);
@@ -47,6 +49,17 @@ export default function AdminDashboard() {
     }
   }, [settings]);
 
+  const handleLogout = async () => {
+    if (!auth) return;
+    try {
+      await signOut(auth);
+      toast({ title: "Berhasil", description: "Anda telah keluar." });
+      router.push('/login');
+    } catch (e) {
+      toast({ variant: "destructive", title: "Gagal", description: "Gagal logout." });
+    }
+  };
+
   const handleSaveBusinessInfo = async () => {
     if (!firestore) return;
     try {
@@ -68,6 +81,7 @@ export default function AdminDashboard() {
         features: [],
         createdAt: new Date().toISOString()
       });
+      toast({ title: "Berhasil", description: "Layanan baru ditambahkan." });
     } catch (e) {
       toast({ variant: "destructive", title: "Gagal", description: "Gagal menambah layanan." });
     }
@@ -104,16 +118,23 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-8">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-            <p className="text-muted-foreground">Kelola konten dan pesanan TechFlow Mandiri</p>
+            <p className="text-muted-foreground">Kelola konten dan pesanan {businessInfo.name || 'TechFlow Mandiri'}</p>
           </div>
-          <Button variant="outline" onClick={() => router.push('/')} className="mr-2">Lihat Web</Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => router.push('/')} className="flex items-center gap-2">
+              <Globe size={16} /> Lihat Web
+            </Button>
+            <Button variant="destructive" onClick={handleLogout} className="flex items-center gap-2">
+              <LogOut size={16} /> Keluar
+            </Button>
+          </div>
         </div>
 
         <Tabs defaultValue="bookings" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 md:w-auto">
+          <TabsList className="grid w-full grid-cols-3 md:w-[400px]">
             <TabsTrigger value="bookings">Pesanan</TabsTrigger>
             <TabsTrigger value="services">Layanan</TabsTrigger>
             <TabsTrigger value="settings">Pengaturan</TabsTrigger>
@@ -128,7 +149,7 @@ export default function AdminDashboard() {
               <CardContent>
                 <div className="space-y-4">
                   {bookingsLoading ? (
-                    <Loader2 className="animate-spin mx-auto" />
+                    <div className="py-8 flex justify-center"><Loader2 className="animate-spin" /></div>
                   ) : bookings?.length === 0 ? (
                     <p className="text-center py-8 text-muted-foreground">Belum ada pesanan.</p>
                   ) : (
@@ -143,11 +164,11 @@ export default function AdminDashboard() {
                           <span className={`text-xs px-2 py-1 rounded-full ${booking.status === 'Selesai' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'}`}>
                             {booking.status || 'Pending'}
                           </span>
-                          <Button size="sm" variant="ghost" onClick={() => handleUpdateBookingStatus(booking.id, 'Selesai')}>
-                            <CheckCircle2 size={16} />
+                          <Button size="sm" variant="ghost" onClick={() => handleUpdateBookingStatus(booking.id, 'Selesai')} title="Tandai Selesai">
+                            <CheckCircle2 size={16} className="text-green-500" />
                           </Button>
-                          <Button size="sm" variant="ghost" onClick={() => handleUpdateBookingStatus(booking.id, 'Pending')}>
-                            <Clock size={16} />
+                          <Button size="sm" variant="ghost" onClick={() => handleUpdateBookingStatus(booking.id, 'Pending')} title="Tandai Pending">
+                            <Clock size={16} className="text-yellow-500" />
                           </Button>
                         </div>
                       </div>
@@ -164,7 +185,9 @@ export default function AdminDashboard() {
               <Button onClick={handleAddService}><Plus className="mr-2" size={16} /> Tambah Layanan</Button>
             </div>
             <div className="grid md:grid-cols-2 gap-6">
-              {services?.map((service: any) => (
+              {servicesLoading ? (
+                <div className="col-span-full py-8 flex justify-center"><Loader2 className="animate-spin" /></div>
+              ) : services?.map((service: any) => (
                 <Card key={service.id}>
                   <CardContent className="p-6 space-y-4">
                     <div className="grid gap-2">
@@ -188,7 +211,7 @@ export default function AdminDashboard() {
                         onBlur={(e) => updateDoc(doc(firestore!, 'services', service.id), { description: e.target.value })}
                       />
                     </div>
-                    <Button variant="destructive" size="sm" onClick={() => handleDeleteService(service.id)}>
+                    <Button variant="destructive" size="sm" onClick={() => handleDeleteService(service.id)} className="w-full md:w-auto">
                       <Trash2 size={16} className="mr-2" /> Hapus Layanan
                     </Button>
                   </CardContent>

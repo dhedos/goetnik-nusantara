@@ -1,7 +1,8 @@
+
 "use client";
 
 import { BUSINESS_NAME_DEFAULT } from '@/lib/constants';
-import { Cpu, Facebook, Instagram, Twitter, Linkedin } from 'lucide-react';
+import { Cpu, Facebook, Instagram, Twitter, Linkedin, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useFirestore, useDoc } from '@/firebase';
 import { doc } from 'firebase/firestore';
@@ -43,6 +44,11 @@ export function Footer() {
                 <Link href="#" className="hover:text-primary transition-colors">{item}</Link>
               </li>
             ))}
+            <li>
+              <Link href="/login" className="hover:text-primary transition-colors flex items-center gap-2">
+                <Lock size={14} /> Admin Login
+              </Link>
+            </li>
           </ul>
         </div>
 
