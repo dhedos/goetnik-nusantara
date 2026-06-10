@@ -7,13 +7,13 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Services: Everyone can read, only admin can write
+    // Services: Everyone can read (essential for homepage), only admin can write
     match /services/{serviceId} {
       allow read: if true;
       allow write: if isAuthenticated();
     }
 
-    // Bookings: Everyone can create, only admin can read/update/delete
+    // Bookings: Everyone can create (booking form), only admin can read/update/delete
     match /bookings/{bookingId} {
       allow create: if true;
       allow read, update, delete: if isAuthenticated();

@@ -38,24 +38,22 @@ export default function AdminDashboard() {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Services can be read by anyone (public)
+  // CRITICAL: Ensure we only query once auth state is settled and user is valid to avoid race conditions
   const servicesQuery = useMemoFirebase(() => 
-    firestore ? collection(firestore, 'services') : null, 
-    [firestore]
+    (firestore && !authLoading && user) ? collection(firestore, 'services') : null, 
+    [firestore, authLoading, user]
   );
   const { data: services, loading: servicesLoading } = useCollection(servicesQuery);
 
-  // CRITICAL: Only query bookings if the user is authenticated to avoid Permission Denied error
   const bookingsQuery = useMemoFirebase(() => 
-    (firestore && user) ? collection(firestore, 'bookings') : null, 
-    [firestore, user]
+    (firestore && !authLoading && user) ? collection(firestore, 'bookings') : null, 
+    [firestore, authLoading, user]
   );
   const { data: bookings, loading: bookingsLoading } = useCollection(bookingsQuery);
 
-  // Settings can be read by anyone (public)
   const settingsRef = useMemoFirebase(() => 
-    firestore ? doc(firestore, 'settings', 'business') : null, 
-    [firestore]
+    (firestore && !authLoading && user) ? doc(firestore, 'settings', 'business') : null, 
+    [firestore, authLoading, user]
   );
   const { data: settings } = useDoc(settingsRef);
 
