@@ -10,6 +10,7 @@
         "price": { "type": "string" },
         "description": { "type": "string" },
         "iconName": { "type": "string" },
+        "imageUrl": { "type": "string", "description": "Base64 or URL of the service image." },
         "features": { "type": "array", "items": { "type": "string" } },
         "createdAt": { "type": "string", "format": "date-time" }
       },
@@ -44,6 +45,7 @@
         "logoUrl": { "type": "string" },
         "heroTitle": { "type": "string" },
         "heroSubtitle": { "type": "string" },
+        "heroImageUrl": { "type": "string", "description": "Base64 or URL of the hero background image." },
         "aboutTitle": { "type": "string" },
         "aboutContent": { "type": "string" },
         "privacyPolicy": { "type": "string" },

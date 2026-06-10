@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from 'next/image';
@@ -31,7 +32,8 @@ export default function Home() {
   );
   const { data: settings } = useDoc(settingsRef);
 
-  const heroImage = PlaceHolderImages.find(img => img.id === 'hero-tech');
+  const heroPlaceholder = PlaceHolderImages.find(img => img.id === 'hero-tech');
+  const heroDisplayImage = settings?.heroImageUrl || heroPlaceholder?.imageUrl;
   const serviceImageIds = ['service-os', 'service-repair', 'service-design', 'service-web'];
 
   const heroTitle = settings?.heroTitle || 'Selamat Datang di Portal Kami';
@@ -45,14 +47,14 @@ export default function Home() {
         {/* Hero Section */}
         <section className="relative min-h-screen flex items-center pt-20 px-4 overflow-hidden">
           <div className="absolute inset-0 -z-20">
-            {heroImage && (
+            {heroDisplayImage && (
               <Image 
-                src={heroImage.imageUrl}
+                src={heroDisplayImage}
                 alt="Tech Background"
                 fill
-                className="object-cover opacity-30 scale-105 animate-pulse"
+                className="object-cover opacity-30 scale-105"
                 priority
-                data-ai-hint={heroImage.imageHint}
+                unoptimized={!!settings?.heroImageUrl}
               />
             )}
             <div className="absolute inset-0 bg-gradient-to-br from-background via-background/90 to-primary/10" />
@@ -134,6 +136,7 @@ export default function Home() {
                     features={service.features || []}
                     icon={ICON_MAP[service.iconName] || ICON_MAP.Monitor}
                     imageId={serviceImageIds[index % serviceImageIds.length]}
+                    imageUrl={service.imageUrl}
                   />
                 </div>
               ))}

@@ -14,21 +14,23 @@ interface ServiceCardProps {
   description: string;
   features: string[];
   imageId: string;
+  imageUrl?: string;
 }
 
-export function ServiceCard({ name, icon: Icon, price, description, features, imageId }: ServiceCardProps) {
-  const image = PlaceHolderImages.find(img => img.id === imageId);
+export function ServiceCard({ name, icon: Icon, price, description, features, imageId, imageUrl }: ServiceCardProps) {
+  const placeholder = PlaceHolderImages.find(img => img.id === imageId);
+  const displayImage = imageUrl || placeholder?.imageUrl;
 
   return (
     <Card className="flex flex-col h-full bg-card/40 border-border/50 hover:border-primary/50 transition-all duration-300 group overflow-hidden">
       <div className="relative h-48 overflow-hidden">
-        {image && (
+        {displayImage && (
           <Image 
-            src={image.imageUrl}
+            src={displayImage}
             alt={name}
             fill
             className="object-cover group-hover:scale-110 transition-transform duration-500"
-            data-ai-hint={image.imageHint}
+            unoptimized={!!imageUrl}
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />

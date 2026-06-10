@@ -14,10 +14,9 @@ import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, CheckCircle2, 
   Globe, Layout, Info, Phone, Shield, Image as ImageIcon,
-  Settings, ShoppingBag, Menu, X, Upload, Check, Link as LinkIcon
+  Settings, ShoppingBag, Menu, X, Upload
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { ICON_MAP } from '@/lib/constants';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { cn } from '@/lib/utils';
@@ -33,8 +32,9 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [activeSection, setActiveSection] = useState<AdminSection>('branding');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isUploading, setIsUploading] = useState(false);
+  const [isUploading, setIsUploading] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const heroInputRef = useRef<HTMLInputElement>(null);
   
   const canFetchData = !authLoading && user && firestore;
 
@@ -66,6 +66,7 @@ export default function AdminDashboard() {
     logoUrl: '',
     heroTitle: '',
     heroSubtitle: '',
+    heroImageUrl: '',
     aboutTitle: '',
     aboutContent: '',
     privacyPolicy: '',
@@ -92,6 +93,7 @@ export default function AdminDashboard() {
         logoUrl: settings.logoUrl || '',
         heroTitle: settings.heroTitle || '',
         heroSubtitle: settings.heroSubtitle || '',
+        heroImageUrl: settings.heroImageUrl || '',
         aboutTitle: settings.aboutTitle || '',
         aboutContent: settings.aboutContent || '',
         privacyPolicy: settings.privacyPolicy || '',
@@ -135,55 +137,46 @@ export default function AdminDashboard() {
       });
   };
 
-  // Fungsi Unggah Logo menggunakan metode Base64 (Tanpa Firebase Storage)
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: 'logo' | 'hero' | string) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Cek ukuran file (Base64 menambah ukuran ~33%, limit Firestore 1MB)
-    if (file.size > 500000) { // Limit 500KB agar aman di Firestore
+    if (file.size > 800000) {
       toast({ 
         variant: "destructive", 
         title: "File Terlalu Besar", 
-        description: "Gunakan gambar di bawah 500KB untuk logo agar performa tetap cepat." 
+        description: "Gunakan gambar di bawah 800KB agar database tetap cepat." 
       });
       return;
     }
 
-    setIsUploading(true);
+    setIsUploading(target);
     
     const reader = new FileReader();
     reader.onloadend = async () => {
       const base64String = reader.result as string;
-      setBusinessInfo(prev => ({ ...prev, logoUrl: base64String }));
       
-      // Simpan langsung ke Firestore
-      if (firestore) {
-        const docRef = doc(firestore, 'settings', 'business');
-        try {
-          await setDoc(docRef, { 
-            logoUrl: base64String,
-            updatedAt: serverTimestamp() 
-          }, { merge: true });
-          toast({ title: "Berhasil", description: "Logo berhasil diperbarui." });
-        } catch (error: any) {
-          toast({ 
-            variant: "destructive", 
-            title: "Gagal Menyimpan", 
-            description: "Pastikan Rules Firestore Anda sudah benar." 
-          });
+      if (target === 'logo') {
+        setBusinessInfo(prev => ({ ...prev, logoUrl: base64String }));
+      } else if (target === 'hero') {
+        setBusinessInfo(prev => ({ ...prev, heroImageUrl: base64String }));
+      } else {
+        // Update service image directly
+        if (firestore) {
+          const docRef = doc(firestore, 'services', target);
+          try {
+            await updateDoc(docRef, { imageUrl: base64String });
+            toast({ title: "Berhasil", description: "Gambar layanan diperbarui." });
+          } catch (error) {
+            toast({ variant: "destructive", title: "Gagal", description: "Gagal menyimpan gambar." });
+          }
         }
       }
-      setIsUploading(false);
+      setIsUploading(null);
     };
     
-    reader.onerror = () => {
-      toast({ variant: "destructive", title: "Gagal", description: "Gagal membaca file gambar." });
-      setIsUploading(false);
-    };
-
     reader.readAsDataURL(file);
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    if (e.target) e.target.value = '';
   };
 
   const handleAddService = () => {
@@ -194,6 +187,7 @@ export default function AdminDashboard() {
       price: 'Rp 0',
       description: 'Deskripsi layanan baru',
       iconName: 'Monitor',
+      imageUrl: '',
       features: ['Fitur 1'],
       createdAt: serverTimestamp()
     };
@@ -308,7 +302,7 @@ export default function AdminDashboard() {
               <Card>
                 <CardHeader>
                   <CardTitle>Logo Identitas</CardTitle>
-                  <CardDescription>Ganti logo tanpa perlu Firebase Storage (Metode Instan).</CardDescription>
+                  <CardDescription>Ganti logo tanpa perlu Firebase Storage (Metode Base64).</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
@@ -324,7 +318,7 @@ export default function AdminDashboard() {
                       ) : (
                         <ImageIcon className="text-muted-foreground/30" size={40} />
                       )}
-                      {isUploading && (
+                      {isUploading === 'logo' && (
                         <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
                           <Loader2 className="animate-spin text-primary" />
                         </div>
@@ -334,42 +328,27 @@ export default function AdminDashboard() {
                     <div className="flex-1 space-y-4 w-full">
                       <div className="grid gap-2">
                         <Label className="flex items-center gap-2">
-                          <Upload size={14} /> Pilih Gambar dari Komputer
+                          <Upload size={14} /> Pilih Gambar
                         </Label>
                         <input 
                           type="file" 
                           ref={fileInputRef} 
                           className="hidden" 
                           accept="image/*" 
-                          onChange={handleLogoUpload} 
+                          onChange={(e) => handleImageUpload(e, 'logo')} 
                         />
                         <Button 
                           variant="outline" 
                           onClick={() => fileInputRef.current?.click()} 
-                          disabled={isUploading} 
+                          disabled={!!isUploading} 
                           className="w-full h-12"
                         >
-                          {isUploading ? (
+                          {isUploading === 'logo' ? (
                             <><Loader2 className="mr-2 animate-spin" /> Sedang Memproses...</>
                           ) : (
                             <><Upload className="mr-2" size={16} /> Klik untuk Pilih Logo Baru</>
                           )}
                         </Button>
-                        <p className="text-[10px] text-muted-foreground">Saran: Gunakan file PNG/JPG ukuran kecil (maks 500KB) agar website tetap ringan.</p>
-                      </div>
-                      
-                      <div className="relative">
-                        <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
-                        <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">Atau Masukkan URL</span></div>
-                      </div>
-
-                      <div className="grid gap-2">
-                        <Label>URL Gambar Langsung</Label>
-                        <Input 
-                          placeholder="https://contoh.com/logo.png" 
-                          value={businessInfo.logoUrl}
-                          onChange={(e) => setBusinessInfo({...businessInfo, logoUrl: e.target.value})}
-                        />
                       </div>
                     </div>
                   </div>
@@ -428,6 +407,31 @@ export default function AdminDashboard() {
                 {services?.map((service: any) => (
                   <Card key={service.id}>
                     <CardContent className="p-6 space-y-4">
+                      <div className="relative h-40 w-full rounded-lg border-2 border-dashed flex items-center justify-center overflow-hidden bg-accent/5 mb-4 group">
+                        {service.imageUrl ? (
+                          <Image src={service.imageUrl} alt={service.name} fill className="object-cover" unoptimized />
+                        ) : (
+                          <ImageIcon className="text-muted-foreground/30" size={32} />
+                        )}
+                        {isUploading === service.id && (
+                          <div className="absolute inset-0 bg-background/60 flex items-center justify-center z-10">
+                            <Loader2 className="animate-spin text-primary" />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                          <input 
+                            type="file" 
+                            id={`file-${service.id}`} 
+                            className="hidden" 
+                            accept="image/*" 
+                            onChange={(e) => handleImageUpload(e, service.id)} 
+                          />
+                          <Button size="sm" variant="secondary" onClick={() => document.getElementById(`file-${service.id}`)?.click()}>
+                            <Upload className="mr-2" size={14} /> Ganti Gambar
+                          </Button>
+                        </div>
+                      </div>
+
                       <div className="grid gap-2">
                         <Label>Nama Layanan</Label>
                         <Input defaultValue={service.name} onBlur={(e) => handleUpdateService(service.id, { name: e.target.value })} />
@@ -450,7 +454,41 @@ export default function AdminDashboard() {
 
           {activeSection === 'hero' && (
             <Card>
-              <CardContent className="p-6 space-y-4">
+              <CardContent className="p-6 space-y-6">
+                <div className="grid gap-4">
+                  <Label>Gambar Latar Belakang Hero</Label>
+                  <div className="relative h-60 w-full rounded-xl border-2 border-dashed flex items-center justify-center overflow-hidden bg-accent/5">
+                    {businessInfo.heroImageUrl ? (
+                      <Image 
+                        src={businessInfo.heroImageUrl} 
+                        alt="Hero Background Preview" 
+                        fill 
+                        className="object-cover"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="text-center p-4">
+                        <ImageIcon className="mx-auto text-muted-foreground/30 mb-2" size={48} />
+                        <p className="text-xs text-muted-foreground">Belum ada gambar custom. Menggunakan gambar bawaan.</p>
+                      </div>
+                    )}
+                    {isUploading === 'hero' && (
+                      <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
+                        <Loader2 className="animate-spin text-primary" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <input type="file" ref={heroInputRef} className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'hero')} />
+                    <Button variant="outline" className="flex-1" onClick={() => heroInputRef.current?.click()} disabled={!!isUploading}>
+                      <Upload className="mr-2" size={16} /> Pilih Gambar Hero
+                    </Button>
+                    <Button variant="destructive" size="icon" onClick={() => setBusinessInfo({...businessInfo, heroImageUrl: ''})}>
+                      <Trash2 size={16} />
+                    </Button>
+                  </div>
+                </div>
+
                 <div className="grid gap-2"><Label>Judul Utama (Hero)</Label><Input value={businessInfo.heroTitle} onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})} /></div>
                 <div className="grid gap-2"><Label>Sub-judul (Hero)</Label><Textarea value={businessInfo.heroSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, heroSubtitle: e.target.value})} /></div>
               </CardContent>
