@@ -3,6 +3,7 @@
 
 import { Cpu, Facebook, Instagram, Twitter, Linkedin, Lock } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 
@@ -17,6 +18,7 @@ export function Footer() {
   
   const logoText = settings?.logoText || '';
   const logoAccentText = settings?.logoAccentText || '';
+  const logoUrl = settings?.logoUrl || '';
   const businessName = settings?.name || '';
   const aboutSubtitle = settings?.heroSubtitle || '';
 
@@ -24,11 +26,24 @@ export function Footer() {
     <footer className="bg-card/30 border-t border-border/50 pt-16 pb-8 px-4">
       <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 mb-12">
         <div className="md:col-span-2 space-y-6">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground">
-              <Cpu size={24} />
-            </div>
-            <span className="text-2xl font-bold font-headline">{logoText}<span className="text-primary">{logoAccentText}</span></span>
+          <Link href="/" className="flex items-center gap-3">
+            {logoUrl ? (
+              <div className="relative h-12 w-36">
+                <Image 
+                  src={logoUrl} 
+                  alt="Logo" 
+                  fill 
+                  className="object-contain object-left"
+                />
+              </div>
+            ) : (
+              <>
+                <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground">
+                  <Cpu size={24} />
+                </div>
+                <span className="text-2xl font-bold font-headline">{logoText}<span className="text-primary">{logoAccentText}</span></span>
+              </>
+            )}
           </Link>
           <p className="text-muted-foreground max-w-md leading-relaxed">
             {aboutSubtitle}

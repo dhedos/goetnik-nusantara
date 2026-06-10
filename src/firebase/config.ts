@@ -4,6 +4,7 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
+import { getStorage, FirebaseStorage } from 'firebase/storage';
 
 export const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -18,12 +19,12 @@ interface FirebaseServices {
   firebaseApp: FirebaseApp | null;
   firestore: Firestore | null;
   auth: Auth | null;
+  storage: FirebaseStorage | null;
 }
 
 export function initializeFirebase(): FirebaseServices {
-  // Check if API Key is available
   if (!process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
-    return { firebaseApp: null, firestore: null, auth: null };
+    return { firebaseApp: null, firestore: null, auth: null, storage: null };
   }
 
   try {
@@ -37,10 +38,11 @@ export function initializeFirebase(): FirebaseServices {
 
     const firestore = getFirestore(app);
     const auth = getAuth(app);
+    const storage = getStorage(app);
 
-    return { firebaseApp: app, firestore, auth };
+    return { firebaseApp: app, firestore, auth, storage };
   } catch (error) {
     console.error("Firebase initialization failed:", error);
-    return { firebaseApp: null, firestore: null, auth: null };
+    return { firebaseApp: null, firestore: null, auth: null, storage: null };
   }
 }

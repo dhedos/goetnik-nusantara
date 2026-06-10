@@ -1,6 +1,8 @@
+
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 import { Menu, X, Cpu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -28,6 +30,7 @@ export function Navbar() {
 
   const logoText = settings?.logoText || '';
   const logoAccentText = settings?.logoAccentText || '';
+  const logoUrl = settings?.logoUrl || '';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,13 +46,27 @@ export function Navbar() {
       scrolled ? "bg-background/80 backdrop-blur-lg border-b border-border py-2" : "bg-transparent"
     )}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
-            <Cpu size={24} />
-          </div>
-          <span className="text-xl font-bold font-headline tracking-tight">
-            {logoText}<span className="text-primary">{logoAccentText}</span>
-          </span>
+        <Link href="/" className="flex items-center gap-3 group">
+          {logoUrl ? (
+            <div className="relative h-10 w-32">
+              <Image 
+                src={logoUrl} 
+                alt="Logo" 
+                fill 
+                className="object-contain"
+                priority
+              />
+            </div>
+          ) : (
+            <>
+              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
+                <Cpu size={24} />
+              </div>
+              <span className="text-xl font-bold font-headline tracking-tight">
+                {logoText}<span className="text-primary">{logoAccentText}</span>
+              </span>
+            </>
+          )}
         </Link>
 
         {/* Desktop Links */}
