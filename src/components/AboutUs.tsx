@@ -1,7 +1,7 @@
 
 "use client";
 
-import { ADVANTAGES, BUSINESS_NAME_DEFAULT } from '@/lib/constants';
+import { ADVANTAGES } from '@/lib/constants';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
@@ -15,7 +15,8 @@ export function AboutUs() {
   );
   const { data: settings } = useDoc(settingsRef);
   
-  const businessName = settings?.name || BUSINESS_NAME_DEFAULT;
+  const aboutTitle = settings?.aboutTitle || '';
+  const aboutContent = settings?.aboutContent || '';
 
   return (
     <section id="tentang" className="py-24 px-4 bg-secondary/20">
@@ -24,13 +25,10 @@ export function AboutUs() {
           <div className="space-y-8">
             <div>
               <Badge variant="outline" className="mb-4 py-1 px-4 border-primary text-primary">Tentang Kami</Badge>
-              <h2 className="text-4xl md:text-5xl font-bold font-headline mb-6">Partner Teknologi <span className="text-primary">Terpercaya</span> Anda</h2>
-              <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-                Di <strong>{businessName}</strong>, kami percaya bahwa teknologi harus memudahkan hidup Anda, bukan menambah beban. Kami hadir sebagai solusi satu atap untuk segala kebutuhan perangkat digital dan identitas visual Anda.
-              </p>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Dimulai dari semangat untuk membantu UMKM dan individu dalam bertransformasi digital, kami kini telah melayani ratusan klien dengan tingkat kepuasan tinggi. Fokus kami adalah kualitas, kecepatan, dan kejujuran.
-              </p>
+              <h2 className="text-4xl md:text-5xl font-bold font-headline mb-6">{aboutTitle}</h2>
+              <div className="text-lg text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                {aboutContent}
+              </div>
             </div>
 
             <div className="grid sm:grid-cols-3 gap-6 pt-6">
@@ -51,7 +49,7 @@ export function AboutUs() {
 
           <div className="grid gap-6">
             <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
-              <div className="w-8 h-1 bg-primary rounded-full" /> Mengapa Memilih Kami?
+              <div className="w-8 h-1 bg-primary rounded-full" /> Keunggulan Kami
             </h3>
             {ADVANTAGES.map((adv, i) => (
               <Card key={i} className="bg-background/40 border-border/50 hover:border-primary/30 transition-all">

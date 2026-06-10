@@ -32,7 +32,7 @@
     },
     "BusinessSettings": {
       "title": "BusinessSettings",
-      "description": "General settings for the business.",
+      "description": "General settings for the business content and branding.",
       "type": "object",
       "properties": {
         "name": { "type": "string" },
@@ -42,7 +42,13 @@
         "logoText": { "type": "string" },
         "logoAccentText": { "type": "string" },
         "heroTitle": { "type": "string" },
-        "heroSubtitle": { "type": "string" }
+        "heroSubtitle": { "type": "string" },
+        "aboutTitle": { "type": "string" },
+        "aboutContent": { "type": "string" },
+        "privacyPolicy": { "type": "string" },
+        "socialInstagram": { "type": "string" },
+        "socialFacebook": { "type": "string" },
+        "socialTwitter": { "type": "string" }
       }
     }
   },

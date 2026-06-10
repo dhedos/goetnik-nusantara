@@ -1,4 +1,5 @@
-import { Monitor, HardDrive, Palette, Globe, CheckCircle, Clock, ShieldCheck } from 'lucide-react';
+
+import { Monitor, HardDrive, Palette, Globe, CheckCircle, Clock, ShieldCheck, Laptop, Phone, Wrench } from 'lucide-react';
 
 export const BUSINESS_NAME_DEFAULT = "";
 export const OWNER_WHATSAPP_DEFAULT = "";
@@ -12,10 +13,11 @@ export const ICON_MAP: Record<string, any> = {
   Globe,
   CheckCircle,
   Clock,
-  ShieldCheck
+  ShieldCheck,
+  Laptop,
+  Phone,
+  Wrench
 };
-
-export const SERVICES_DEFAULT = [];
 
 export const ADVANTAGES = [
   {

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Cpu, Facebook, Instagram, Twitter, Linkedin, Lock } from 'lucide-react';
@@ -17,6 +18,7 @@ export function Footer() {
   const logoText = settings?.logoText || '';
   const logoAccentText = settings?.logoAccentText || '';
   const businessName = settings?.name || '';
+  const aboutSubtitle = settings?.heroSubtitle || '';
 
   return (
     <footer className="bg-card/30 border-t border-border/50 pt-16 pb-8 px-4">
@@ -29,25 +31,34 @@ export function Footer() {
             <span className="text-2xl font-bold font-headline">{logoText}<span className="text-primary">{logoAccentText}</span></span>
           </Link>
           <p className="text-muted-foreground max-w-md leading-relaxed">
-            Solusi perbaikan laptop, desain grafis profesional, dan pengembangan website untuk kebutuhan digital Anda. Memberikan layanan terbaik dengan sentuhan teknologi modern.
+            {aboutSubtitle}
           </p>
           <div className="flex gap-4">
-            {[Instagram, Facebook, Twitter, Linkedin].map((Icon, i) => (
-              <a key={i} href="#" className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all">
-                <Icon size={20} />
+            {settings?.socialInstagram && (
+              <a href={settings.socialInstagram} target="_blank" className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all">
+                <Instagram size={20} />
               </a>
-            ))}
+            )}
+            {settings?.socialFacebook && (
+              <a href={settings.socialFacebook} target="_blank" className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all">
+                <Facebook size={20} />
+              </a>
+            )}
+            {settings?.socialTwitter && (
+              <a href={settings.socialTwitter} target="_blank" className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all">
+                <Twitter size={20} />
+              </a>
+            )}
           </div>
         </div>
 
         <div>
           <h4 className="font-bold text-lg mb-6">Tautan Cepat</h4>
           <ul className="space-y-4 text-muted-foreground">
-            {['Beranda', 'Layanan', 'Tentang Kami', 'Kontak', 'Kebijakan Privasi'].map((item, i) => (
-              <li key={i}>
-                <Link href="#" className="hover:text-primary transition-colors">{item}</Link>
-              </li>
-            ))}
+            <li><Link href="#" className="hover:text-primary transition-colors">Beranda</Link></li>
+            <li><Link href="#layanan" className="hover:text-primary transition-colors">Layanan</Link></li>
+            <li><Link href="#tentang" className="hover:text-primary transition-colors">Tentang Kami</Link></li>
+            <li><Link href="#kontak" className="hover:text-primary transition-colors">Kontak</Link></li>
             <li>
               <Link href="/login" className="hover:text-primary transition-colors flex items-center gap-2">
                 <Lock size={14} /> Admin Login
@@ -57,19 +68,16 @@ export function Footer() {
         </div>
 
         <div>
-          <h4 className="font-bold text-lg mb-6">Layanan Utama</h4>
+          <h4 className="font-bold text-lg mb-6">Informasi</h4>
           <ul className="space-y-4 text-muted-foreground">
-            {['Instal Ulang OS', 'Service Hardware', 'Desain Logo', 'Landing Page', 'Maintenance Web'].map((item, i) => (
-              <li key={i}>
-                <Link href="#" className="hover:text-primary transition-colors">{item}</Link>
-              </li>
-            ))}
+             <li><Link href="#pesan" className="hover:text-primary transition-colors">Pesan Sekarang</Link></li>
+             <li><Link href="#" className="hover:text-primary transition-colors">Kebijakan Privasi</Link></li>
           </ul>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto pt-8 border-t border-border/50 text-center text-muted-foreground text-sm">
-        <p>© {currentYear} {businessName}. All Rights Reserved. Built with Precision & Care.</p>
+        <p>© {currentYear} {businessName}. All Rights Reserved.</p>
       </div>
     </footer>
   );

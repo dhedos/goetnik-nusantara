@@ -1,9 +1,9 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
 import { useUser, useFirestore, useCollection, useDoc, useAuth, useMemoFirebase } from '@/firebase';
 import { useRouter } from 'next/navigation';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,17 +12,26 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
-import { Loader2, Plus, Trash2, Save, LogOut, CheckCircle2, Clock, Globe, Layout } from 'lucide-react';
+import { 
+  Loader2, Plus, Trash2, Save, LogOut, CheckCircle2, 
+  Clock, Globe, Layout, Info, Phone, Shield, 
+  Settings, ShoppingBag, Menu, X, LucideIcon 
+} from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { ICON_MAP } from '@/lib/constants';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
+import { cn } from '@/lib/utils';
+
+type AdminSection = 'bookings' | 'services' | 'branding' | 'hero' | 'about' | 'contact' | 'privacy';
 
 export default function AdminDashboard() {
   const { user, loading: authLoading } = useUser();
   const auth = useAuth();
   const firestore = useFirestore();
   const router = useRouter();
+  const [activeSection, setActiveSection] = useState<AdminSection>('bookings');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   
   const servicesQuery = useMemoFirebase(() => 
     firestore ? collection(firestore, 'services') : null, 
@@ -50,7 +59,13 @@ export default function AdminDashboard() {
     logoText: '',
     logoAccentText: '',
     heroTitle: '',
-    heroSubtitle: ''
+    heroSubtitle: '',
+    aboutTitle: '',
+    aboutContent: '',
+    privacyPolicy: '',
+    socialInstagram: '',
+    socialFacebook: '',
+    socialTwitter: ''
   });
 
   useEffect(() => {
@@ -69,7 +84,13 @@ export default function AdminDashboard() {
         logoText: settings.logoText || '',
         logoAccentText: settings.logoAccentText || '',
         heroTitle: settings.heroTitle || '',
-        heroSubtitle: settings.heroSubtitle || ''
+        heroSubtitle: settings.heroSubtitle || '',
+        aboutTitle: settings.aboutTitle || '',
+        aboutContent: settings.aboutContent || '',
+        privacyPolicy: settings.privacyPolicy || '',
+        socialInstagram: settings.socialInstagram || '',
+        socialFacebook: settings.socialFacebook || '',
+        socialTwitter: settings.socialTwitter || ''
       });
     }
   }, [settings]);
@@ -103,7 +124,7 @@ export default function AdminDashboard() {
         errorEmitter.emit('permission-error', permissionError);
       });
     
-    toast({ title: "Berhasil", description: "Pengaturan web telah diperbarui." });
+    toast({ title: "Berhasil", description: "Pengaturan telah diperbarui." });
   };
 
   const handleAddService = () => {
@@ -134,7 +155,6 @@ export default function AdminDashboard() {
   const handleDeleteService = (id: string) => {
     if (!firestore) return;
     const docRef = doc(firestore, 'services', id);
-    
     deleteDoc(docRef)
       .catch(async (e) => {
         const permissionError = new FirestorePermissionError({
@@ -143,14 +163,12 @@ export default function AdminDashboard() {
         });
         errorEmitter.emit('permission-error', permissionError);
       });
-    
     toast({ title: "Berhasil", description: "Layanan telah dihapus." });
   };
 
   const handleUpdateService = (id: string, data: any) => {
     if (!firestore) return;
     const docRef = doc(firestore, 'services', id);
-    
     updateDoc(docRef, data)
       .catch(async (e) => {
         const permissionError = new FirestorePermissionError({
@@ -160,40 +178,22 @@ export default function AdminDashboard() {
         });
         errorEmitter.emit('permission-error', permissionError);
       });
-    
     toast({ title: "Terupdate", description: "Perubahan layanan disimpan." });
   };
 
   const handleUpdateBookingStatus = (id: string, status: string) => {
     if (!firestore) return;
     const docRef = doc(firestore, 'bookings', id);
-    const data = { status };
-    
-    updateDoc(docRef, data)
+    updateDoc(docRef, { status })
       .catch(async (e) => {
         const permissionError = new FirestorePermissionError({
           path: docRef.path,
           operation: 'update',
-          requestResourceData: data,
+          requestResourceData: { status },
         });
         errorEmitter.emit('permission-error', permissionError);
       });
-    
     toast({ title: "Berhasil", description: "Status pesanan diperbarui." });
-  };
-
-  const handleDeleteBooking = (id: string) => {
-    if (!firestore) return;
-    const docRef = doc(firestore, 'bookings', id);
-    deleteDoc(docRef)
-      .catch(async (e) => {
-        const permissionError = new FirestorePermissionError({
-          path: docRef.path,
-          operation: 'delete',
-        });
-        errorEmitter.emit('permission-error', permissionError);
-      });
-    toast({ title: "Berhasil", description: "Pesanan dihapus." });
   };
 
   if (authLoading || !user) {
@@ -204,36 +204,83 @@ export default function AdminDashboard() {
     );
   }
 
+  const navItems = [
+    { id: 'bookings', label: 'Pesanan', icon: ShoppingBag },
+    { id: 'services', label: 'Layanan', icon: Settings },
+    { id: 'branding', label: 'Branding & Logo', icon: Layout },
+    { id: 'hero', label: 'Beranda (Hero)', icon: Globe },
+    { id: 'about', label: 'Tentang Kami', icon: Info },
+    { id: 'contact', label: 'Kontak', icon: Phone },
+    { id: 'privacy', label: 'Kebijakan Privasi', icon: Shield },
+  ];
+
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-            <p className="text-muted-foreground">Kelola konten & pengaturan website</p>
+    <div className="flex min-h-screen bg-background text-foreground">
+      {/* Sidebar */}
+      <aside className={cn(
+        "fixed inset-y-0 left-0 z-50 w-64 bg-card border-r transition-transform duration-300 transform md:relative md:translate-x-0",
+        isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        <div className="flex flex-col h-full">
+          <div className="p-6 border-b">
+            <h2 className="text-xl font-bold text-primary">Admin Panel</h2>
+            <p className="text-xs text-muted-foreground mt-1">Management Console</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => router.push('/')} className="flex items-center gap-2">
-              <Globe size={16} /> Lihat Web
+          
+          <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setActiveSection(item.id as AdminSection)}
+                className={cn(
+                  "flex items-center w-full gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
+                  activeSection === item.id 
+                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" 
+                    : "hover:bg-accent text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <item.icon size={18} />
+                {item.label}
+              </button>
+            ))}
+          </nav>
+
+          <div className="p-4 border-t space-y-2">
+             <Button variant="outline" className="w-full justify-start gap-3" onClick={() => router.push('/')}>
+              <Globe size={18} /> Lihat Website
             </Button>
-            <Button variant="destructive" onClick={handleLogout} className="flex items-center gap-2">
-              <LogOut size={16} /> Keluar
+            <Button variant="destructive" className="w-full justify-start gap-3" onClick={handleLogout}>
+              <LogOut size={18} /> Keluar
             </Button>
           </div>
         </div>
+      </aside>
 
-        <Tabs defaultValue="bookings" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 md:w-[450px]">
-            <TabsTrigger value="bookings">Pesanan</TabsTrigger>
-            <TabsTrigger value="services">Layanan</TabsTrigger>
-            <TabsTrigger value="settings">Pengaturan Web</TabsTrigger>
-          </TabsList>
+      {/* Main Content */}
+      <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+        <header className="flex items-center justify-between mb-8 md:hidden">
+          <h2 className="text-xl font-bold">Admin Panel</h2>
+          <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+            {isSidebarOpen ? <X /> : <Menu />}
+          </Button>
+        </header>
 
-          <TabsContent value="bookings" className="mt-6">
+        <div className="max-w-5xl mx-auto space-y-6">
+          <div className="flex items-center justify-between">
+            <h1 className="text-3xl font-bold capitalize">Kelola {activeSection.replace('-', ' ')}</h1>
+            {(activeSection !== 'bookings' && activeSection !== 'services') && (
+              <Button onClick={handleSaveBusinessInfo} className="shadow-lg shadow-primary/20">
+                <Save className="mr-2" size={18} /> Simpan Semua Perubahan
+              </Button>
+            )}
+          </div>
+
+          {/* Bookings Section */}
+          {activeSection === 'bookings' && (
             <Card>
               <CardHeader>
                 <CardTitle>Daftar Pesanan</CardTitle>
-                <CardDescription>Semua pesanan yang masuk melalui website.</CardDescription>
+                <CardDescription>Pesanan pelanggan yang masuk melalui website.</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -243,7 +290,7 @@ export default function AdminDashboard() {
                     <p className="text-center py-8 text-muted-foreground">Belum ada pesanan.</p>
                   ) : (
                     bookings.map((booking: any) => (
-                      <div key={booking.id} className="flex flex-col md:flex-row md:items-center justify-between p-4 border rounded-lg gap-4">
+                      <div key={booking.id} className="flex flex-col md:flex-row md:items-center justify-between p-4 border rounded-lg gap-4 bg-card/50">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <p className="font-bold">{booking.fullName}</p>
@@ -252,31 +299,21 @@ export default function AdminDashboard() {
                             </span>
                           </div>
                           <p className="text-sm text-muted-foreground">Layanan: <span className="text-foreground font-medium">{booking.service}</span></p>
-                          <p className="text-sm text-muted-foreground">Kontak: {booking.whatsapp} | {booking.address}</p>
-                          {booking.notes && <p className="text-xs italic mt-2 p-2 bg-secondary/30 rounded border border-border/50">"{booking.notes}"</p>}
+                          <p className="text-sm text-muted-foreground">Kontak: {booking.whatsapp}</p>
                         </div>
-                        <div className="flex items-center gap-2 shrink-0">
+                        <div className="flex items-center gap-2">
                           <Button 
                             size="sm" 
                             variant={booking.status === 'Selesai' ? 'secondary' : 'outline'} 
                             onClick={() => handleUpdateBookingStatus(booking.id, 'Selesai')}
-                            className="flex items-center gap-2"
                           >
-                            <CheckCircle2 size={16} className={booking.status === 'Selesai' ? 'text-green-500' : ''} /> 
-                            {booking.status === 'Selesai' ? 'Selesai' : 'Tandai Selesai'}
+                            <CheckCircle2 size={16} />
                           </Button>
                           <Button 
                             size="sm" 
-                            variant={booking.status === 'Pending' ? 'secondary' : 'outline'}
-                            onClick={() => handleUpdateBookingStatus(booking.id, 'Pending')}
+                            variant="destructive" 
+                            onClick={() => confirm('Hapus?') && deleteDoc(doc(firestore!, 'bookings', booking.id))}
                           >
-                            <Clock size={16} />
-                          </Button>
-                          <Button size="sm" variant="destructive" onClick={() => {
-                            if(confirm('Hapus pesanan ini?')) {
-                              handleDeleteBooking(booking.id);
-                            }
-                          }}>
                             <Trash2 size={16} />
                           </Button>
                         </div>
@@ -286,182 +323,184 @@ export default function AdminDashboard() {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          )}
 
-          <TabsContent value="services" className="mt-6">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold">Kelola Layanan</h3>
-              <Button onClick={handleAddService}><Plus className="mr-2" size={16} /> Tambah Layanan</Button>
-            </div>
-            <div className="grid md:grid-cols-2 gap-6">
-              {servicesLoading ? (
-                <div className="col-span-full py-8 flex justify-center"><Loader2 className="animate-spin" /></div>
-              ) : services?.map((service: any) => (
-                <Card key={service.id} className="relative group">
-                  <CardContent className="p-6 space-y-4">
-                    <div className="grid gap-2">
-                      <Label>Nama Layanan</Label>
-                      <Input 
-                        defaultValue={service.name} 
-                        onBlur={(e) => handleUpdateService(service.id, { name: e.target.value })}
-                        placeholder="Contoh: Instal Ulang OS"
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
+          {/* Services Section */}
+          {activeSection === 'services' && (
+            <div className="space-y-6">
+              <div className="flex justify-end">
+                <Button onClick={handleAddService}><Plus className="mr-2" size={16} /> Tambah Layanan</Button>
+              </div>
+              <div className="grid md:grid-cols-2 gap-6">
+                {servicesLoading ? (
+                  <div className="col-span-full py-8 flex justify-center"><Loader2 className="animate-spin" /></div>
+                ) : services?.map((service: any) => (
+                  <Card key={service.id}>
+                    <CardContent className="p-6 space-y-4">
                       <div className="grid gap-2">
-                        <Label>Harga (Teks)</Label>
+                        <Label>Nama Layanan</Label>
                         <Input 
-                          defaultValue={service.price} 
-                          onBlur={(e) => handleUpdateService(service.id, { price: e.target.value })}
-                          placeholder="Rp 100.000"
+                          defaultValue={service.name} 
+                          onBlur={(e) => handleUpdateService(service.id, { name: e.target.value })}
                         />
                       </div>
-                      <div className="grid gap-2">
-                        <Label>Ikon</Label>
-                        <Select 
-                          defaultValue={service.iconName || 'Monitor'} 
-                          onValueChange={(val) => handleUpdateService(service.id, { iconName: val })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Object.keys(ICON_MAP).map(icon => (
-                              <SelectItem key={icon} value={icon}>{icon}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-2">
+                          <Label>Harga (Teks)</Label>
+                          <Input 
+                            defaultValue={service.price} 
+                            onBlur={(e) => handleUpdateService(service.id, { price: e.target.value })}
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label>Ikon</Label>
+                          <Select 
+                            defaultValue={service.iconName || 'Monitor'} 
+                            onValueChange={(val) => handleUpdateService(service.id, { iconName: val })}
+                          >
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              {Object.keys(ICON_MAP).map(icon => <SelectItem key={icon} value={icon}>{icon}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
-                    </div>
-                    <div className="grid gap-2">
-                      <Label>Deskripsi</Label>
-                      <Textarea 
-                        defaultValue={service.description} 
-                        onBlur={(e) => handleUpdateService(service.id, { description: e.target.value })}
-                        rows={3}
-                      />
-                    </div>
-                    <div className="flex justify-between items-center pt-2">
-                      <p className="text-[10px] text-muted-foreground">ID: {service.id}</p>
-                      <Button variant="destructive" size="sm" onClick={() => handleDeleteService(service.id)}>
-                        <Trash2 size={16} className="mr-2" /> Hapus
+                      <div className="grid gap-2">
+                        <Label>Deskripsi</Label>
+                        <Textarea 
+                          defaultValue={service.description} 
+                          onBlur={(e) => handleUpdateService(service.id, { description: e.target.value })}
+                        />
+                      </div>
+                      <Button variant="destructive" size="sm" onClick={() => handleDeleteService(service.id)} className="w-full">
+                        <Trash2 size={16} className="mr-2" /> Hapus Layanan
                       </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
-          </TabsContent>
+          )}
 
-          <TabsContent value="settings" className="mt-6">
-            <div className="grid gap-8">
-              {/* Branding & Visual */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2"><Layout className="text-primary" /> Branding & Tampilan Logo</CardTitle>
-                  <CardDescription>Atur nama bisnis dan bagaimana logo muncul di Navbar.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="grid gap-2">
-                      <Label>Nama Bisnis (Nama Web)</Label>
-                      <Input 
-                        value={businessInfo.name} 
-                        onChange={(e) => setBusinessInfo({...businessInfo, name: e.target.value})}
-                        placeholder="Nama Bisnis Anda"
-                      />
-                    </div>
+          {/* Branding Section */}
+          {activeSection === 'branding' && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Branding & Identitas Logo</CardTitle>
+                <CardDescription>Atur nama bisnis dan teks logo yang muncul di navigasi.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid gap-4">
+                  <div className="grid gap-2">
+                    <Label>Nama Bisnis (Nama Tab Web)</Label>
+                    <Input value={businessInfo.name} onChange={(e) => setBusinessInfo({...businessInfo, name: e.target.value})} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-2">
                       <Label>Logo Text (Utama)</Label>
-                      <Input 
-                        value={businessInfo.logoText} 
-                        onChange={(e) => setBusinessInfo({...businessInfo, logoText: e.target.value})}
-                        placeholder="Teks Logo Utama"
-                      />
+                      <Input value={businessInfo.logoText} onChange={(e) => setBusinessInfo({...businessInfo, logoText: e.target.value})} />
                     </div>
                     <div className="grid gap-2">
                       <Label>Logo Text (Aksen)</Label>
-                      <Input 
-                        value={businessInfo.logoAccentText} 
-                        onChange={(e) => setBusinessInfo({...businessInfo, logoAccentText: e.target.value})}
-                        placeholder="Teks Aksen Logo"
-                      />
+                      <Input value={businessInfo.logoAccentText} onChange={(e) => setBusinessInfo({...businessInfo, logoAccentText: e.target.value})} />
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-              {/* Hero Section */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2"><Globe className="text-primary" /> Bagian Utama (Hero)</CardTitle>
-                  <CardDescription>Teks besar yang muncul pertama kali saat pengunjung membuka web.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid gap-2">
-                    <Label>Judul Utama (Hero Title)</Label>
-                    <Input 
-                      value={businessInfo.heroTitle} 
-                      onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})}
-                      placeholder="Judul Besar di Depan"
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>Sub-judul (Hero Subtitle)</Label>
-                    <Textarea 
-                      value={businessInfo.heroSubtitle} 
-                      onChange={(e) => setBusinessInfo({...businessInfo, heroSubtitle: e.target.value})}
-                      rows={3}
-                      placeholder="Deskripsi singkat di bawah judul utama"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
+          {/* Hero Section */}
+          {activeSection === 'hero' && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Bagian Beranda (Hero)</CardTitle>
+                <CardDescription>Teks utama yang dilihat pertama kali oleh pengunjung.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid gap-2">
+                  <Label>Judul Utama (Hero Title)</Label>
+                  <Input value={businessInfo.heroTitle} onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})} />
+                </div>
+                <div className="grid gap-2">
+                  <Label>Sub-judul (Hero Subtitle)</Label>
+                  <Textarea value={businessInfo.heroSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, heroSubtitle: e.target.value})} rows={4} />
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-              {/* Contact Information */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Kontak & Alamat</CardTitle>
-                  <CardDescription>Informasi yang muncul di bagian kontak dan footer.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="grid gap-2">
-                      <Label>Nomor WhatsApp (Contoh: 628123456789)</Label>
-                      <Input 
-                        placeholder="Wajib gunakan kode negara, contoh: 62812..."
-                        value={businessInfo.whatsapp} 
-                        onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})}
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label>Email Kontak</Label>
-                      <Input 
-                        value={businessInfo.email} 
-                        onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})}
-                        placeholder="email@bisnis.com"
-                      />
-                    </div>
+          {/* About Us Section */}
+          {activeSection === 'about' && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Konten Tentang Kami</CardTitle>
+                <CardDescription>Ceritakan sejarah dan visi misi bisnis Anda.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid gap-2">
+                  <Label>Judul Bagian Tentang</Label>
+                  <Input value={businessInfo.aboutTitle} onChange={(e) => setBusinessInfo({...businessInfo, aboutTitle: e.target.value})} placeholder="Contoh: Partner Teknologi Terpercaya Anda" />
+                </div>
+                <div className="grid gap-2">
+                  <Label>Isi Cerita / Deskripsi Tentang</Label>
+                  <Textarea value={businessInfo.aboutContent} onChange={(e) => setBusinessInfo({...businessInfo, aboutContent: e.target.value})} rows={10} placeholder="Tuliskan detail tentang bisnis Anda di sini..." />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Contact Section */}
+          {activeSection === 'contact' && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Informasi Kontak & Sosial Media</CardTitle>
+                <CardDescription>Data ini akan muncul di bagian kontak dan footer.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="grid gap-2">
+                    <Label>WhatsApp (Kode Negara, misal: 628123456789)</Label>
+                    <Input value={businessInfo.whatsapp} onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})} />
                   </div>
                   <div className="grid gap-2">
-                    <Label>Alamat Bisnis</Label>
-                    <Textarea 
-                      value={businessInfo.address} 
-                      onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})}
-                      rows={2}
-                      placeholder="Alamat lengkap lokasi bisnis"
-                    />
+                    <Label>Email</Label>
+                    <Input value={businessInfo.email} onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})} />
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="grid gap-2">
+                    <Label>Instagram (Link/Username)</Label>
+                    <Input value={businessInfo.socialInstagram} onChange={(e) => setBusinessInfo({...businessInfo, socialInstagram: e.target.value})} />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Facebook (Link)</Label>
+                    <Input value={businessInfo.socialFacebook} onChange={(e) => setBusinessInfo({...businessInfo, socialFacebook: e.target.value})} />
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <Label>Alamat Lengkap</Label>
+                  <Textarea value={businessInfo.address} onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})} rows={3} />
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-              <Button onClick={handleSaveBusinessInfo} className="w-full h-14 text-lg font-bold shadow-xl shadow-primary/20">
-                <Save className="mr-2" size={24} /> Simpan Perubahan Website
-              </Button>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
+          {/* Privacy Policy Section */}
+          {activeSection === 'privacy' && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Kebijakan Privasi</CardTitle>
+                <CardDescription>Teks kebijakan yang akan muncul di halaman khusus atau tautan footer.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid gap-2">
+                  <Label>Teks Kebijakan Privasi</Label>
+                  <Textarea value={businessInfo.privacyPolicy} onChange={(e) => setBusinessInfo({...businessInfo, privacyPolicy: e.target.value})} rows={20} placeholder="Tuliskan kebijakan privasi bisnis Anda di sini..." />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </main>
     </div>
   );
 }
