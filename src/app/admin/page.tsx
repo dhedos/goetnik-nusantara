@@ -10,20 +10,28 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc } from 'firebase/firestore';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
-import { Loader2, Plus, Trash2, Save, LogOut, CheckCircle2, Clock, Globe } from 'lucide-react';
+import { Loader2, Plus, Trash2, Save, LogOut, CheckCircle2, Clock, Globe, Monitor, HardDrive, Palette, ShieldCheck } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { BUSINESS_NAME_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT } from '@/lib/constants';
+import { BUSINESS_NAME_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT, ICON_MAP } from '@/lib/constants';
 
 export default function AdminDashboard() {
   const { user, loading: authLoading } = useUser();
   const auth = useAuth();
   const firestore = useFirestore();
   const router = useRouter();
-  const { data: services, loading: servicesLoading } = useCollection(firestore ? collection(firestore, 'services') : null);
-  const { data: bookings, loading: bookingsLoading } = useCollection(firestore ? collection(firestore, 'bookings') : null);
-  const { data: settings } = useDoc(firestore ? doc(firestore, 'settings', 'business') : null);
+  
+  const { data: services, loading: servicesLoading } = useCollection(
+    firestore ? collection(firestore, 'services') : null
+  );
+  const { data: bookings, loading: bookingsLoading } = useCollection(
+    firestore ? collection(firestore, 'bookings') : null
+  );
+  const { data: settings } = useDoc(
+    firestore ? doc(firestore, 'settings', 'business') : null
+  );
 
   const [businessInfo, setBusinessInfo] = useState({
     name: '',
@@ -63,7 +71,10 @@ export default function AdminDashboard() {
   const handleSaveBusinessInfo = async () => {
     if (!firestore) return;
     try {
-      await setDoc(doc(firestore, 'settings', 'business'), businessInfo);
+      await setDoc(doc(firestore, 'settings', 'business'), {
+        ...businessInfo,
+        updatedAt: serverTimestamp()
+      });
       toast({ title: "Berhasil", description: "Informasi bisnis telah diperbarui." });
     } catch (e) {
       toast({ variant: "destructive", title: "Gagal", description: "Tidak dapat menyimpan perubahan." });
@@ -78,8 +89,8 @@ export default function AdminDashboard() {
         price: 'Rp 0',
         description: 'Deskripsi layanan baru',
         iconName: 'Monitor',
-        features: [],
-        createdAt: new Date().toISOString()
+        features: ['Fitur 1'],
+        createdAt: serverTimestamp()
       });
       toast({ title: "Berhasil", description: "Layanan baru ditambahkan." });
     } catch (e) {
@@ -94,6 +105,16 @@ export default function AdminDashboard() {
       toast({ title: "Berhasil", description: "Layanan telah dihapus." });
     } catch (e) {
       toast({ variant: "destructive", title: "Gagal", description: "Gagal menghapus layanan." });
+    }
+  };
+
+  const handleUpdateService = async (id: string, data: any) => {
+    if (!firestore) return;
+    try {
+      await updateDoc(doc(firestore, 'services', id), data);
+      toast({ title: "Terupdate", description: "Perubahan layanan disimpan." });
+    } catch (e) {
+      toast({ variant: "destructive", title: "Gagal", description: "Gagal update layanan." });
     }
   };
 
@@ -121,7 +142,7 @@ export default function AdminDashboard() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-            <p className="text-muted-foreground">Kelola konten dan pesanan {businessInfo.name || 'TechFlow Mandiri'}</p>
+            <p className="text-muted-foreground">Kelola konten {businessInfo.name}</p>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={() => router.push('/')} className="flex items-center gap-2">
@@ -150,25 +171,46 @@ export default function AdminDashboard() {
                 <div className="space-y-4">
                   {bookingsLoading ? (
                     <div className="py-8 flex justify-center"><Loader2 className="animate-spin" /></div>
-                  ) : bookings?.length === 0 ? (
+                  ) : !bookings || bookings.length === 0 ? (
                     <p className="text-center py-8 text-muted-foreground">Belum ada pesanan.</p>
                   ) : (
-                    bookings?.map((booking: any) => (
+                    bookings.map((booking: any) => (
                       <div key={booking.id} className="flex flex-col md:flex-row md:items-center justify-between p-4 border rounded-lg gap-4">
-                        <div>
-                          <p className="font-bold">{booking.fullName} - {booking.service}</p>
-                          <p className="text-sm text-muted-foreground">{booking.whatsapp} | {booking.address}</p>
-                          <p className="text-xs italic mt-1">{booking.notes || 'Tanpa catatan'}</p>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="font-bold">{booking.fullName}</p>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase font-bold ${booking.status === 'Selesai' ? 'bg-green-500/10 text-green-500 border border-green-500/20' : 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20'}`}>
+                              {booking.status || 'Pending'}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground">Layanan: <span className="text-foreground font-medium">{booking.service}</span></p>
+                          <p className="text-sm text-muted-foreground">Kontak: {booking.whatsapp} | {booking.address}</p>
+                          {booking.notes && <p className="text-xs italic mt-2 p-2 bg-secondary/30 rounded border border-border/50">"{booking.notes}"</p>}
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className={`text-xs px-2 py-1 rounded-full ${booking.status === 'Selesai' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'}`}>
-                            {booking.status || 'Pending'}
-                          </span>
-                          <Button size="sm" variant="ghost" onClick={() => handleUpdateBookingStatus(booking.id, 'Selesai')} title="Tandai Selesai">
-                            <CheckCircle2 size={16} className="text-green-500" />
+                        <div className="flex items-center gap-2 shrink-0">
+                          <Button 
+                            size="sm" 
+                            variant={booking.status === 'Selesai' ? 'secondary' : 'outline'} 
+                            onClick={() => handleUpdateBookingStatus(booking.id, 'Selesai')}
+                            className="flex items-center gap-2"
+                          >
+                            <CheckCircle2 size={16} className={booking.status === 'Selesai' ? 'text-green-500' : ''} /> 
+                            {booking.status === 'Selesai' ? 'Selesai' : 'Tandai Selesai'}
                           </Button>
-                          <Button size="sm" variant="ghost" onClick={() => handleUpdateBookingStatus(booking.id, 'Pending')} title="Tandai Pending">
-                            <Clock size={16} className="text-yellow-500" />
+                          <Button 
+                            size="sm" 
+                            variant={booking.status === 'Pending' ? 'secondary' : 'outline'}
+                            onClick={() => handleUpdateBookingStatus(booking.id, 'Pending')}
+                          >
+                            <Clock size={16} />
+                          </Button>
+                          <Button size="sm" variant="destructive" onClick={async () => {
+                            if(confirm('Hapus pesanan ini?')) {
+                              await deleteDoc(doc(firestore!, 'bookings', booking.id));
+                              toast({ title: "Dihapus", description: "Pesanan telah dihapus." });
+                            }
+                          }}>
+                            <Trash2 size={16} />
                           </Button>
                         </div>
                       </div>
@@ -188,32 +230,56 @@ export default function AdminDashboard() {
               {servicesLoading ? (
                 <div className="col-span-full py-8 flex justify-center"><Loader2 className="animate-spin" /></div>
               ) : services?.map((service: any) => (
-                <Card key={service.id}>
+                <Card key={service.id} className="relative group">
                   <CardContent className="p-6 space-y-4">
                     <div className="grid gap-2">
                       <Label>Nama Layanan</Label>
                       <Input 
                         defaultValue={service.name} 
-                        onBlur={(e) => updateDoc(doc(firestore!, 'services', service.id), { name: e.target.value })}
+                        onBlur={(e) => handleUpdateService(service.id, { name: e.target.value })}
+                        placeholder="Contoh: Instal Ulang OS"
                       />
                     </div>
-                    <div className="grid gap-2">
-                      <Label>Harga</Label>
-                      <Input 
-                        defaultValue={service.price} 
-                        onBlur={(e) => updateDoc(doc(firestore!, 'services', service.id), { price: e.target.value })}
-                      />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="grid gap-2">
+                        <Label>Harga (Teks)</Label>
+                        <Input 
+                          defaultValue={service.price} 
+                          onBlur={(e) => handleUpdateService(service.id, { price: e.target.value })}
+                          placeholder="Rp 100.000"
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label>Ikon</Label>
+                        <Select 
+                          defaultValue={service.iconName || 'Monitor'} 
+                          onValueChange={(val) => handleUpdateService(service.id, { iconName: val })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Object.keys(ICON_MAP).map(icon => (
+                              <SelectItem key={icon} value={icon}>{icon}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                     <div className="grid gap-2">
                       <Label>Deskripsi</Label>
                       <Textarea 
                         defaultValue={service.description} 
-                        onBlur={(e) => updateDoc(doc(firestore!, 'services', service.id), { description: e.target.value })}
+                        onBlur={(e) => handleUpdateService(service.id, { description: e.target.value })}
+                        rows={3}
                       />
                     </div>
-                    <Button variant="destructive" size="sm" onClick={() => handleDeleteService(service.id)} className="w-full md:w-auto">
-                      <Trash2 size={16} className="mr-2" /> Hapus Layanan
-                    </Button>
+                    <div className="flex justify-between items-center pt-2">
+                      <p className="text-[10px] text-muted-foreground">ID: {service.id}</p>
+                      <Button variant="destructive" size="sm" onClick={() => handleDeleteService(service.id)}>
+                        <Trash2 size={16} className="mr-2" /> Hapus
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
@@ -224,7 +290,7 @@ export default function AdminDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle>Informasi Bisnis</CardTitle>
-                <CardDescription>Update nama bisnis, alamat, dan kontak WhatsApp.</CardDescription>
+                <CardDescription>Update profil bisnis yang muncul di website dan link WhatsApp.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid gap-2">
@@ -235,30 +301,30 @@ export default function AdminDashboard() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label>Nomor WhatsApp (Format: 628123456789 - Gunakan kode negara 62 di depan)</Label>
+                  <Label>Nomor WhatsApp (Contoh: 628123456789)</Label>
                   <Input 
-                    placeholder="Contoh: 628123456789"
+                    placeholder="Wajib gunakan kode negara, contoh: 62812..."
                     value={businessInfo.whatsapp} 
                     onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})}
                   />
-                  <p className="text-xs text-muted-foreground italic">Nomor ini akan digunakan untuk tombol WhatsApp melayang dan form pemesanan.</p>
                 </div>
                 <div className="grid gap-2">
-                  <Label>Email</Label>
+                  <Label>Email Kontak</Label>
                   <Input 
                     value={businessInfo.email} 
                     onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})}
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label>Alamat</Label>
+                  <Label>Alamat Bisnis</Label>
                   <Textarea 
                     value={businessInfo.address} 
                     onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})}
+                    rows={2}
                   />
                 </div>
-                <Button onClick={handleSaveBusinessInfo} className="w-full">
-                  <Save className="mr-2" size={16} /> Simpan Perubahan
+                <Button onClick={handleSaveBusinessInfo} className="w-full h-12 text-lg font-bold">
+                  <Save className="mr-2" size={20} /> Simpan Semua Pengaturan
                 </Button>
               </CardContent>
             </Card>
