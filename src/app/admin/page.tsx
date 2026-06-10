@@ -70,6 +70,9 @@ export default function AdminDashboard() {
     heroImageUrl: '',
     aboutTitle: '',
     aboutContent: '',
+    servicesSectionBadge: '',
+    servicesSectionTitle: '',
+    servicesSectionSubtitle: '',
     privacyPolicy: '',
     socialInstagram: '',
     socialFacebook: '',
@@ -98,6 +101,9 @@ export default function AdminDashboard() {
         heroImageUrl: settings.heroImageUrl || '',
         aboutTitle: settings.aboutTitle || '',
         aboutContent: settings.aboutContent || '',
+        servicesSectionBadge: settings.servicesSectionBadge || '',
+        servicesSectionTitle: settings.servicesSectionTitle || '',
+        servicesSectionSubtitle: settings.servicesSectionSubtitle || '',
         privacyPolicy: settings.privacyPolicy || '',
         socialInstagram: settings.socialInstagram || '',
         socialFacebook: settings.socialFacebook || '',
@@ -292,11 +298,9 @@ export default function AdminDashboard() {
         <div className="max-w-5xl mx-auto space-y-6">
           <div className="flex items-center justify-between">
             <h1 className="text-3xl font-bold capitalize">Kelola {activeSection.replace('-', ' ')}</h1>
-            {(activeSection !== 'bookings' && activeSection !== 'services') && (
-              <Button onClick={handleSaveBusinessInfo} className="shadow-lg">
-                <Save className="mr-2" size={18} /> Simpan Perubahan
-              </Button>
-            )}
+            <Button onClick={handleSaveBusinessInfo} className="shadow-lg">
+              <Save className="mr-2" size={18} /> Simpan Perubahan
+            </Button>
           </div>
 
           {activeSection === 'branding' && (
@@ -404,7 +408,43 @@ export default function AdminDashboard() {
 
           {activeSection === 'services' && (
             <div className="space-y-6">
-              <div className="flex justify-end"><Button onClick={handleAddService}><Plus className="mr-2" size={16} /> Tambah Layanan</Button></div>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Pengaturan Judul Bagian Layanan</CardTitle>
+                  <CardDescription>Edit teks yang muncul di atas daftar layanan.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-2">
+                    <Label>Badge Bagian Layanan (Teks Kecil Biru)</Label>
+                    <Input 
+                      value={businessInfo.servicesSectionBadge} 
+                      onChange={(e) => setBusinessInfo({...businessInfo, servicesSectionBadge: e.target.value})} 
+                      placeholder="Contoh: APA YANG KAMI LAKUKAN"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Judul Bagian Layanan</Label>
+                    <Input 
+                      value={businessInfo.servicesSectionTitle} 
+                      onChange={(e) => setBusinessInfo({...businessInfo, servicesSectionTitle: e.target.value})} 
+                      placeholder="Contoh: Layanan Unggulan"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Sub-judul Bagian Layanan</Label>
+                    <Textarea 
+                      value={businessInfo.servicesSectionSubtitle} 
+                      onChange={(e) => setBusinessInfo({...businessInfo, servicesSectionSubtitle: e.target.value})} 
+                      placeholder="Contoh: Pilih layanan yang Anda butuhkan..."
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-bold">Daftar Paket Layanan</h2>
+                <Button onClick={handleAddService}><Plus className="mr-2" size={16} /> Tambah Layanan</Button>
+              </div>
               <div className="grid md:grid-cols-2 gap-6">
                 {services?.map((service: any) => (
                   <Card key={service.id}>

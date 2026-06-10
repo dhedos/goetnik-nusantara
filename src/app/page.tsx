@@ -40,6 +40,10 @@ export default function Home() {
   const heroTitle = settings?.heroTitle || 'Selamat Datang di Portal Kami';
   const heroSubtitle = settings?.heroSubtitle || 'Kami siap melayani berbagai kebutuhan teknis dan digital Anda dengan profesional.';
 
+  const servicesBadge = settings?.servicesSectionBadge || 'APA YANG KAMI LAKUKAN';
+  const servicesTitle = settings?.servicesSectionTitle || 'Layanan Unggulan';
+  const servicesSubtitle = settings?.servicesSectionSubtitle || 'Pilih layanan yang Anda butuhkan. Kami menjamin kualitas terbaik untuk setiap pengerjaan.';
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -120,10 +124,16 @@ export default function Home() {
         <section id="layanan" className="py-24 px-4 bg-background">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16 space-y-4">
-              <h4 className="text-primary font-bold uppercase tracking-widest text-sm">Apa yang Kami Lakukan</h4>
-              <h2 className="text-4xl md:text-5xl font-bold font-headline">Layanan <span className="text-gradient">Unggulan</span></h2>
+              <h4 className="text-primary font-bold uppercase tracking-widest text-sm">{servicesBadge}</h4>
+              <h2 className="text-4xl md:text-5xl font-bold font-headline">
+                {servicesTitle.includes(' ') ? (
+                  <>
+                    {servicesTitle.split(' ').slice(0, -1).join(' ')} <span className="text-gradient">{servicesTitle.split(' ').slice(-1)}</span>
+                  </>
+                ) : servicesTitle}
+              </h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Pilih layanan yang Anda butuhkan. Kami menjamin kualitas terbaik untuk setiap pengerjaan.
+                {servicesSubtitle}
               </p>
             </div>
 
