@@ -42,7 +42,7 @@ export default function Home() {
             <div className="absolute inset-0 w-12 h-12 rounded-full border border-primary/10 animate-ping opacity-20" />
           </div>
           <div className="space-y-2 text-center">
-            <p className="text-xs font-bold text-primary tracking-[0.3em] uppercase opacity-80">Menyiapkan Pengalaman</p>
+            <p className="text-xs font-bold text-primary tracking-[0.3em] uppercase opacity-80">Menyiapkan Halaman</p>
             <div className="h-0.5 w-12 bg-primary/20 mx-auto rounded-full overflow-hidden">
               <div className="h-full bg-primary w-full -translate-x-full animate-[progress_1.5s_infinite_linear]" />
             </div>
