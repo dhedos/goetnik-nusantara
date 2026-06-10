@@ -7,6 +7,14 @@ import Image from 'next/image';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const TikTokIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className} xmlns="http://www.w3.org/2000/svg">
@@ -29,6 +37,7 @@ export function Footer() {
   const logoUrl = settings?.logoUrl || '';
   const businessName = settings?.name || 'Go Etnik NUSANTARA';
   const aboutSubtitle = settings?.heroSubtitle || 'Kami menyediakan layanan service laptop profesional, desain grafis estetik, dan pembuatan aplikasi modern.';
+  const privacyPolicyContent = settings?.privacyPolicy || 'Kebijakan privasi belum diatur oleh admin.';
 
   const socialLinks = {
     instagram: settings?.socialInstagram || '',
@@ -127,7 +136,23 @@ export function Footer() {
           <h4 className="font-bold text-lg mb-6">Informasi</h4>
           <ul className="space-y-4 text-muted-foreground">
              <li><Link href="#pesan" className="hover:text-primary transition-colors">Pesan Sekarang</Link></li>
-             <li><Link href="#" className="hover:text-primary transition-colors">Kebijakan Privasi</Link></li>
+             <li>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <button className="hover:text-primary transition-colors text-left">Kebijakan Privasi</button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl max-h-[80vh]">
+                    <DialogHeader>
+                      <DialogTitle className="text-2xl font-bold">Kebijakan Privasi</DialogTitle>
+                    </DialogHeader>
+                    <ScrollArea className="h-full max-h-[60vh] mt-4 pr-4">
+                      <div className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                        {privacyPolicyContent}
+                      </div>
+                    </ScrollArea>
+                  </DialogContent>
+                </Dialog>
+             </li>
           </ul>
         </div>
       </div>
@@ -136,7 +161,7 @@ export function Footer() {
         <div className="flex items-center gap-4">
           <p>© {currentYear} {businessName}. All Rights Reserved.</p>
           <Link href="/login" className="opacity-20 hover:opacity-100 transition-opacity p-2" title="Admin Access">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-20 hover:opacity-100 transition-opacity"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 .6-.92l7-3a1 1 0 0 1 .8 0l7 3a1 1 0 0 1 .6.92v7Z"/><path d="M12 8a2 2 0 0 0-2 2"/><path d="M12 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><path d="M8 18a4 4 0 0 1 8 0"/></svg>
           </Link>
         </div>
       </div>
