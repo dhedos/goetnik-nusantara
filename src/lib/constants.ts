@@ -1,6 +1,7 @@
 
 import { Monitor, HardDrive, Palette, Globe, CheckCircle, Clock, ShieldCheck, Laptop, Phone, Wrench } from 'lucide-react';
 
+export const MAIN_BUSINESS_ID = "main";
 export const BUSINESS_NAME_DEFAULT = "Go Etnik NUSANTARA";
 export const OWNER_WHATSAPP_DEFAULT = "628123456789";
 export const BUSINESS_ADDRESS_DEFAULT = "Jl. Raya Teknologi No. 42, Kota Digital, Indonesia";

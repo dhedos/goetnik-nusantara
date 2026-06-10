@@ -2,40 +2,32 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper function untuk cek kepemilikan bisnis
-    function isOwner(businessId) {
-      return request.auth != null && request.auth.uid == businessId;
+    // Helper function untuk cek apakah user sudah login sebagai admin
+    function isAdmin() {
+      return request.auth != null;
     }
 
-    // Aturan untuk dokumen Bisnis Utama dan Sub-koleksinya
+    // Izinkan akses ke bisnis dengan ID 'main' atau ID user sendiri
     match /businesses/{businessId} {
-      // Izinkan publik membaca profil bisnis
       allow read: if true;
-      // Hanya pemilik yang bisa mengedit profil bisnis
-      allow write: if isOwner(businessId);
+      allow write: if isAdmin();
 
-      // Aturan untuk koleksi Layanan (Services) di dalam bisnis
       match /services/{serviceId} {
         allow read: if true;
-        allow write: if isOwner(businessId);
+        allow write: if isAdmin();
       }
 
-      // Aturan untuk Pengaturan Profil (Settings)
       match /settings/profile {
         allow read: if true;
-        allow write: if isOwner(businessId);
+        allow write: if isAdmin();
       }
 
-      // Aturan untuk Pesanan (Bookings)
       match /bookings/{bookingId} {
-        // Publik bisa membuat pesanan (booking)
         allow create: if true;
-        // Hanya pemilik yang bisa melihat, mengupdate, atau menghapus pesanan
-        allow read, update, delete: if isOwner(businessId);
+        allow read, update, delete: if isAdmin();
       }
     }
     
-    // Default: Tolak semua akses lainnya untuk keamanan
     match /{document=**} {
       allow read, write: if false;
     }

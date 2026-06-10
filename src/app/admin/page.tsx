@@ -21,7 +21,7 @@ import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import { PRIVACY_POLICY_DEFAULT, BUSINESS_NAME_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT } from '@/lib/constants';
+import { PRIVACY_POLICY_DEFAULT, BUSINESS_NAME_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT, MAIN_BUSINESS_ID } from '@/lib/constants';
 
 type AdminSection = 'bookings' | 'services' | 'branding' | 'hero' | 'about' | 'contact' | 'social' | 'privacy';
 
@@ -34,23 +34,23 @@ export default function AdminDashboard() {
   const [isUploading, setIsUploading] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   
-  const canFetchData = !!(user?.uid && firestore);
+  const canFetchData = !!(firestore);
 
   const servicesQuery = useMemoFirebase(() => 
-    canFetchData ? collection(firestore!, 'businesses', user!.uid, 'services') : null, 
-    [canFetchData, firestore, user?.uid]
+    canFetchData ? collection(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services') : null, 
+    [canFetchData, firestore]
   );
   const { data: services } = useCollection(servicesQuery);
 
   const bookingsQuery = useMemoFirebase(() => 
-    canFetchData ? collection(firestore!, 'businesses', user!.uid, 'bookings') : null, 
-    [canFetchData, firestore, user?.uid]
+    canFetchData ? collection(firestore!, 'businesses', MAIN_BUSINESS_ID, 'bookings') : null, 
+    [canFetchData, firestore]
   );
   const { data: bookings } = useCollection(bookingsQuery);
 
   const settingsRef = useMemoFirebase(() => 
-    canFetchData ? doc(firestore!, 'businesses', user!.uid, 'settings', 'profile') : null, 
-    [canFetchData, firestore, user?.uid]
+    canFetchData ? doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'settings', 'profile') : null, 
+    [canFetchData, firestore]
   );
   const { data: settings } = useDoc(settingsRef);
 
@@ -130,7 +130,7 @@ export default function AdminDashboard() {
   const handleSaveBusinessInfo = () => {
     if (!firestore || !user) return;
     setIsSaving(true);
-    const docRef = doc(firestore, 'businesses', user.uid, 'settings', 'profile');
+    const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'settings', 'profile');
     const data = {
       ...businessInfo,
       ownerId: user.uid,
@@ -139,7 +139,7 @@ export default function AdminDashboard() {
     
     setDoc(docRef, data, { merge: true })
       .then(() => {
-        toast({ title: "Berhasil Disimpan", description: "Semua perubahan telah diterapkan ke website." });
+        toast({ title: "Berhasil Disimpan", description: "Semua perubahan telah diterapkan ke website secara otomatis." });
         setIsSaving(false);
       })
       .catch((e) => {
@@ -170,7 +170,7 @@ export default function AdminDashboard() {
       } else if (target === 'hero') {
         setBusinessInfo(prev => ({ ...prev, heroImageUrl: base64String }));
       } else {
-        const docRef = doc(firestore, 'businesses', user.uid, 'services', target);
+        const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'services', target);
         updateDoc(docRef, { imageUrl: base64String });
       }
       setIsUploading(null);
@@ -181,7 +181,7 @@ export default function AdminDashboard() {
 
   const handleAddService = () => {
     if (!firestore || !user) return;
-    const colRef = collection(firestore, 'businesses', user.uid, 'services');
+    const colRef = collection(firestore, 'businesses', MAIN_BUSINESS_ID, 'services');
     const newService = {
       name: 'Layanan Baru',
       price: 'Rp 0',
@@ -197,10 +197,9 @@ export default function AdminDashboard() {
   };
 
   const copyPublicLink = () => {
-    if (!user) return;
-    const url = `${window.location.origin}?id=${user.uid}`;
+    const url = `${window.location.origin}`;
     navigator.clipboard.writeText(url);
-    toast({ title: "Link Disalin", description: "Tautan ini adalah alamat website publik Anda." });
+    toast({ title: "Link Disalin", description: "Ini adalah alamat website utama Anda." });
   };
 
   if (authLoading) return <div className="flex h-screen items-center justify-center bg-[#0B1120]"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -262,9 +261,9 @@ export default function AdminDashboard() {
                     <div>
                       <p className="font-bold text-white">{b.fullName}</p>
                       <p className="text-sm text-muted-foreground">{b.service} - {b.whatsapp}</p>
-                      <p className="text-xs text-muted-foreground/50">{new Date(b.createdAt?.seconds * 1000).toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground/50">{b.createdAt?.seconds ? new Date(b.createdAt.seconds * 1000).toLocaleString() : 'Baru Saja'}</p>
                     </div>
-                    <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteDoc(doc(firestore!, 'businesses', user.uid, 'bookings', b.id))}><Trash2 size={18} /></Button>
+                    <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'bookings', b.id))}><Trash2 size={18} /></Button>
                   </div>
                 ))}
                 {bookings?.length === 0 && <p className="text-center text-muted-foreground py-10">Belum ada pesanan.</p>}
@@ -377,21 +376,21 @@ export default function AdminDashboard() {
                         <div className="absolute top-4 right-4 flex gap-2">
                           <input type="file" className="hidden" id={`s-${s.id}`} onChange={(e) => handleImageUpload(e, s.id)} />
                           <Button variant="secondary" size="sm" asChild className="rounded-full h-8"><label htmlFor={`s-${s.id}`} className="cursor-pointer">{isUploading === s.id ? '...' : 'Ganti Gambar'}</label></Button>
-                          <Button variant="destructive" size="icon" className="rounded-full h-8 w-8" onClick={() => deleteDoc(doc(firestore!, 'businesses', user.uid, 'services', s.id))}><Trash2 size={14} /></Button>
+                          <Button variant="destructive" size="icon" className="rounded-full h-8 w-8" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id))}><Trash2 size={14} /></Button>
                         </div>
                       </div>
                       <CardContent className="p-6 space-y-4">
                         <div className="space-y-2">
                           <Label className="text-[10px] uppercase font-bold opacity-50">Nama Layanan</Label>
-                          <Input defaultValue={s.name} className="rounded-lg h-10 bg-background/50 font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', user.uid, 'services', s.id), { name: e.target.value })} />
+                          <Input defaultValue={s.name} className="rounded-lg h-10 bg-background/50 font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { name: e.target.value })} />
                         </div>
                         <div className="space-y-2">
                           <Label className="text-[10px] uppercase font-bold opacity-50">Harga Mulai</Label>
-                          <Input defaultValue={s.price} className="rounded-lg h-10 bg-background/50 text-primary font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', user.uid, 'services', s.id), { price: e.target.value })} />
+                          <Input defaultValue={s.price} className="rounded-lg h-10 bg-background/50 text-primary font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { price: e.target.value })} />
                         </div>
                         <div className="space-y-2">
                           <Label className="text-[10px] uppercase font-bold opacity-50">Deskripsi Singkat</Label>
-                          <Textarea defaultValue={s.description} className="rounded-lg min-h-[80px] bg-background/50 text-xs" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', user.uid, 'services', s.id), { description: e.target.value })} />
+                          <Textarea defaultValue={s.description} className="rounded-lg min-h-[80px] bg-background/50 text-xs" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { description: e.target.value })} />
                         </div>
                       </CardContent>
                     </Card>

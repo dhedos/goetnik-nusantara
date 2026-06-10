@@ -21,7 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { ICON_MAP, BUSINESS_NAME_DEFAULT } from '@/lib/constants';
+import { ICON_MAP, BUSINESS_NAME_DEFAULT, MAIN_BUSINESS_ID } from '@/lib/constants';
 
 function LoadingScreen({ text }: { text: string }) {
   return (
@@ -46,7 +46,8 @@ function LoadingScreen({ text }: { text: string }) {
 
 function HomeContent() {
   const searchParams = useSearchParams();
-  const businessId = searchParams.get('id') || "goetnik-default";
+  // Gunakan MAIN_BUSINESS_ID sebagai default otomatis
+  const businessId = searchParams.get('id') || MAIN_BUSINESS_ID;
   const firestore = useFirestore();
   const [isTimeout, setIsTimeout] = useState(false);
 
