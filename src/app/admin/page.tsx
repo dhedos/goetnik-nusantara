@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
-import { useUser, useFirestore, useCollection, useDoc, useAuth, useMemoFirebase, useStorage } from '@/firebase';
+import { useUser, useFirestore, useCollection, useDoc, useAuth, useMemoFirebase } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,12 +10,11 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, CheckCircle2, 
   Globe, Layout, Info, Phone, Shield, Image as ImageIcon,
-  Settings, ShoppingBag, Menu, X, Upload, AlertTriangle, Link as LinkIcon
+  Settings, ShoppingBag, Menu, X, Upload, Check, Link as LinkIcon
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { ICON_MAP } from '@/lib/constants';
@@ -23,7 +22,6 @@ import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 
 type AdminSection = 'bookings' | 'services' | 'branding' | 'hero' | 'about' | 'contact' | 'privacy';
@@ -32,7 +30,6 @@ export default function AdminDashboard() {
   const { user, loading: authLoading } = useUser();
   const auth = useAuth();
   const firestore = useFirestore();
-  const storage = useStorage();
   const router = useRouter();
   const [activeSection, setActiveSection] = useState<AdminSection>('branding');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -125,6 +122,9 @@ export default function AdminDashboard() {
     };
     
     setDoc(docRef, data, { merge: true })
+      .then(() => {
+        toast({ title: "Berhasil", description: "Pengaturan telah disimpan." });
+      })
       .catch(async (e) => {
         const permissionError = new FirestorePermissionError({
           path: docRef.path,
@@ -133,55 +133,57 @@ export default function AdminDashboard() {
         });
         errorEmitter.emit('permission-error', permissionError);
       });
-    
-    toast({ title: "Berhasil", description: "Pengaturan telah diperbarui." });
   };
 
+  // Fungsi Unggah Logo menggunakan metode Base64 (Tanpa Firebase Storage)
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!storage) {
+    // Cek ukuran file (Base64 menambah ukuran ~33%, limit Firestore 1MB)
+    if (file.size > 500000) { // Limit 500KB agar aman di Firestore
       toast({ 
         variant: "destructive", 
-        title: "Storage Tidak Aktif", 
-        description: "Firebase Storage belum diaktifkan di Console Anda. Gunakan opsi URL Manual sebagai alternatif." 
+        title: "File Terlalu Besar", 
+        description: "Gunakan gambar di bawah 500KB untuk logo agar performa tetap cepat." 
       });
       return;
     }
 
     setIsUploading(true);
-    try {
-      const storagePath = `branding/logo-${Date.now()}`;
-      const storageRef = ref(storage, storagePath);
+    
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64String = reader.result as string;
+      setBusinessInfo(prev => ({ ...prev, logoUrl: base64String }));
       
-      const uploadResult = await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(uploadResult.ref);
-      
-      setBusinessInfo(prev => ({ ...prev, logoUrl: downloadURL }));
-      
+      // Simpan langsung ke Firestore
       if (firestore) {
         const docRef = doc(firestore, 'settings', 'business');
-        await setDoc(docRef, { 
-          logoUrl: downloadURL,
-          updatedAt: serverTimestamp() 
-        }, { merge: true });
+        try {
+          await setDoc(docRef, { 
+            logoUrl: base64String,
+            updatedAt: serverTimestamp() 
+          }, { merge: true });
+          toast({ title: "Berhasil", description: "Logo berhasil diperbarui." });
+        } catch (error: any) {
+          toast({ 
+            variant: "destructive", 
+            title: "Gagal Menyimpan", 
+            description: "Pastikan Rules Firestore Anda sudah benar." 
+          });
+        }
       }
-      
-      toast({ title: "Berhasil", description: "Logo berhasil diunggah." });
-    } catch (error: any) {
-      console.error("Upload Error:", error);
-      toast({ 
-        variant: "destructive", 
-        title: "Gagal Mengunggah", 
-        description: error.message?.includes('permission') 
-          ? "Izin ditolak. Silakan cek Storage Rules di Firebase Console Anda."
-          : "Terjadi kesalahan koneksi ke Firebase Storage. Gunakan opsi URL Manual jika ingin tetap gratis." 
-      });
-    } finally {
       setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
+    };
+    
+    reader.onerror = () => {
+      toast({ variant: "destructive", title: "Gagal", description: "Gagal membaca file gambar." });
+      setIsUploading(false);
+    };
+
+    reader.readAsDataURL(file);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleAddService = () => {
@@ -303,18 +305,10 @@ export default function AdminDashboard() {
 
           {activeSection === 'branding' && (
             <div className="space-y-6">
-              <Alert className="bg-primary/5 border-primary/20">
-                <AlertTriangle className="h-4 w-4 text-primary" />
-                <AlertTitle>Info Gratis (Tanpa Kartu Kredit)</AlertTitle>
-                <AlertDescription>
-                  Firebase Storage tetap gratis (5GB). Jika tombol "Unggah" macet, pastikan Anda sudah klik <b>"Get Started"</b> di menu <b>Storage</b> pada Firebase Console. Sebagai alternatif instan, Anda bisa memasukkan <b>URL Gambar</b> secara manual di bawah.
-                </AlertDescription>
-              </Alert>
-
               <Card>
                 <CardHeader>
                   <CardTitle>Logo Identitas</CardTitle>
-                  <CardDescription>Atur logo gambar atau teks untuk identitas bisnis.</CardDescription>
+                  <CardDescription>Ganti logo tanpa perlu Firebase Storage (Metode Instan).</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
@@ -340,31 +334,49 @@ export default function AdminDashboard() {
                     <div className="flex-1 space-y-4 w-full">
                       <div className="grid gap-2">
                         <Label className="flex items-center gap-2">
-                          <LinkIcon size={14} /> Link URL Logo (Opsi Gratis Terjamin)
+                          <Upload size={14} /> Pilih Gambar dari Komputer
                         </Label>
-                        <Input 
-                          placeholder="https://contoh.com/logo-anda.png" 
-                          value={businessInfo.logoUrl}
-                          onChange={(e) => setBusinessInfo({...businessInfo, logoUrl: e.target.value})}
+                        <input 
+                          type="file" 
+                          ref={fileInputRef} 
+                          className="hidden" 
+                          accept="image/*" 
+                          onChange={handleLogoUpload} 
                         />
-                        <p className="text-[10px] text-muted-foreground">Tempel link gambar dari Imgur/PostImages di sini jika tombol unggah bermasalah.</p>
+                        <Button 
+                          variant="outline" 
+                          onClick={() => fileInputRef.current?.click()} 
+                          disabled={isUploading} 
+                          className="w-full h-12"
+                        >
+                          {isUploading ? (
+                            <><Loader2 className="mr-2 animate-spin" /> Sedang Memproses...</>
+                          ) : (
+                            <><Upload className="mr-2" size={16} /> Klik untuk Pilih Logo Baru</>
+                          )}
+                        </Button>
+                        <p className="text-[10px] text-muted-foreground">Saran: Gunakan file PNG/JPG ukuran kecil (maks 500KB) agar website tetap ringan.</p>
                       </div>
                       
                       <div className="relative">
                         <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
-                        <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">Atau</span></div>
+                        <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">Atau Masukkan URL</span></div>
                       </div>
 
-                      <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleLogoUpload} />
-                      <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isUploading} className="w-full">
-                        <Upload className="mr-2" size={16} /> {isUploading ? "Sedang Mengunggah..." : "Unggah File Logo"}
-                      </Button>
+                      <div className="grid gap-2">
+                        <Label>URL Gambar Langsung</Label>
+                        <Input 
+                          placeholder="https://contoh.com/logo.png" 
+                          value={businessInfo.logoUrl}
+                          onChange={(e) => setBusinessInfo({...businessInfo, logoUrl: e.target.value})}
+                        />
+                      </div>
                     </div>
                   </div>
 
                   <div className="grid gap-6 pt-6 border-t">
                     <div className="grid gap-2">
-                      <Label>Nama Bisnis (Title Bar)</Label>
+                      <Label>Nama Bisnis (Muncul di Browser)</Label>
                       <Input value={businessInfo.name} onChange={(e) => setBusinessInfo({...businessInfo, name: e.target.value})} />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
