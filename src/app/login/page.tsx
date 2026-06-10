@@ -29,15 +29,25 @@ export default function LoginPage() {
       toast({ title: "Berhasil", description: "Selamat datang kembali!" });
       router.push('/admin');
     } catch (error: any) {
-      toast({ variant: "destructive", title: "Gagal Login", description: "Cek email dan password Anda." });
+      toast({ 
+        variant: "destructive", 
+        title: "Gagal Login", 
+        description: "Cek kembali email dan password Anda." 
+      });
     } finally {
       setLoading(false);
     }
   };
 
+  const togglePasswordVisibility = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowPassword(!showPassword);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md shadow-2xl">
+      <Card className="w-full max-w-md shadow-2xl border-primary/20">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Admin Login</CardTitle>
           <CardDescription>Masuk untuk mengelola website TechFlow Mandiri</CardDescription>
@@ -68,15 +78,16 @@ export default function LoginPage() {
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground transition-colors"
-                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground transition-colors z-20 h-full"
+                  onClick={togglePasswordVisibility}
+                  aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? <Loader2 className="animate-spin mr-2" /> : 'Login Sekarang'}
+            <Button type="submit" className="w-full h-11" disabled={loading}>
+              {loading ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : 'Login Sekarang'}
             </Button>
           </form>
         </CardContent>
