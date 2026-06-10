@@ -6,7 +6,6 @@ import { doc } from 'firebase/firestore';
 import { MapPin, MessageCircle, Mail, ExternalLink, Map as MapIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT } from '@/lib/constants';
 
 export function Contact() {
@@ -22,7 +21,6 @@ export function Contact() {
   const whatsapp = settings?.whatsapp || OWNER_WHATSAPP_DEFAULT;
   const mapUrl = settings?.mapEmbedUrl;
   
-  // Direct link to Google Maps
   const directMapUrl = settings?.mapDirectUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 
   return (
@@ -101,14 +99,14 @@ export function Contact() {
                   </div>
                 </>
               ) : (
-                <div className="flex flex-col items-center gap-4 p-8 text-center max-w-sm">
+                <div className="flex flex-col items-center gap-4 p-8 text-center max-w-sm animate-in fade-in duration-500">
                   <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
                     <MapIcon size={32} />
                   </div>
                   <div>
-                    <h4 className="font-bold text-lg mb-2">Peta Belum Tersedia</h4>
+                    <h4 className="font-bold text-lg mb-2">Lokasi belum tersedia</h4>
                     <p className="text-muted-foreground text-sm">
-                      Admin belum mengonfigurasi alamat peta di panel pengaturan.
+                      Admin belum mengonfigurasi titik lokasi peta.
                     </p>
                   </div>
                 </div>
