@@ -21,12 +21,8 @@ interface FirebaseServices {
 }
 
 export function initializeFirebase(): FirebaseServices {
-  // Cek apakah API Key tersedia
-  if (!process.env.NEXT_PUBLIC_FIREBASE_API_KEY || process.env.NEXT_PUBLIC_FIREBASE_API_KEY === 'YOUR_API_KEY_HERE') {
-    console.warn(
-      "PERINGATAN: Firebase API Key belum diatur di Environment Variables. " +
-      "Fitur database dan login tidak akan berfungsi sampai Anda mengaturnya di .env.local atau Dashboard Vercel."
-    );
+  // Check if API Key is available
+  if (!process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
     return { firebaseApp: null, firestore: null, auth: null };
   }
 
@@ -44,7 +40,7 @@ export function initializeFirebase(): FirebaseServices {
 
     return { firebaseApp: app, firestore, auth };
   } catch (error) {
-    console.error("Gagal menginisialisasi Firebase:", error);
+    console.error("Firebase initialization failed:", error);
     return { firebaseApp: null, firestore: null, auth: null };
   }
 }
