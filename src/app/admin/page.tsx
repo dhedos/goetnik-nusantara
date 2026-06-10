@@ -14,7 +14,7 @@ import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
-  Settings, ShoppingBag, Copy, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2
+  Settings, ShoppingBag, Copy, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, ExternalLink
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -96,14 +96,6 @@ export default function AdminDashboard() {
       setBusinessInfo(prev => ({
         ...prev,
         ...settings,
-        name: settings.name || prev.name,
-        whatsapp: settings.whatsapp || prev.whatsapp,
-        address: settings.address || prev.address,
-        email: settings.email || prev.email,
-        logoText: settings.logoText || prev.logoText,
-        logoAccentText: settings.logoAccentText || prev.logoAccentText,
-        heroTitle: settings.heroTitle || prev.heroTitle,
-        privacyPolicy: settings.privacyPolicy || prev.privacyPolicy,
       }));
     }
   }, [settings]);
@@ -191,7 +183,7 @@ export default function AdminDashboard() {
   const copyPublicLink = () => {
     const url = `${window.location.origin}`;
     navigator.clipboard.writeText(url);
-    toast({ title: "Link Disalin", description: "Ini adalah alamat website utama Anda." });
+    toast({ title: "Link Disalin", description: "Website Anda kini dapat diakses secara publik." });
   };
 
   if (authLoading || !isMounted) return <div className="flex h-screen items-center justify-center bg-[#0B1120]"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
