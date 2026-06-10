@@ -63,7 +63,7 @@ export function Navbar() {
               <Cpu size={18} />
             </div>
           )}
-          <div className="flex items-center text-xl md:text-2xl font-black font-headline tracking-tight leading-none gap-1.5">
+          <div className="flex items-center text-xl md:text-2xl font-black font-headline tracking-tight leading-none gap-3">
             <span className="text-white">{logoText}</span>
             <span className="text-primary">{logoAccentText}</span>
           </div>

@@ -14,7 +14,7 @@ import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, CheckCircle2, 
   Globe, Layout, Info, Phone, Shield, Image as ImageIcon,
-  Settings, ShoppingBag, Menu, X, Upload, Instagram, Facebook, Twitter, MapPin
+  Settings, ShoppingBag, Menu, X, Upload, Instagram, Facebook, Twitter, MapPin, Search
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -33,6 +33,7 @@ export default function AdminDashboard() {
   const [activeSection, setActiveSection] = useState<AdminSection>('bookings');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isUploading, setIsUploading] = useState<string | null>(null);
+  const [locationQuery, setLocationQuery] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const heroInputRef = useRef<HTMLInputElement>(null);
   
@@ -231,6 +232,17 @@ export default function AdminDashboard() {
     const docRef = doc(firestore, 'bookings', id);
     updateDoc(docRef, { status });
     toast({ title: "Berhasil", description: "Status pesanan diperbarui." });
+  };
+
+  const generateMapFromQuery = () => {
+    if (!locationQuery.trim()) {
+      toast({ variant: "destructive", title: "Input Kosong", description: "Masukkan nama lokasi atau alamat terlebih dahulu." });
+      return;
+    }
+    const encoded = encodeURIComponent(locationQuery);
+    const embedUrl = `https://maps.google.com/maps?q=${encoded}&output=embed`;
+    setBusinessInfo({ ...businessInfo, mapEmbedUrl: embedUrl });
+    toast({ title: "Berhasil", description: "Lokasi berhasil diterapkan ke pratinjau." });
   };
 
   if (authLoading) {
@@ -578,24 +590,40 @@ export default function AdminDashboard() {
               <Card>
                 <CardHeader>
                   <CardTitle>Lokasi Peta (Google Maps)</CardTitle>
-                  <CardDescription>Masukkan URL 'src' dari kode iframe Google Maps Embed.</CardDescription>
+                  <CardDescription>Cari nama lokasi atau masukkan URL &apos;src&apos; secara manual.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid gap-2">
-                    <Label>Google Maps Embed URL</Label>
+                  <div className="grid gap-2 p-4 border rounded-xl bg-accent/5">
+                    <Label className="flex items-center gap-2"><Search size={14} /> Cari Nama Lokasi / Alamat</Label>
+                    <div className="flex gap-2">
+                      <Input 
+                        value={locationQuery} 
+                        onChange={(e) => setLocationQuery(e.target.value)} 
+                        placeholder="Contoh: Monas, Jakarta" 
+                        onKeyDown={(e) => e.key === 'Enter' && generateMapFromQuery()}
+                      />
+                      <Button onClick={generateMapFromQuery}>Cari & Terapkan</Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground italic">
+                      Ketik nama tempat atau alamat lengkap, lalu klik &quot;Cari & Terapkan&quot; untuk mengupdate pratinjau peta di bawah.
+                    </p>
+                  </div>
+
+                  <div className="grid gap-2 mt-4">
+                    <Label>Google Maps Embed URL (Manual)</Label>
                     <Input 
                       value={businessInfo.mapEmbedUrl} 
                       onChange={(e) => setBusinessInfo({...businessInfo, mapEmbedUrl: e.target.value})} 
                       placeholder="https://www.google.com/maps/embed?pb=..."
                     />
-                    <p className="text-xs text-muted-foreground italic">
-                      Cara mendapatkan: Buka Google Maps &gt; Share &gt; Embed a map &gt; Salin bagian URL di dalam tanda kutip src="..."
+                    <p className="text-xs text-muted-foreground">
+                      Pilihan manual: Masukkan URL di dalam tanda kutip src=&quot;...&quot; dari kode iframe Google Maps.
                     </p>
                   </div>
 
                   {businessInfo.mapEmbedUrl && (
                     <div className="mt-4">
-                      <Label className="mb-2 block">Pratinjau Lokasi:</Label>
+                      <Label className="mb-2 block">Pratinjau Lokasi Aktif:</Label>
                       <div className="rounded-xl overflow-hidden border border-border h-[300px] w-full bg-accent/5">
                         <iframe 
                           src={businessInfo.mapEmbedUrl}
