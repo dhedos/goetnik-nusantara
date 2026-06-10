@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from 'next/image';
@@ -32,7 +31,6 @@ export default function Home() {
   );
   const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
 
-  // Mencegah flash konten default saat loading
   if (settingsLoading || (servicesLoading && !services)) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
@@ -75,7 +73,6 @@ export default function Home() {
       <Navbar />
       
       <main>
-        {/* Hero Section */}
         <section className="relative min-h-screen flex items-center pt-20 px-4 overflow-hidden">
           <div className="absolute inset-0 -z-20">
             {heroDisplayImage && (
@@ -144,10 +141,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* AI Assistant Section */}
         <AIAssistant />
 
-        {/* Services Section */}
         <section id="layanan" className="py-24 px-4 bg-background">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16 space-y-4">
@@ -182,13 +177,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* About Section */}
         <AboutUs />
-
-        {/* Booking Form Section */}
         <BookingForm />
-
-        {/* Contact Section */}
         <Contact />
       </main>
 

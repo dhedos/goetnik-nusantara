@@ -42,7 +42,6 @@ export function BookingForm() {
 
   const businessName = settings?.name || BUSINESS_NAME_DEFAULT;
   const rawWhatsapp = settings?.whatsapp || OWNER_WHATSAPP_DEFAULT;
-  // Bersihkan nomor agar hanya berisi angka untuk wa.me
   const ownerWhatsapp = rawWhatsapp.replace(/[^0-9]/g, '');
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -61,14 +60,12 @@ export function BookingForm() {
     setIsSubmitting(true);
     
     try {
-      // 1. Simpan ke Firestore untuk arsip Admin
       await addDoc(collection(firestore, 'bookings'), {
         ...values,
         status: 'Pending',
         createdAt: new Date().toISOString(),
       });
 
-      // 2. Susun pesan untuk dikirim ke WhatsApp
       const message = `*PESANAN BARU - ${businessName}*
 ━━━━━━━━━━━━━━━━━━
 👤 *Pelanggan:* ${values.fullName}
@@ -82,10 +79,8 @@ _Dikirim melalui Sistem Pemesanan Website_`;
       const encodedMessage = encodeURIComponent(message);
       const whatsappUrl = `https://wa.me/${ownerWhatsapp}?text=${encodedMessage}`;
       
-      // 3. Beri notifikasi sukses dan arahkan ke WhatsApp
       toast({ title: "Berhasil", description: "Pesanan disimpan. Mengalihkan ke WhatsApp..." });
       
-      // Gunakan setTimeout agar user sempat melihat toast sebelum pindah halaman
       setTimeout(() => {
         window.open(whatsappUrl, '_blank');
         form.reset();

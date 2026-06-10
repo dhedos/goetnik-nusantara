@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
@@ -8,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT } from '@/lib/constants';
 
-// WhatsApp Official Icon SVG
 const WhatsAppIcon = ({ className }: { className?: string }) => (
   <svg 
     viewBox="0 0 24 24" 
