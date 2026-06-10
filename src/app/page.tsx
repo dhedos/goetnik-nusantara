@@ -13,7 +13,7 @@ import { Footer } from '@/components/Footer';
 import { useFirestore, useCollection, useDoc, useMemoFirebase } from '@/firebase';
 import { collection, doc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2, Cpu } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ICON_MAP } from '@/lib/constants';
 
@@ -24,13 +24,28 @@ export default function Home() {
     firestore ? collection(firestore, 'services') : null, 
     [firestore]
   );
-  const { data: services } = useCollection(servicesQuery);
+  const { data: services, loading: servicesLoading } = useCollection(servicesQuery);
 
   const settingsRef = useMemoFirebase(() => 
     firestore ? doc(firestore, 'settings', 'business') : null, 
     [firestore]
   );
-  const { data: settings } = useDoc(settingsRef);
+  const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
+
+  // Mencegah flash konten default saat loading
+  if (settingsLoading || (servicesLoading && !services)) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4 animate-in fade-in duration-500">
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary relative">
+            <Cpu size={32} className="animate-pulse" />
+            <div className="absolute inset-0 rounded-2xl border-2 border-primary/20 animate-ping opacity-20" />
+          </div>
+          <p className="text-sm font-medium text-muted-foreground tracking-widest uppercase">Memuat Solusi...</p>
+        </div>
+      </div>
+    );
+  }
 
   const heroPlaceholder = PlaceHolderImages.find(img => img.id === 'hero-tech');
   const heroDisplayImage = settings?.heroImageUrl || heroPlaceholder?.imageUrl;
@@ -109,6 +124,7 @@ export default function Home() {
                         width={800}
                         height={600}
                         className="w-full h-auto"
+                        data-ai-hint="laptop computer"
                       />
                   </div>
                 </div>
