@@ -1,10 +1,10 @@
 
 "use client";
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useUser, useFirestore, useCollection, useDoc, useAuth, useMemoFirebase } from '@/firebase';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -12,9 +12,9 @@ import { Label } from '@/components/ui/label';
 import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { 
-  Loader2, Plus, Trash2, Save, LogOut, CheckCircle2, 
-  Globe, Layout, Info, Phone, Shield, Image as ImageIcon,
-  Settings, ShoppingBag, Menu, X, Upload, Instagram, Facebook, Youtube, MapPin, Search, ExternalLink, Copy
+  Loader2, Plus, Trash2, Save, LogOut, 
+  Globe, Layout, Info, Phone, Shield, 
+  Settings, ShoppingBag, Upload, Instagram, Facebook, Youtube, Copy
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -32,10 +32,8 @@ export default function AdminDashboard() {
   const firestore = useFirestore();
   const router = useRouter();
   const [activeSection, setActiveSection] = useState<AdminSection>('bookings');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isUploading, setIsUploading] = useState<string | null>(null);
   
-  // Pastikan data hanya diambil jika user sudah login
   const canFetchData = !!(user?.uid && firestore);
 
   const servicesQuery = useMemoFirebase(() => 
@@ -224,10 +222,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background text-foreground">
-      <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 bg-card border-r transition-transform duration-300 transform md:relative md:translate-x-0 shrink-0",
-        isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-      )}>
+      <aside className="fixed inset-y-0 left-0 z-50 w-64 bg-card border-r md:relative md:translate-x-0 shrink-0">
         <div className="flex flex-col h-full">
           <div className="p-6 border-b"><h2 className="text-xl font-bold text-primary">Bisnis Anda</h2></div>
           <nav className="flex-1 p-4 space-y-2">
@@ -247,15 +242,15 @@ export default function AdminDashboard() {
       <main className="flex-1 overflow-y-auto p-4 md:p-8">
         <div className="max-w-5xl mx-auto space-y-6">
           <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-bold capitalize">{activeSection === 'bookings' ? 'Pesanan Masuk' : activeSection}</h1>
-            <Button onClick={handleSaveBusinessInfo}><Save className="mr-2" size={18} /> Simpan</Button>
+            <h1 className="text-3xl font-bold capitalize">{activeSection}</h1>
+            <Button onClick={handleSaveBusinessInfo}><Save className="mr-2" size={18} /> Simpan Semua</Button>
           </div>
 
           {(bookingsLoading || servicesLoading || settingsLoading) && (
             <div className="flex justify-center p-12"><Loader2 className="animate-spin text-primary" /></div>
           )}
 
-          {!bookingsLoading && activeSection === 'bookings' && (
+          {activeSection === 'bookings' && (
             <Card>
               <CardHeader><CardTitle>Daftar Pesanan</CardTitle></CardHeader>
               <CardContent className="space-y-4">
@@ -264,7 +259,6 @@ export default function AdminDashboard() {
                     <div>
                       <p className="font-bold">{b.fullName}</p>
                       <p className="text-sm text-muted-foreground">{b.service} - {b.whatsapp}</p>
-                      <p className="text-xs text-muted-foreground mt-1">Alamat: {b.address}</p>
                     </div>
                     <div className="flex flex-col items-end gap-2">
                       <Badge variant={b.status === 'Selesai' ? 'default' : 'outline'}>{b.status}</Badge>
@@ -272,29 +266,23 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                 ))}
-                {!bookings?.length && <p className="text-center text-muted-foreground py-8">Belum ada pesanan masuk.</p>}
+                {!bookings?.length && !bookingsLoading && <p className="text-center text-muted-foreground py-8">Belum ada pesanan masuk.</p>}
               </CardContent>
             </Card>
           )}
 
-          {!servicesLoading && activeSection === 'services' && (
+          {activeSection === 'services' && (
              <div className="space-y-6">
                 <Button onClick={handleAddService}><Plus className="mr-2" size={18} /> Tambah Layanan</Button>
                 <div className="grid md:grid-cols-2 gap-4">
                   {services?.map((s: any) => (
                     <Card key={s.id} className="bg-background/50">
                       <CardContent className="p-4 space-y-4">
-                        <div className="space-y-2">
-                          <Label>Nama Layanan</Label>
-                          <Input defaultValue={s.name} onBlur={(e) => updateDoc(doc(firestore!, 'businesses', user.uid, 'services', s.id), { name: e.target.value })} />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Harga (Mulai Dari)</Label>
-                          <Input defaultValue={s.price} onBlur={(e) => updateDoc(doc(firestore!, 'businesses', user.uid, 'services', s.id), { price: e.target.value })} />
-                        </div>
-                        <div className="flex justify-between pt-2">
+                        <Input defaultValue={s.name} onBlur={(e) => updateDoc(doc(firestore!, 'businesses', user.uid, 'services', s.id), { name: e.target.value })} />
+                        <Input defaultValue={s.price} onBlur={(e) => updateDoc(doc(firestore!, 'businesses', user.uid, 'services', s.id), { price: e.target.value })} />
+                        <div className="flex justify-between">
                           <Input type="file" className="hidden" id={`img-${s.id}`} onChange={(e) => handleImageUpload(e, s.id)} />
-                          <Button variant="outline" size="sm" asChild><label htmlFor={`img-${s.id}`} className="cursor-pointer"><Upload size={14} className="mr-2" /> {isUploading === s.id ? 'Mengunggah...' : 'Upload Gambar'}</label></Button>
+                          <Button variant="outline" size="sm" asChild><label htmlFor={`img-${s.id}`} className="cursor-pointer">{isUploading === s.id ? 'Loading...' : 'Ganti Gambar'}</label></Button>
                           <Button variant="destructive" size="sm" onClick={() => deleteDoc(doc(firestore!, 'businesses', user.uid, 'services', s.id))}><Trash2 size={14} /></Button>
                         </div>
                       </CardContent>
@@ -306,54 +294,34 @@ export default function AdminDashboard() {
 
           {activeSection === 'branding' && (
             <Card><CardContent className="p-6 space-y-6">
-              <div className="space-y-2">
-                <Label>Logo Bisnis (Gambar)</Label>
-                <div className="flex items-center gap-4">
-                  {businessInfo.logoUrl && <Image src={businessInfo.logoUrl} alt="Logo" width={50} height={50} className="rounded object-contain" unoptimized />}
-                  <Input type="file" onChange={(e) => handleImageUpload(e, 'logo')} />
-                </div>
+              <Label>Logo Bisnis (Gambar)</Label>
+              <div className="flex items-center gap-4">
+                {businessInfo.logoUrl && <Image src={businessInfo.logoUrl} alt="Logo" width={50} height={50} className="rounded object-contain" unoptimized />}
+                <Input type="file" onChange={(e) => handleImageUpload(e, 'logo')} />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Teks Utama Logo</Label>
-                  <Input placeholder="Contoh: Go Etnik" value={businessInfo.logoText} onChange={(e) => setBusinessInfo({...businessInfo, logoText: e.target.value})} />
-                </div>
-                <div className="space-y-2">
-                  <Label>Teks Aksen Logo</Label>
-                  <Input placeholder="Contoh: NUSANTARA" value={businessInfo.logoAccentText} onChange={(e) => setBusinessInfo({...businessInfo, logoAccentText: e.target.value})} />
-                </div>
+                <Input placeholder="Teks Utama Logo" value={businessInfo.logoText} onChange={(e) => setBusinessInfo({...businessInfo, logoText: e.target.value})} />
+                <Input placeholder="Teks Aksen Logo" value={businessInfo.logoAccentText} onChange={(e) => setBusinessInfo({...businessInfo, logoAccentText: e.target.value})} />
               </div>
             </CardContent></Card>
           )}
 
           {activeSection === 'contact' && (
-            <Card><CardContent className="p-6 space-y-6">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2"><Label>WhatsApp Bisnis</Label><Input value={businessInfo.whatsapp} onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})} /></div>
-                <div className="space-y-2"><Label>Email</Label><Input value={businessInfo.email} onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})} /></div>
-              </div>
-              <div className="space-y-2"><Label>Alamat Lengkap</Label><Textarea value={businessInfo.address} onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})} /></div>
-              <div className="space-y-2">
-                <Label>Google Maps Embed URL</Label>
-                <Input placeholder="Paste <iframe> src attribute di sini" value={businessInfo.mapEmbedUrl} onChange={(e) => setBusinessInfo({...businessInfo, mapEmbedUrl: e.target.value})} />
-              </div>
-              <hr />
-              <div className="space-y-4">
-                <Label className="text-primary font-bold">Media Sosial (URL Lengkap)</Label>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-2"><Instagram size={18} /><Input placeholder="Instagram URL" value={businessInfo.socialInstagram} onChange={(e) => setBusinessInfo({...businessInfo, socialInstagram: e.target.value})} /></div>
-                  <div className="flex items-center gap-2"><Facebook size={18} /><Input placeholder="Facebook URL" value={businessInfo.socialFacebook} onChange={(e) => setBusinessInfo({...businessInfo, socialFacebook: e.target.value})} /></div>
-                  <div className="flex items-center gap-2"><Youtube size={18} /><Input placeholder="YouTube URL" value={businessInfo.socialYoutube} onChange={(e) => setBusinessInfo({...businessInfo, socialYoutube: e.target.value})} /></div>
-                  <div className="flex items-center gap-2"><Settings size={18} /><Input placeholder="TikTok URL" value={businessInfo.socialTiktok} onChange={(e) => setBusinessInfo({...businessInfo, socialTiktok: e.target.value})} /></div>
-                </div>
+            <Card><CardContent className="p-6 space-y-4">
+              <Input placeholder="WhatsApp" value={businessInfo.whatsapp} onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})} />
+              <Input placeholder="Email" value={businessInfo.email} onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})} />
+              <Textarea placeholder="Alamat" value={businessInfo.address} onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})} />
+              <Input placeholder="Maps Embed URL" value={businessInfo.mapEmbedUrl} onChange={(e) => setBusinessInfo({...businessInfo, mapEmbedUrl: e.target.value})} />
+              <div className="grid grid-cols-2 gap-4">
+                <Input placeholder="Instagram URL" value={businessInfo.socialInstagram} onChange={(e) => setBusinessInfo({...businessInfo, socialInstagram: e.target.value})} />
+                <Input placeholder="Facebook URL" value={businessInfo.socialFacebook} onChange={(e) => setBusinessInfo({...businessInfo, socialFacebook: e.target.value})} />
               </div>
             </CardContent></Card>
           )}
 
           {activeSection === 'privacy' && (
-            <Card><CardContent className="p-6 space-y-4">
-              <Label>Konten Kebijakan Privasi</Label>
-              <Textarea className="min-h-[400px]" value={businessInfo.privacyPolicy} onChange={(e) => setBusinessInfo({...businessInfo, privacyPolicy: e.target.value})} />
+            <Card><CardContent className="p-6">
+              <Textarea className="min-h-[300px]" value={businessInfo.privacyPolicy} onChange={(e) => setBusinessInfo({...businessInfo, privacyPolicy: e.target.value})} />
             </CardContent></Card>
           )}
 
@@ -361,16 +329,16 @@ export default function AdminDashboard() {
             <Card><CardContent className="p-6 space-y-4">
               <Label>Gambar Hero</Label>
               <Input type="file" onChange={(e) => handleImageUpload(e, 'hero')} />
-              <Input placeholder="Badge (e.g. Solusi Terpercaya)" value={businessInfo.heroBadge} onChange={(e) => setBusinessInfo({...businessInfo, heroBadge: e.target.value})} />
-              <Input placeholder="Judul Utama" value={businessInfo.heroTitle} onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})} />
-              <Textarea placeholder="Sub-judul" value={businessInfo.heroSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, heroSubtitle: e.target.value})} />
+              <Input placeholder="Badge Hero" value={businessInfo.heroBadge} onChange={(e) => setBusinessInfo({...businessInfo, heroBadge: e.target.value})} />
+              <Input placeholder="Judul Hero" value={businessInfo.heroTitle} onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})} />
+              <Textarea placeholder="Subjudul Hero" value={businessInfo.heroSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, heroSubtitle: e.target.value})} />
             </CardContent></Card>
           )}
 
           {activeSection === 'about' && (
             <Card><CardContent className="p-6 space-y-4">
-              <Input placeholder="Judul Tentang Kami" value={businessInfo.aboutTitle} onChange={(e) => setBusinessInfo({...businessInfo, aboutTitle: e.target.value})} />
-              <Textarea className="min-h-[200px]" placeholder="Konten Tentang Kami" value={businessInfo.aboutContent} onChange={(e) => setBusinessInfo({...businessInfo, aboutContent: e.target.value})} />
+              <Input placeholder="Judul Tentang" value={businessInfo.aboutTitle} onChange={(e) => setBusinessInfo({...businessInfo, aboutTitle: e.target.value})} />
+              <Textarea className="min-h-[200px]" placeholder="Konten Tentang" value={businessInfo.aboutContent} onChange={(e) => setBusinessInfo({...businessInfo, aboutContent: e.target.value})} />
             </CardContent></Card>
           )}
         </div>

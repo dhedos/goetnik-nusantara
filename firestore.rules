@@ -7,28 +7,32 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == businessId;
     }
 
-    // Aturan untuk dokumen Bisnis Utama
+    // Aturan untuk dokumen Bisnis Utama dan Sub-koleksinya
     match /businesses/{businessId} {
+      // Izinkan publik membaca profil bisnis
       allow read: if true;
+      // Hanya pemilik yang bisa mengedit profil bisnis
       allow write: if isOwner(businessId);
-    }
 
-    // Aturan untuk Layanan (Services)
-    match /businesses/{businessId}/services/{serviceId} {
-      allow read: if true;
-      allow write: if isOwner(businessId);
-    }
+      // Aturan untuk koleksi Layanan (Services) di dalam bisnis
+      match /services/{serviceId} {
+        allow read: if true;
+        allow write: if isOwner(businessId);
+      }
 
-    // Aturan untuk Pengaturan Profil (Settings)
-    match /businesses/{businessId}/settings/profile {
-      allow read: if true;
-      allow write: if isOwner(businessId);
-    }
+      // Aturan untuk Pengaturan Profil (Settings)
+      match /settings/profile {
+        allow read: if true;
+        allow write: if isOwner(businessId);
+      }
 
-    // Aturan untuk Pesanan (Bookings)
-    match /businesses/{businessId}/bookings/{bookingId} {
-      allow create: if true;
-      allow read, update, delete: if isOwner(businessId);
+      // Aturan untuk Pesanan (Bookings)
+      match /bookings/{bookingId} {
+        // Publik bisa membuat pesanan (booking)
+        allow create: if true;
+        // Hanya pemilik yang bisa melihat, mengupdate, atau menghapus pesanan
+        allow read, update, delete: if isOwner(businessId);
+      }
     }
     
     // Default: Tolak semua akses lainnya untuk keamanan
