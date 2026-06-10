@@ -6,6 +6,8 @@ import { useState, useEffect } from 'react';
 import { Menu, X, Cpu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useFirestore, useDoc } from '@/firebase';
+import { doc } from 'firebase/firestore';
 
 const NAV_LINKS = [
   { name: 'Beranda', href: '#' },
@@ -17,6 +19,12 @@ const NAV_LINKS = [
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  
+  const firestore = useFirestore();
+  const { data: settings } = useDoc(firestore ? doc(firestore, 'settings', 'business') : null);
+
+  const logoText = settings?.logoText || 'TechFlow';
+  const logoAccentText = settings?.logoAccentText || 'Mandiri';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -37,7 +45,7 @@ export function Navbar() {
             <Cpu size={24} />
           </div>
           <span className="text-xl font-bold font-headline tracking-tight">
-            TechFlow<span className="text-primary">Mandiri</span>
+            {logoText}<span className="text-primary">{logoAccentText}</span>
           </span>
         </Link>
 

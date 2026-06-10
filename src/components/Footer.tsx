@@ -12,6 +12,8 @@ export function Footer() {
   const firestore = useFirestore();
   const { data: settings } = useDoc(firestore ? doc(firestore, 'settings', 'business') : null);
   
+  const logoText = settings?.logoText || 'TechFlow';
+  const logoAccentText = settings?.logoAccentText || 'Mandiri';
   const businessName = settings?.name || BUSINESS_NAME_DEFAULT;
 
   return (
@@ -22,7 +24,7 @@ export function Footer() {
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground">
               <Cpu size={24} />
             </div>
-            <span className="text-2xl font-bold font-headline">TechFlow<span className="text-primary">Mandiri</span></span>
+            <span className="text-2xl font-bold font-headline">{logoText}<span className="text-primary">{logoAccentText}</span></span>
           </Link>
           <p className="text-muted-foreground max-w-md leading-relaxed">
             Solusi perbaikan laptop, desain grafis profesional, dan pengembangan website untuk kebutuhan digital Anda. Memberikan layanan terbaik dengan sentuhan teknologi modern.

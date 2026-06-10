@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
-import { Loader2, Plus, Trash2, Save, LogOut, CheckCircle2, Clock, Globe, Monitor, HardDrive, Palette, ShieldCheck } from 'lucide-react';
+import { Loader2, Plus, Trash2, Save, LogOut, CheckCircle2, Clock, Globe, Monitor, HardDrive, Palette, ShieldCheck, Layout } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { BUSINESS_NAME_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT, ICON_MAP } from '@/lib/constants';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -39,7 +39,11 @@ export default function AdminDashboard() {
     name: '',
     whatsapp: '',
     address: '',
-    email: ''
+    email: '',
+    logoText: 'TechFlow',
+    logoAccentText: 'Mandiri',
+    heroTitle: 'Transformasi Digital Tanpa Hambatan',
+    heroSubtitle: 'Kami menyediakan layanan service laptop profesional, desain grafis estetik, dan pembuatan aplikasi modern.'
   });
 
   useEffect(() => {
@@ -55,6 +59,10 @@ export default function AdminDashboard() {
         whatsapp: settings.whatsapp || OWNER_WHATSAPP_DEFAULT,
         address: settings.address || BUSINESS_ADDRESS_DEFAULT,
         email: settings.email || BUSINESS_EMAIL_DEFAULT,
+        logoText: settings.logoText || 'TechFlow',
+        logoAccentText: settings.logoAccentText || 'Mandiri',
+        heroTitle: settings.heroTitle || 'Transformasi Digital Tanpa Hambatan',
+        heroSubtitle: settings.heroSubtitle || 'Kami menyediakan layanan service laptop profesional, desain grafis estetik, dan pembuatan aplikasi modern.'
       });
     }
   }, [settings]);
@@ -88,7 +96,7 @@ export default function AdminDashboard() {
         errorEmitter.emit('permission-error', permissionError);
       });
     
-    toast({ title: "Berhasil", description: "Informasi bisnis telah diperbarui." });
+    toast({ title: "Berhasil", description: "Pengaturan web telah diperbarui." });
   };
 
   const handleAddService = () => {
@@ -167,6 +175,20 @@ export default function AdminDashboard() {
     toast({ title: "Berhasil", description: "Status pesanan diperbarui." });
   };
 
+  const handleDeleteBooking = (id: string) => {
+    if (!firestore) return;
+    const docRef = doc(firestore, 'bookings', id);
+    deleteDoc(docRef)
+      .catch(async (e) => {
+        const permissionError = new FirestorePermissionError({
+          path: docRef.path,
+          operation: 'delete',
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      });
+    toast({ title: "Berhasil", description: "Pesanan dihapus." });
+  };
+
   if (authLoading || !user) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -181,7 +203,7 @@ export default function AdminDashboard() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-            <p className="text-muted-foreground">Kelola konten {businessInfo.name}</p>
+            <p className="text-muted-foreground">Kelola konten & pengaturan website</p>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={() => router.push('/')} className="flex items-center gap-2">
@@ -194,10 +216,10 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs defaultValue="bookings" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 md:w-[400px]">
+          <TabsList className="grid w-full grid-cols-3 md:w-[450px]">
             <TabsTrigger value="bookings">Pesanan</TabsTrigger>
             <TabsTrigger value="services">Layanan</TabsTrigger>
-            <TabsTrigger value="settings">Pengaturan</TabsTrigger>
+            <TabsTrigger value="settings">Pengaturan Web</TabsTrigger>
           </TabsList>
 
           <TabsContent value="bookings" className="mt-6">
@@ -245,7 +267,7 @@ export default function AdminDashboard() {
                           </Button>
                           <Button size="sm" variant="destructive" onClick={() => {
                             if(confirm('Hapus pesanan ini?')) {
-                              handleDeleteService(booking.id); // Re-using delete logic for consistency
+                              handleDeleteBooking(booking.id);
                             }
                           }}>
                             <Trash2 size={16} />
@@ -325,47 +347,106 @@ export default function AdminDashboard() {
           </TabsContent>
 
           <TabsContent value="settings" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Informasi Bisnis</CardTitle>
-                <CardDescription>Update profil bisnis yang muncul di website dan link WhatsApp.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid gap-2">
-                  <Label>Nama Bisnis</Label>
-                  <Input 
-                    value={businessInfo.name} 
-                    onChange={(e) => setBusinessInfo({...businessInfo, name: e.target.value})}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label>Nomor WhatsApp (Contoh: 628123456789)</Label>
-                  <Input 
-                    placeholder="Wajib gunakan kode negara, contoh: 62812..."
-                    value={businessInfo.whatsapp} 
-                    onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label>Email Kontak</Label>
-                  <Input 
-                    value={businessInfo.email} 
-                    onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label>Alamat Bisnis</Label>
-                  <Textarea 
-                    value={businessInfo.address} 
-                    onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})}
-                    rows={2}
-                  />
-                </div>
-                <Button onClick={handleSaveBusinessInfo} className="w-full h-12 text-lg font-bold">
-                  <Save className="mr-2" size={20} /> Simpan Semua Pengaturan
-                </Button>
-              </CardContent>
-            </Card>
+            <div className="grid gap-8">
+              {/* Branding & Visual */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2"><Layout className="text-primary" /> Branding & Tampilan Logo</CardTitle>
+                  <CardDescription>Atur nama bisnis dan bagaimana logo muncul di Navbar.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="grid gap-2">
+                      <Label>Nama Bisnis (Nama Web)</Label>
+                      <Input 
+                        value={businessInfo.name} 
+                        onChange={(e) => setBusinessInfo({...businessInfo, name: e.target.value})}
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label>Logo Text (Utama)</Label>
+                      <Input 
+                        value={businessInfo.logoText} 
+                        onChange={(e) => setBusinessInfo({...businessInfo, logoText: e.target.value})}
+                        placeholder="Contoh: TechFlow"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label>Logo Text (Aksen)</Label>
+                      <Input 
+                        value={businessInfo.logoAccentText} 
+                        onChange={(e) => setBusinessInfo({...businessInfo, logoAccentText: e.target.value})}
+                        placeholder="Contoh: Mandiri"
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Hero Section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2"><Globe className="text-primary" /> Bagian Utama (Hero)</CardTitle>
+                  <CardDescription>Teks besar yang muncul pertama kali saat pengunjung membuka web.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid gap-2">
+                    <Label>Judul Utama (Hero Title)</Label>
+                    <Input 
+                      value={businessInfo.heroTitle} 
+                      onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Sub-judul (Hero Subtitle)</Label>
+                    <Textarea 
+                      value={businessInfo.heroSubtitle} 
+                      onChange={(e) => setBusinessInfo({...businessInfo, heroSubtitle: e.target.value})}
+                      rows={3}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Contact Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Kontak & Alamat</CardTitle>
+                  <CardDescription>Informasi yang muncul di bagian kontak dan footer.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="grid gap-2">
+                      <Label>Nomor WhatsApp (Contoh: 628123456789)</Label>
+                      <Input 
+                        placeholder="Wajib gunakan kode negara, contoh: 62812..."
+                        value={businessInfo.whatsapp} 
+                        onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})}
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label>Email Kontak</Label>
+                      <Input 
+                        value={businessInfo.email} 
+                        onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})}
+                      />
+                    </div>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Alamat Bisnis</Label>
+                    <Textarea 
+                      value={businessInfo.address} 
+                      onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})}
+                      rows={2}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Button onClick={handleSaveBusinessInfo} className="w-full h-14 text-lg font-bold shadow-xl shadow-primary/20">
+                <Save className="mr-2" size={24} /> Simpan Perubahan Website
+              </Button>
+            </div>
           </TabsContent>
         </Tabs>
       </div>

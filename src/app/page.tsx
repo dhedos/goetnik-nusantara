@@ -25,6 +25,9 @@ export default function Home() {
   const heroImage = PlaceHolderImages.find(img => img.id === 'hero-tech');
   const serviceImageIds = ['service-os', 'service-repair', 'service-design', 'service-web'];
 
+  const heroTitle = settings?.heroTitle || 'Transformasi Digital Tanpa Hambatan';
+  const heroSubtitle = settings?.heroSubtitle || 'Kami menyediakan layanan service laptop profesional, desain grafis estetik, dan pembuatan aplikasi modern untuk mendukung performa bisnis dan hobi Anda.';
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -57,12 +60,12 @@ export default function Home() {
               </div>
               
               <h1 className="text-5xl md:text-7xl font-extrabold font-headline leading-tight tracking-tighter">
-                Transformasi Digital <br />
-                <span className="text-gradient">Tanpa Hambatan</span>
+                {heroTitle.split(' ').slice(0, -2).join(' ')} <br />
+                <span className="text-gradient">{heroTitle.split(' ').slice(-2).join(' ')}</span>
               </h1>
               
               <p className="text-xl text-muted-foreground leading-relaxed max-w-xl">
-                Kami menyediakan layanan service laptop profesional, desain grafis estetik, dan pembuatan aplikasi modern untuk mendukung performa bisnis dan hobi Anda.
+                {heroSubtitle}
               </p>
               
               <div className="flex flex-wrap gap-4 pt-4">
