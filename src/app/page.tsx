@@ -19,7 +19,7 @@ import { collection, doc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { ArrowRight, Loader2, Sparkles } from 'lucide-react';
+import { ArrowRight, Loader2, Sparkles, Cpu } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ICON_MAP, BUSINESS_NAME_DEFAULT, MAIN_BUSINESS_ID } from '@/lib/constants';
 
@@ -79,12 +79,12 @@ function HomeContent() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsTimeout(true);
-    }, 4500); 
+    }, 3000); // 3 detik loading screen untuk kesan premium
     return () => clearTimeout(timer);
   }, []);
 
-  // Tampilkan loading screen jika sedang mengambil data awal
-  if (!isTimeout && (settingsLoading && !settings)) {
+  // Tampilkan loading screen jika sedang mengambil data awal atau belum timeout
+  if (!isTimeout && (settingsLoading || !settings)) {
     return <LoadingScreen text="Menghubungkan ke Pusat Layanan..." />;
   }
 

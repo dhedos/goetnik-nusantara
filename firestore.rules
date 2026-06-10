@@ -2,28 +2,23 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Fungsi pembantu untuk cek admin
-    function isAdmin() {
-      return request.auth != null;
-    }
-
-    // Aturan untuk bisnis tunggal dengan ID 'main'
-    match /businesses/{businessId} {
-      // Siapapun bisa baca profil dan layanan bisnis
+    // Aturan untuk bisnis utama dengan ID 'main'
+    match /businesses/main {
+      // Siapapun bisa baca dokumen bisnis utama (untuk logo, nama, dll)
       allow read: if true;
       // Hanya admin yang bisa mengelola data bisnis utama
-      allow write: if isAdmin();
+      allow write: if request.auth != null;
 
-      // Aturan eksplisit untuk sub-koleksi layanan
+      // Aturan untuk sub-koleksi layanan
       match /services/{serviceId} {
         allow read: if true;
-        allow write: if isAdmin();
+        allow write: if request.auth != null;
       }
 
-      // Aturan eksplisit untuk pengaturan profil
+      // Aturan untuk sub-koleksi pengaturan profil
       match /settings/profile {
         allow read: if true;
-        allow write: if isAdmin();
+        allow write: if request.auth != null;
       }
 
       // Aturan untuk pesanan (bookings)
@@ -31,7 +26,7 @@ service cloud.firestore {
         // Pengunjung bisa buat pesanan
         allow create: if true;
         // Hanya admin yang bisa baca dan kelola pesanan
-        allow read, update, delete: if isAdmin();
+        allow read, update, delete: if request.auth != null;
       }
     }
     
