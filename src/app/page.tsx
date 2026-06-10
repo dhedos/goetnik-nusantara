@@ -4,6 +4,7 @@
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { AIAssistant } from '@/components/AIAssistant';
 import { BookingForm } from '@/components/BookingForm';
@@ -25,7 +26,7 @@ import { ICON_MAP } from '@/lib/constants';
 // ID Bisnis default jika tidak ada parameter ?id=...
 const DEFAULT_BUSINESS_ID = "goetnik-default"; 
 
-export default function Home() {
+function HomeContent() {
   const searchParams = useSearchParams();
   const businessId = searchParams.get('id') || DEFAULT_BUSINESS_ID;
   const firestore = useFirestore();
@@ -44,8 +45,7 @@ export default function Home() {
   );
   const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
 
-  // LOADING SCREEN: Pastikan tampil saat inisialisasi Firestore atau saat fetching data
-  // Menggunakan background gelap dan styling yang sesuai dengan gambar user
+  // LOADING SCREEN: Pastikan tampil sesuai desain asli user
   if (!firestore || settingsLoading || (servicesLoading && !services)) {
     return (
       <div className="flex h-screen flex-col items-center justify-center gap-6 bg-[#0B1120] text-center p-4">
@@ -128,5 +128,18 @@ export default function Home() {
       <Footer businessId={businessId} />
       <WhatsAppPopup businessId={businessId} />
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-screen flex-col items-center justify-center gap-6 bg-[#0B1120] text-center p-4">
+        <Loader2 className="h-16 w-16 animate-spin text-primary" />
+        <p className="text-gray-400 text-xl font-medium tracking-tight">Memuat Halaman...</p>
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
   );
 }
