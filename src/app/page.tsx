@@ -23,8 +23,6 @@ import { ArrowRight, Loader2 } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ICON_MAP } from '@/lib/constants';
 
-const DEFAULT_BUSINESS_ID = "goetnik-default"; 
-
 function LoadingScreen({ text }: { text: string }) {
   return (
     <div className="flex h-screen flex-col items-center justify-center gap-6 bg-[#0B1120] text-center p-4">
@@ -38,7 +36,7 @@ function LoadingScreen({ text }: { text: string }) {
 
 function HomeContent() {
   const searchParams = useSearchParams();
-  const businessId = searchParams.get('id') || DEFAULT_BUSINESS_ID;
+  const businessId = searchParams.get('id') || "goetnik-default";
   const firestore = useFirestore();
 
   const servicesQuery = useMemoFirebase(() => 
@@ -140,7 +138,7 @@ function HomeContent() {
 
 export default function Home() {
   return (
-    <Suspense fallback={<LoadingScreen text="Memuat Halaman..." />}>
+    <Suspense fallback={<LoadingScreen text="Menghubungkan ke Pusat Layanan..." />}>
       <HomeContent />
     </Suspense>
   );
