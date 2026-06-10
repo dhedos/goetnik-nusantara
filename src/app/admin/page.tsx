@@ -224,7 +224,7 @@ export default function AdminDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle>Informasi Bisnis</CardTitle>
-                <CardDescription>Update nama bisnis, alamat, dan kontak.</CardDescription>
+                <CardDescription>Update nama bisnis, alamat, dan kontak WhatsApp.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid gap-2">
@@ -235,11 +235,13 @@ export default function AdminDashboard() {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label>WhatsApp (Tanpa '+')</Label>
+                  <Label>Nomor WhatsApp (Format: 628123456789 - Gunakan kode negara 62 di depan)</Label>
                   <Input 
+                    placeholder="Contoh: 628123456789"
                     value={businessInfo.whatsapp} 
                     onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})}
                   />
+                  <p className="text-xs text-muted-foreground italic">Nomor ini akan digunakan untuk tombol WhatsApp melayang dan form pemesanan.</p>
                 </div>
                 <div className="grid gap-2">
                   <Label>Email</Label>
