@@ -21,7 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { ICON_MAP } from '@/lib/constants';
+import { ICON_MAP, BUSINESS_NAME_DEFAULT } from '@/lib/constants';
 
 function LoadingScreen({ text }: { text: string }) {
   return (
@@ -38,6 +38,7 @@ function HomeContent() {
   const searchParams = useSearchParams();
   const businessId = searchParams.get('id') || "goetnik-default";
   const firestore = useFirestore();
+  const [isTimeout, setIsTimeout] = useState(false);
 
   const servicesQuery = useMemoFirebase(() => 
     firestore ? collection(firestore, 'businesses', businessId, 'services') : null, 
@@ -51,8 +52,16 @@ function HomeContent() {
   );
   const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
 
-  // Jika firestore belum siap atau sedang memuat pengaturan profil
-  if (!firestore || settingsLoading) {
+  // Fallback timeout jika koneksi sangat lambat atau API Key salah
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsTimeout(true);
+    }, 5000); // 5 detik
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Tampilkan loading hanya jika firestore sedang inisialisasi DAN belum timeout
+  if (!isTimeout && (!firestore || (settingsLoading && !settings))) {
     return <LoadingScreen text="Menghubungkan ke Pusat Layanan..." />;
   }
 
@@ -61,14 +70,15 @@ function HomeContent() {
   const serviceImageIds = ['service-os', 'service-repair', 'service-design', 'service-web'];
 
   const heroBadge = settings?.heroBadge || 'Solusi Terpercaya';
-  const heroTitle = settings?.heroTitle || 'Selamat Datang';
-  const heroSubtitle = settings?.heroSubtitle || 'Kami siap melayani kebutuhan Anda.';
+  const heroTitle = settings?.heroTitle || BUSINESS_NAME_DEFAULT;
+  const heroSubtitle = settings?.heroSubtitle || 'Kami siap melayani kebutuhan teknologi dan desain Anda secara profesional.';
 
   return (
     <div className="flex flex-col min-h-screen">
       <DynamicTitle businessId={businessId} />
       <Navbar businessId={businessId} />
       <main>
+        {/* Hero Section */}
         <section className="relative min-h-screen flex items-center pt-20 px-4">
           <div className="absolute inset-0 -z-20">
             {heroDisplayImage && (
@@ -78,29 +88,41 @@ function HomeContent() {
                 fill 
                 className="object-cover opacity-30" 
                 unoptimized={!!settings?.heroImageUrl} 
+                priority
               />
             )}
             <div className="absolute inset-0 bg-background/90" />
           </div>
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-7xl mx-auto w-full">
             <div className="space-y-6 max-w-2xl">
-              <Badge variant="outline" className="animate-fade-in border-primary/50 text-primary">{heroBadge}</Badge>
-              <h1 className="text-5xl md:text-7xl font-bold animate-fade-in tracking-tight">{heroTitle}</h1>
-              <p className="text-xl text-muted-foreground animate-fade-in leading-relaxed">{heroSubtitle}</p>
-              <Button asChild size="lg" className="animate-fade-in rounded-xl px-8 shadow-xl shadow-primary/20">
-                <Link href="#pesan">Pesan Sekarang <ArrowRight className="ml-2" /></Link>
-              </Button>
+              <Badge variant="outline" className="animate-fade-in border-primary/50 text-primary px-4 py-1">{heroBadge}</Badge>
+              <h1 className="text-5xl md:text-7xl font-bold animate-fade-in tracking-tight leading-[1.1]">
+                {heroTitle}
+              </h1>
+              <p className="text-xl text-muted-foreground animate-fade-in leading-relaxed max-w-xl">
+                {heroSubtitle}
+              </p>
+              <div className="flex flex-wrap gap-4 animate-fade-in pt-4">
+                <Button asChild size="lg" className="rounded-xl px-8 shadow-xl shadow-primary/20 h-14 text-lg">
+                  <Link href="#pesan">Pesan Sekarang <ArrowRight className="ml-2" /></Link>
+                </Button>
+                <Button asChild variant="outline" size="lg" className="rounded-xl px-8 h-14 text-lg border-white/10 bg-white/5 backdrop-blur-sm">
+                  <Link href="#layanan">Lihat Layanan</Link>
+                </Button>
+              </div>
             </div>
           </div>
         </section>
 
         <AIAssistant businessId={businessId} />
         
+        {/* Services Section */}
         <section id="layanan" className="py-24 px-4 bg-secondary/10">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-              <Badge variant="outline" className="mb-4">Layanan Unggulan</Badge>
-              <h2 className="text-3xl md:text-4xl font-bold">Solusi Digital Untuk Anda</h2>
+            <div className="text-center mb-16 space-y-4">
+              <Badge variant="outline" className="uppercase tracking-widest px-4">Layanan Unggulan</Badge>
+              <h2 className="text-3xl md:text-5xl font-bold">Solusi Digital Untuk Anda</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">Kami menyediakan berbagai layanan teknis dan kreatif untuk mendukung pertumbuhan bisnis dan produktivitas Anda.</p>
             </div>
             
             {servicesLoading ? (
@@ -120,8 +142,9 @@ function HomeContent() {
                 ))}
               </div>
             ) : (
-              <Card className="max-w-md mx-auto p-12 text-center bg-card/30 border-dashed">
-                <p className="text-muted-foreground">Belum ada layanan yang tersedia saat ini.</p>
+              <Card className="max-w-md mx-auto p-12 text-center bg-card/30 border-dashed border-white/10">
+                <p className="text-muted-foreground">Belum ada layanan yang ditambahkan oleh admin.</p>
+                <Button variant="link" className="mt-4" asChild><Link href="/login">Login Admin</Link></Button>
               </Card>
             )}
           </div>
