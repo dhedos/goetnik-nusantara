@@ -17,6 +17,7 @@ import { useFirestore, useCollection, useDoc, useMemoFirebase } from '@/firebase
 import { collection, doc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ICON_MAP } from '@/lib/constants';
