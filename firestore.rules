@@ -7,25 +7,25 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Services: Everyone can read, only admin can write
+    // Services: Publik bisa melihat daftar layanan, hanya Admin yang bisa mengubah
     match /services/{serviceId} {
       allow read: if true;
       allow write: if isAuthenticated();
     }
 
-    // Bookings: Everyone can create, only admin can read/update/delete
+    // Bookings: Publik bisa mengirim pesanan (create), hanya Admin yang bisa melihat/mengelola
     match /bookings/{bookingId} {
       allow create: if true;
       allow read, update, delete: if isAuthenticated();
     }
 
-    // Business Settings: Everyone can read, only admin can write
+    // Business Settings: Publik bisa melihat Nama Bisnis & Logo, hanya Admin yang bisa mengubah
     match /settings/{docId} {
       allow read: if true;
       allow write: if isAuthenticated();
     }
     
-    // Default fallback
+    // Default fallback: Tolak akses lainnya demi keamanan
     match /{document=**} {
       allow read, write: if false;
     }
