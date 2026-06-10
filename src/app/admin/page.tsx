@@ -16,7 +16,7 @@ import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, CheckCircle2, 
   Globe, Layout, Info, Phone, Shield, Image as ImageIcon,
-  Settings, ShoppingBag, Menu, X, Upload, AlertCircle
+  Settings, ShoppingBag, Menu, X, Upload, AlertCircle, AlertTriangle
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { ICON_MAP } from '@/lib/constants';
@@ -24,6 +24,7 @@ import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 type AdminSection = 'bookings' | 'services' | 'branding' | 'hero' | 'about' | 'contact' | 'privacy';
 
@@ -143,35 +144,46 @@ export default function AdminDashboard() {
     if (!storage) {
       toast({ 
         variant: "destructive", 
-        title: "Konfigurasi Error", 
-        description: "Firebase Storage belum terdeteksi. Silakan aktifkan Storage di Console." 
+        title: "Gagal", 
+        description: "Firebase Storage tidak ditemukan. Cek config atau bucket name." 
       });
       return;
     }
 
     if (file.size > 2 * 1024 * 1024) {
-      toast({ variant: "destructive", title: "Gagal", description: "Ukuran file maksimal 2MB." });
+      toast({ variant: "destructive", title: "Terlalu Besar", description: "Ukuran file maksimal 2MB." });
       return;
     }
 
     setIsUploading(true);
     try {
-      const storageRef = ref(storage, `branding/logo-${Date.now()}`);
+      const storagePath = `branding/logo-${Date.now()}-${file.name}`;
+      const storageRef = ref(storage, storagePath);
+      
       const uploadResult = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(uploadResult.ref);
       
       setBusinessInfo(prev => ({ ...prev, logoUrl: downloadURL }));
+      
       if (firestore) {
         const docRef = doc(firestore, 'settings', 'business');
-        await setDoc(docRef, { logoUrl: downloadURL }, { merge: true });
+        setDoc(docRef, { logoUrl: downloadURL }, { merge: true })
+          .catch(async (e) => {
+            errorEmitter.emit('permission-error', new FirestorePermissionError({
+              path: docRef.path,
+              operation: 'write',
+              requestResourceData: { logoUrl: downloadURL }
+            }));
+          });
       }
       
-      toast({ title: "Berhasil", description: "Logo berhasil diunggah." });
+      toast({ title: "Berhasil", description: "Logo berhasil diperbarui secara otomatis." });
     } catch (error: any) {
+      console.error("Upload error:", error);
       toast({ 
         variant: "destructive", 
-        title: "Gagal Unggah", 
-        description: "Pastikan Storage Rules sudah diatur." 
+        title: "Gagal Mengunggah", 
+        description: error.message || "Pastikan Storage Rules sudah diatur di Firebase Console." 
       });
     } finally {
       setIsUploading(false);
@@ -193,12 +205,11 @@ export default function AdminDashboard() {
 
     addDoc(colRef, data)
       .catch(async (e) => {
-        const permissionError = new FirestorePermissionError({
+        errorEmitter.emit('permission-error', new FirestorePermissionError({
           path: colRef.path,
           operation: 'create',
           requestResourceData: data,
-        });
-        errorEmitter.emit('permission-error', permissionError);
+        }));
       });
     
     toast({ title: "Berhasil", description: "Layanan baru ditambahkan." });
@@ -209,11 +220,10 @@ export default function AdminDashboard() {
     const docRef = doc(firestore, 'services', id);
     deleteDoc(docRef)
       .catch(async (e) => {
-        const permissionError = new FirestorePermissionError({
+        errorEmitter.emit('permission-error', new FirestorePermissionError({
           path: docRef.path,
           operation: 'delete',
-        });
-        errorEmitter.emit('permission-error', permissionError);
+        }));
       });
     toast({ title: "Berhasil", description: "Layanan telah dihapus." });
   };
@@ -223,12 +233,11 @@ export default function AdminDashboard() {
     const docRef = doc(firestore, 'services', id);
     updateDoc(docRef, data)
       .catch(async (e) => {
-        const permissionError = new FirestorePermissionError({
+        errorEmitter.emit('permission-error', new FirestorePermissionError({
           path: docRef.path,
           operation: 'update',
           requestResourceData: data,
-        });
-        errorEmitter.emit('permission-error', permissionError);
+        }));
       });
   };
 
@@ -237,12 +246,11 @@ export default function AdminDashboard() {
     const docRef = doc(firestore, 'bookings', id);
     updateDoc(docRef, { status })
       .catch(async (e) => {
-        const permissionError = new FirestorePermissionError({
+        errorEmitter.emit('permission-error', new FirestorePermissionError({
           path: docRef.path,
           operation: 'update',
           requestResourceData: { status },
-        });
-        errorEmitter.emit('permission-error', permissionError);
+        }));
       });
     toast({ title: "Berhasil", description: "Status pesanan diperbarui." });
   };
@@ -329,85 +337,108 @@ export default function AdminDashboard() {
           </div>
 
           {activeSection === 'branding' && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Branding & Identitas Logo</CardTitle>
-                <CardDescription>Pilih file logo untuk diunggah langsung ke penyimpanan aman.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-8">
-                <div className="grid gap-6">
-                  <div className="space-y-4">
-                    <Label>Logo Gambar (Penyimpanan Storage)</Label>
-                    <div className="flex items-center gap-6">
-                      <div className="relative w-24 h-24 rounded-2xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center overflow-hidden bg-accent/5">
-                        {businessInfo.logoUrl ? (
-                          <Image 
-                            src={businessInfo.logoUrl} 
-                            alt="Logo Preview" 
-                            fill 
-                            className="object-contain p-2"
-                            unoptimized
-                          />
-                        ) : (
-                          <ImageIcon className="text-muted-foreground/40" size={32} />
-                        )}
-                        {isUploading && (
-                          <div className="absolute inset-0 bg-background/60 flex items-center justify-center backdrop-blur-sm">
-                            <Loader2 className="animate-spin text-primary" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="space-y-2">
-                        <input 
-                          type="file" 
-                          ref={fileInputRef} 
-                          className="hidden" 
-                          accept="image/*"
-                          onChange={handleLogoUpload}
-                        />
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => fileInputRef.current?.click()}
-                          disabled={isUploading}
-                          className="w-full"
-                        >
-                          {isUploading ? (
-                            <>
-                              <Loader2 className="mr-2 animate-spin" size={16} /> 
-                              Mengunggah...
-                            </>
-                          ) : (
-                            <>
-                              <Upload className="mr-2" size={16} /> 
-                              Pilih & Unggah Logo
-                            </>
-                          )}
-                        </Button>
-                        <p className="text-xs text-muted-foreground">Optimal: PNG transparan atau SVG. Maks 2MB.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label>Nama Bisnis (Muncul di Tab & Footer)</Label>
-                    <Input value={businessInfo.name} onChange={(e) => setBusinessInfo({...businessInfo, name: e.target.value})} />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-2">
-                      <Label>Teks Logo Utama</Label>
-                      <Input value={businessInfo.logoText} onChange={(e) => setBusinessInfo({...businessInfo, logoText: e.target.value})} placeholder="Misal: Tech" />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label>Teks Logo Aksen</Label>
-                      <Input value={businessInfo.logoAccentText} onChange={(e) => setBusinessInfo({...businessInfo, logoAccentText: e.target.value})} placeholder="Misal: Flow" />
-                    </div>
-                  </div>
+            <div className="space-y-6">
+              <Alert className="bg-yellow-500/10 border-yellow-500/20 text-yellow-500">
+                <AlertTriangle size={18} className="mr-2" />
+                <div>
+                  <AlertTitle className="font-bold">PENTING: Masih Stuck Loading?</AlertTitle>
+                  <AlertDescription className="text-sm">
+                    Pastikan Anda sudah mengaktifkan <b>Storage</b> di Firebase Console dan memasang <b>Rules Storage</b> berikut:
+                    <pre className="mt-2 p-3 bg-black/40 rounded-md text-[10px] text-foreground/80 overflow-x-auto">
+                      {`rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+  }
+}`}
+                    </pre>
+                  </AlertDescription>
                 </div>
-              </CardContent>
-            </Card>
+              </Alert>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Branding & Identitas Logo</CardTitle>
+                  <CardDescription>Pilih file logo untuk diunggah langsung ke penyimpanan aman.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-8">
+                  <div className="grid gap-6">
+                    <div className="space-y-4">
+                      <Label>Logo Gambar (Penyimpanan Storage)</Label>
+                      <div className="flex items-center gap-6">
+                        <div className="relative w-24 h-24 rounded-2xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center overflow-hidden bg-accent/5">
+                          {businessInfo.logoUrl ? (
+                            <Image 
+                              src={businessInfo.logoUrl} 
+                              alt="Logo Preview" 
+                              fill 
+                              className="object-contain p-2"
+                              unoptimized
+                            />
+                          ) : (
+                            <ImageIcon className="text-muted-foreground/40" size={32} />
+                          )}
+                          {isUploading && (
+                            <div className="absolute inset-0 bg-background/60 flex items-center justify-center backdrop-blur-sm">
+                              <Loader2 className="animate-spin text-primary" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="space-y-2">
+                          <input 
+                            type="file" 
+                            ref={fileInputRef} 
+                            className="hidden" 
+                            accept="image/*"
+                            onChange={handleLogoUpload}
+                          />
+                          <Button 
+                            type="button" 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={isUploading}
+                            className="w-full"
+                          >
+                            {isUploading ? (
+                              <>
+                                <Loader2 className="mr-2 animate-spin" size={16} /> 
+                                Mengunggah...
+                              </>
+                            ) : (
+                              <>
+                                <Upload className="mr-2" size={16} /> 
+                                Pilih & Unggah Logo
+                              </>
+                            )}
+                          </Button>
+                          <p className="text-xs text-muted-foreground">Optimal: PNG transparan atau SVG. Maks 2MB.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid gap-2">
+                      <Label>Nama Bisnis (Muncul di Tab & Footer)</Label>
+                      <Input value={businessInfo.name} onChange={(e) => setBusinessInfo({...businessInfo, name: e.target.value})} />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="grid gap-2">
+                        <Label>Teks Logo Utama</Label>
+                        <Input value={businessInfo.logoText} onChange={(e) => setBusinessInfo({...businessInfo, logoText: e.target.value})} placeholder="Misal: Tech" />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label>Teks Logo Aksen</Label>
+                        <Input value={businessInfo.logoAccentText} onChange={(e) => setBusinessInfo({...businessInfo, logoAccentText: e.target.value})} placeholder="Misal: Flow" />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
 
           {activeSection === 'bookings' && (

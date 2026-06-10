@@ -2,30 +2,30 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper function to check if user is authenticated
+    // Fungsi pembantu untuk cek login
     function isAuthenticated() {
       return request.auth != null;
     }
 
-    // Services: Publik bisa melihat daftar layanan, hanya Admin yang bisa mengubah
+    // Services: Publik bisa melihat, Admin bisa edit
     match /services/{serviceId} {
       allow read: if true;
       allow write: if isAuthenticated();
     }
 
-    // Bookings: Publik bisa mengirim pesanan (create), hanya Admin yang bisa melihat/mengelola
+    // Bookings: Publik bisa kirim, Admin bisa kelola
     match /bookings/{bookingId} {
       allow create: if true;
       allow read, update, delete: if isAuthenticated();
     }
 
-    // Business Settings: Publik bisa melihat Nama Bisnis & Logo, hanya Admin yang bisa mengubah
+    // Settings: Publik bisa melihat (PENTING untuk Logo & Nama), Admin bisa edit
     match /settings/{docId} {
       allow read: if true;
       allow write: if isAuthenticated();
     }
     
-    // Default fallback: Tolak akses lainnya demi keamanan
+    // Default: Tolak akses lainnya
     match /{document=**} {
       allow read, write: if false;
     }

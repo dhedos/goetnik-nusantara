@@ -38,7 +38,12 @@ export function initializeFirebase(): FirebaseServices {
 
     const firestore = getFirestore(app);
     const auth = getAuth(app);
-    const storage = getStorage(app);
+    
+    // Pastikan storage diinisialisasi hanya jika bucket tersedia
+    let storage = null;
+    if (firebaseConfig.storageBucket) {
+      storage = getStorage(app);
+    }
 
     return { firebaseApp: app, firestore, auth, storage };
   } catch (error) {
