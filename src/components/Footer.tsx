@@ -1,7 +1,5 @@
-
 "use client";
 
-import { BUSINESS_NAME_DEFAULT } from '@/lib/constants';
 import { Cpu, Facebook, Instagram, Twitter, Linkedin, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
@@ -16,9 +14,9 @@ export function Footer() {
   );
   const { data: settings } = useDoc(settingsRef);
   
-  const logoText = settings?.logoText || 'TechFlow';
-  const logoAccentText = settings?.logoAccentText || 'Mandiri';
-  const businessName = settings?.name || BUSINESS_NAME_DEFAULT;
+  const logoText = settings?.logoText || '';
+  const logoAccentText = settings?.logoAccentText || '';
+  const businessName = settings?.name || '';
 
   return (
     <footer className="bg-card/30 border-t border-border/50 pt-16 pb-8 px-4">

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -15,7 +14,7 @@ import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc, serverTimestamp 
 import { signOut } from 'firebase/auth';
 import { Loader2, Plus, Trash2, Save, LogOut, CheckCircle2, Clock, Globe, Layout } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { BUSINESS_NAME_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT, ICON_MAP } from '@/lib/constants';
+import { ICON_MAP } from '@/lib/constants';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 
@@ -48,10 +47,10 @@ export default function AdminDashboard() {
     whatsapp: '',
     address: '',
     email: '',
-    logoText: 'TechFlow',
-    logoAccentText: 'Mandiri',
-    heroTitle: 'Transformasi Digital Tanpa Hambatan',
-    heroSubtitle: 'Kami menyediakan layanan service laptop profesional, desain grafis estetik, dan pembuatan aplikasi modern.'
+    logoText: '',
+    logoAccentText: '',
+    heroTitle: '',
+    heroSubtitle: ''
   });
 
   useEffect(() => {
@@ -63,14 +62,14 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (settings) {
       setBusinessInfo({
-        name: settings.name || BUSINESS_NAME_DEFAULT,
-        whatsapp: settings.whatsapp || OWNER_WHATSAPP_DEFAULT,
-        address: settings.address || BUSINESS_ADDRESS_DEFAULT,
-        email: settings.email || BUSINESS_EMAIL_DEFAULT,
-        logoText: settings.logoText || 'TechFlow',
-        logoAccentText: settings.logoAccentText || 'Mandiri',
-        heroTitle: settings.heroTitle || 'Transformasi Digital Tanpa Hambatan',
-        heroSubtitle: settings.heroSubtitle || 'Kami menyediakan layanan service laptop profesional, desain grafis estetik, dan pembuatan aplikasi modern.'
+        name: settings.name || '',
+        whatsapp: settings.whatsapp || '',
+        address: settings.address || '',
+        email: settings.email || '',
+        logoText: settings.logoText || '',
+        logoAccentText: settings.logoAccentText || '',
+        heroTitle: settings.heroTitle || '',
+        heroSubtitle: settings.heroSubtitle || ''
       });
     }
   }, [settings]);
@@ -369,6 +368,7 @@ export default function AdminDashboard() {
                       <Input 
                         value={businessInfo.name} 
                         onChange={(e) => setBusinessInfo({...businessInfo, name: e.target.value})}
+                        placeholder="Nama Bisnis Anda"
                       />
                     </div>
                     <div className="grid gap-2">
@@ -376,7 +376,7 @@ export default function AdminDashboard() {
                       <Input 
                         value={businessInfo.logoText} 
                         onChange={(e) => setBusinessInfo({...businessInfo, logoText: e.target.value})}
-                        placeholder="Contoh: TechFlow"
+                        placeholder="Teks Logo Utama"
                       />
                     </div>
                     <div className="grid gap-2">
@@ -384,7 +384,7 @@ export default function AdminDashboard() {
                       <Input 
                         value={businessInfo.logoAccentText} 
                         onChange={(e) => setBusinessInfo({...businessInfo, logoAccentText: e.target.value})}
-                        placeholder="Contoh: Mandiri"
+                        placeholder="Teks Aksen Logo"
                       />
                     </div>
                   </div>
@@ -403,6 +403,7 @@ export default function AdminDashboard() {
                     <Input 
                       value={businessInfo.heroTitle} 
                       onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})}
+                      placeholder="Judul Besar di Depan"
                     />
                   </div>
                   <div className="grid gap-2">
@@ -411,6 +412,7 @@ export default function AdminDashboard() {
                       value={businessInfo.heroSubtitle} 
                       onChange={(e) => setBusinessInfo({...businessInfo, heroSubtitle: e.target.value})}
                       rows={3}
+                      placeholder="Deskripsi singkat di bawah judul utama"
                     />
                   </div>
                 </CardContent>
@@ -437,6 +439,7 @@ export default function AdminDashboard() {
                       <Input 
                         value={businessInfo.email} 
                         onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})}
+                        placeholder="email@bisnis.com"
                       />
                     </div>
                   </div>
@@ -446,6 +449,7 @@ export default function AdminDashboard() {
                       value={businessInfo.address} 
                       onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})}
                       rows={2}
+                      placeholder="Alamat lengkap lokasi bisnis"
                     />
                   </div>
                 </CardContent>
