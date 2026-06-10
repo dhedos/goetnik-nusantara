@@ -51,6 +51,7 @@ function HomeContent() {
   );
   const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
 
+  // Jika firestore belum siap atau sedang memuat pengaturan profil
   if (!firestore || settingsLoading) {
     return <LoadingScreen text="Menghubungkan ke Pusat Layanan..." />;
   }
