@@ -9,14 +9,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, CheckCircle2, 
   Globe, Layout, Info, Phone, Shield, Image as ImageIcon,
-  Settings, ShoppingBag, Menu, X, Upload, AlertTriangle, InfoIcon, Database, Link as LinkIcon
+  Settings, ShoppingBag, Menu, X, Upload, AlertTriangle, Link as LinkIcon
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { ICON_MAP } from '@/lib/constants';
@@ -25,6 +24,7 @@ import { FirestorePermissionError } from '@/firebase/errors';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 
 type AdminSection = 'bookings' | 'services' | 'branding' | 'hero' | 'about' | 'contact' | 'privacy';
 
@@ -40,9 +40,6 @@ export default function AdminDashboard() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const canFetchData = !authLoading && user && firestore;
-
-  // Cek apakah Storage sudah terkonfigurasi dengan benar di Firebase
-  const isStorageConfigured = !!storage?.app?.options?.storageBucket;
 
   const servicesQuery = useMemoFirebase(() => 
     canFetchData ? collection(firestore, 'services') : null, 
@@ -144,11 +141,11 @@ export default function AdminDashboard() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!isStorageConfigured) {
+    if (!storage) {
       toast({ 
         variant: "destructive", 
-        title: "Peringatan", 
-        description: "Firebase Storage Anda memerlukan upgrade ke Blaze Plan. Silakan gunakan opsi URL Manual di bawah jika ingin tetap gratis." 
+        title: "Storage Tidak Aktif", 
+        description: "Firebase Storage belum diaktifkan di Console Anda. Gunakan opsi URL Manual sebagai alternatif." 
       });
       return;
     }
@@ -156,7 +153,8 @@ export default function AdminDashboard() {
     setIsUploading(true);
     try {
       const storagePath = `branding/logo-${Date.now()}`;
-      const storageRef = ref(storage!, storagePath);
+      const storageRef = ref(storage, storagePath);
+      
       const uploadResult = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(uploadResult.ref);
       
@@ -172,11 +170,13 @@ export default function AdminDashboard() {
       
       toast({ title: "Berhasil", description: "Logo berhasil diunggah." });
     } catch (error: any) {
-      console.error(error);
+      console.error("Upload Error:", error);
       toast({ 
         variant: "destructive", 
-        title: "Gagal Unggah", 
-        description: "Firebase menolak akses. Gunakan opsi 'URL Manual' untuk solusi gratis." 
+        title: "Gagal Mengunggah", 
+        description: error.message?.includes('permission') 
+          ? "Izin ditolak. Silakan cek Storage Rules di Firebase Console Anda."
+          : "Terjadi kesalahan koneksi ke Firebase Storage. Gunakan opsi URL Manual jika ingin tetap gratis." 
       });
     } finally {
       setIsUploading(false);
@@ -304,10 +304,10 @@ export default function AdminDashboard() {
           {activeSection === 'branding' && (
             <div className="space-y-6">
               <Alert className="bg-primary/5 border-primary/20">
-                <InfoIcon className="h-4 w-4 text-primary" />
-                <AlertTitle>Solusi Gratis Tanpa Kartu Kredit</AlertTitle>
+                <AlertTriangle className="h-4 w-4 text-primary" />
+                <AlertTitle>Info Gratis (Tanpa Kartu Kredit)</AlertTitle>
                 <AlertDescription>
-                  Jika pengunggahan file meminta upgrade (Blaze Plan), Anda bisa memasukkan **URL Gambar** secara manual di bawah ini. Cukup unggah logo Anda ke situs gratis seperti <b>Imgur.com</b> atau <b>PostImages.org</b>, lalu tempel link gambarnya di sini.
+                  Firebase Storage tetap gratis (5GB). Jika tombol "Unggah" macet, pastikan Anda sudah klik <b>"Get Started"</b> di menu <b>Storage</b> pada Firebase Console. Sebagai alternatif instan, Anda bisa memasukkan <b>URL Gambar</b> secara manual di bawah.
                 </AlertDescription>
               </Alert>
 
@@ -340,23 +340,24 @@ export default function AdminDashboard() {
                     <div className="flex-1 space-y-4 w-full">
                       <div className="grid gap-2">
                         <Label className="flex items-center gap-2">
-                          <LinkIcon size={14} /> Link URL Logo (Opsi Gratis)
+                          <LinkIcon size={14} /> Link URL Logo (Opsi Gratis Terjamin)
                         </Label>
                         <Input 
-                          placeholder="https://imgur.com/logo-anda.png" 
+                          placeholder="https://contoh.com/logo-anda.png" 
                           value={businessInfo.logoUrl}
                           onChange={(e) => setBusinessInfo({...businessInfo, logoUrl: e.target.value})}
                         />
+                        <p className="text-[10px] text-muted-foreground">Tempel link gambar dari Imgur/PostImages di sini jika tombol unggah bermasalah.</p>
                       </div>
                       
                       <div className="relative">
                         <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
-                        <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">Atau Unggah File</span></div>
+                        <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">Atau</span></div>
                       </div>
 
                       <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleLogoUpload} />
                       <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isUploading} className="w-full">
-                        {isUploading ? "Mengunggah..." : "Pilih File Gambar"}
+                        <Upload className="mr-2" size={16} /> {isUploading ? "Sedang Mengunggah..." : "Unggah File Logo"}
                       </Button>
                     </div>
                   </div>
@@ -368,7 +369,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="grid gap-2">
-                        <Label>Teks Logo (Main)</Label>
+                        <Label>Teks Logo (Utama)</Label>
                         <Input value={businessInfo.logoText} onChange={(e) => setBusinessInfo({...businessInfo, logoText: e.target.value})} />
                       </div>
                       <div className="grid gap-2">
@@ -402,6 +403,7 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                   ))}
+                  {bookings?.length === 0 && <p className="text-center text-muted-foreground py-8">Belum ada pesanan masuk.</p>}
                 </div>
               </CardContent>
             </Card>
@@ -414,10 +416,19 @@ export default function AdminDashboard() {
                 {services?.map((service: any) => (
                   <Card key={service.id}>
                     <CardContent className="p-6 space-y-4">
-                      <Input defaultValue={service.name} onBlur={(e) => handleUpdateService(service.id, { name: e.target.value })} placeholder="Nama Layanan" />
-                      <Input defaultValue={service.price} onBlur={(e) => handleUpdateService(service.id, { price: e.target.value })} placeholder="Harga" />
-                      <Textarea defaultValue={service.description} onBlur={(e) => handleUpdateService(service.id, { description: e.target.value })} placeholder="Deskripsi" />
-                      <Button variant="destructive" size="sm" onClick={() => handleDeleteService(service.id)} className="w-full">Hapus</Button>
+                      <div className="grid gap-2">
+                        <Label>Nama Layanan</Label>
+                        <Input defaultValue={service.name} onBlur={(e) => handleUpdateService(service.id, { name: e.target.value })} />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label>Harga</Label>
+                        <Input defaultValue={service.price} onBlur={(e) => handleUpdateService(service.id, { price: e.target.value })} />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label>Deskripsi</Label>
+                        <Textarea defaultValue={service.description} onBlur={(e) => handleUpdateService(service.id, { description: e.target.value })} />
+                      </div>
+                      <Button variant="destructive" size="sm" onClick={() => handleDeleteService(service.id)} className="w-full">Hapus Layanan</Button>
                     </CardContent>
                   </Card>
                 ))}
@@ -428,8 +439,8 @@ export default function AdminDashboard() {
           {activeSection === 'hero' && (
             <Card>
               <CardContent className="p-6 space-y-4">
-                <div className="grid gap-2"><Label>Judul Hero</Label><Input value={businessInfo.heroTitle} onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})} /></div>
-                <div className="grid gap-2"><Label>Subtitle Hero</Label><Textarea value={businessInfo.heroSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, heroSubtitle: e.target.value})} /></div>
+                <div className="grid gap-2"><Label>Judul Utama (Hero)</Label><Input value={businessInfo.heroTitle} onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})} /></div>
+                <div className="grid gap-2"><Label>Sub-judul (Hero)</Label><Textarea value={businessInfo.heroSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, heroSubtitle: e.target.value})} /></div>
               </CardContent>
             </Card>
           )}
@@ -437,8 +448,8 @@ export default function AdminDashboard() {
           {activeSection === 'about' && (
             <Card>
               <CardContent className="p-6 space-y-4">
-                <Input value={businessInfo.aboutTitle} onChange={(e) => setBusinessInfo({...businessInfo, aboutTitle: e.target.value})} placeholder="Judul" />
-                <Textarea value={businessInfo.aboutContent} onChange={(e) => setBusinessInfo({...businessInfo, aboutContent: e.target.value})} rows={10} placeholder="Konten" />
+                <div className="grid gap-2"><Label>Judul Tentang Kami</Label><Input value={businessInfo.aboutTitle} onChange={(e) => setBusinessInfo({...businessInfo, aboutTitle: e.target.value})} /></div>
+                <div className="grid gap-2"><Label>Konten Tentang Kami</Label><Textarea value={businessInfo.aboutContent} onChange={(e) => setBusinessInfo({...businessInfo, aboutContent: e.target.value})} rows={10} /></div>
               </CardContent>
             </Card>
           )}
@@ -447,10 +458,10 @@ export default function AdminDashboard() {
             <Card>
               <CardContent className="p-6 space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
-                  <Input value={businessInfo.whatsapp} onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})} placeholder="WhatsApp" />
-                  <Input value={businessInfo.email} onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})} placeholder="Email" />
+                  <div className="grid gap-2"><Label>Nomor WhatsApp (Tanpa +)</Label><Input value={businessInfo.whatsapp} onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})} placeholder="628123456789" /></div>
+                  <div className="grid gap-2"><Label>Email</Label><Input value={businessInfo.email} onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})} placeholder="admin@email.com" /></div>
                 </div>
-                <Textarea value={businessInfo.address} onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})} placeholder="Alamat" />
+                <div className="grid gap-2"><Label>Alamat Kantor</Label><Textarea value={businessInfo.address} onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})} /></div>
               </CardContent>
             </Card>
           )}
@@ -458,7 +469,7 @@ export default function AdminDashboard() {
           {activeSection === 'privacy' && (
             <Card>
               <CardContent className="p-6">
-                <Textarea value={businessInfo.privacyPolicy} onChange={(e) => setBusinessInfo({...businessInfo, privacyPolicy: e.target.value})} rows={15} placeholder="Kebijakan Privasi" />
+                <div className="grid gap-2"><Label>Teks Kebijakan Privasi</Label><Textarea value={businessInfo.privacyPolicy} onChange={(e) => setBusinessInfo({...businessInfo, privacyPolicy: e.target.value})} rows={15} /></div>
               </CardContent>
             </Card>
           )}
