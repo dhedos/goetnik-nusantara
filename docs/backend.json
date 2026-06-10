@@ -40,6 +40,7 @@
         "whatsapp": { "type": "string" },
         "address": { "type": "string" },
         "email": { "type": "string" },
+        "mapEmbedUrl": { "type": "string", "description": "The src URL from Google Maps Embed iframe code." },
         "logoText": { "type": "string" },
         "logoAccentText": { "type": "string" },
         "logoUrl": { "type": "string" },

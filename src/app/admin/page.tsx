@@ -14,7 +14,7 @@ import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, CheckCircle2, 
   Globe, Layout, Info, Phone, Shield, Image as ImageIcon,
-  Settings, ShoppingBag, Menu, X, Upload
+  Settings, ShoppingBag, Menu, X, Upload, Instagram, Facebook, Twitter, MapPin
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -30,7 +30,7 @@ export default function AdminDashboard() {
   const auth = useAuth();
   const firestore = useFirestore();
   const router = useRouter();
-  const [activeSection, setActiveSection] = useState<AdminSection>('branding');
+  const [activeSection, setActiveSection] = useState<AdminSection>('bookings');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isUploading, setIsUploading] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -61,6 +61,7 @@ export default function AdminDashboard() {
     whatsapp: '',
     address: '',
     email: '',
+    mapEmbedUrl: '',
     logoText: '',
     logoAccentText: '',
     logoUrl: '',
@@ -92,6 +93,7 @@ export default function AdminDashboard() {
         whatsapp: settings.whatsapp || '',
         address: settings.address || '',
         email: settings.email || '',
+        mapEmbedUrl: settings.mapEmbedUrl || '',
         logoText: settings.logoText || '',
         logoAccentText: settings.logoAccentText || '',
         logoUrl: settings.logoUrl || '',
@@ -169,7 +171,6 @@ export default function AdminDashboard() {
       } else if (target === 'hero') {
         setBusinessInfo(prev => ({ ...prev, heroImageUrl: base64String }));
       } else {
-        // Update service image directly
         if (firestore) {
           const docRef = doc(firestore, 'services', target);
           try {
@@ -248,7 +249,7 @@ export default function AdminDashboard() {
     { id: 'branding', label: 'Branding & Logo', icon: Layout },
     { id: 'hero', label: 'Beranda (Hero)', icon: Globe },
     { id: 'about', label: 'Tentang Kami', icon: Info },
-    { id: 'contact', label: 'Kontak', icon: Phone },
+    { id: 'contact', label: 'Kontak & Alamat', icon: Phone },
     { id: 'privacy', label: 'Kebijakan Privasi', icon: Shield },
   ];
 
@@ -551,15 +552,69 @@ export default function AdminDashboard() {
           )}
 
           {activeSection === 'contact' && (
-            <Card>
-              <CardContent className="p-6 space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="grid gap-2"><Label>Nomor WhatsApp (Tanpa +)</Label><Input value={businessInfo.whatsapp} onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})} placeholder="628123456789" /></div>
-                  <div className="grid gap-2"><Label>Email</Label><Input value={businessInfo.email} onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})} placeholder="admin@email.com" /></div>
-                </div>
-                <div className="grid gap-2"><Label>Alamat Kantor</Label><Textarea value={businessInfo.address} onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})} /></div>
-              </CardContent>
-            </Card>
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Informasi Kontak Utama</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label className="flex items-center gap-2"><Phone size={14} /> Nomor WhatsApp (Tanpa +)</Label>
+                      <Input value={businessInfo.whatsapp} onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})} placeholder="628123456789" />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label className="flex items-center gap-2"><X size={14} /> Email Bisnis</Label>
+                      <Input value={businessInfo.email} onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})} placeholder="admin@email.com" />
+                    </div>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label className="flex items-center gap-2"><MapPin size={14} /> Alamat Kantor</Label>
+                    <Textarea value={businessInfo.address} onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})} placeholder="Jl. Merdeka No. 123..." />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Lokasi Peta (Google Maps)</CardTitle>
+                  <CardDescription>Masukkan URL 'src' dari kode iframe Google Maps Embed.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-2">
+                    <Label>Google Maps Embed URL</Label>
+                    <Input 
+                      value={businessInfo.mapEmbedUrl} 
+                      onChange={(e) => setBusinessInfo({...businessInfo, mapEmbedUrl: e.target.value})} 
+                      placeholder="https://www.google.com/maps/embed?pb=..."
+                    />
+                    <p className="text-xs text-muted-foreground italic">
+                      Cara mendapatkan: Buka Google Maps > Share > Embed a map > Salin bagian URL di dalam tanda kutip src="..."
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Media Sosial</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-2">
+                    <Label className="flex items-center gap-2"><Instagram size={14} /> Instagram URL</Label>
+                    <Input value={businessInfo.socialInstagram} onChange={(e) => setBusinessInfo({...businessInfo, socialInstagram: e.target.value})} placeholder="https://instagram.com/akunanda" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label className="flex items-center gap-2"><Facebook size={14} /> Facebook URL</Label>
+                    <Input value={businessInfo.socialFacebook} onChange={(e) => setBusinessInfo({...businessInfo, socialFacebook: e.target.value})} placeholder="https://facebook.com/akunanda" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label className="flex items-center gap-2"><Twitter size={14} /> Twitter URL</Label>
+                    <Input value={businessInfo.socialTwitter} onChange={(e) => setBusinessInfo({...businessInfo, socialTwitter: e.target.value})} placeholder="https://twitter.com/akunanda" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
 
           {activeSection === 'privacy' && (

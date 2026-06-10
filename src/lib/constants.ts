@@ -1,10 +1,10 @@
 
 import { Monitor, HardDrive, Palette, Globe, CheckCircle, Clock, ShieldCheck, Laptop, Phone, Wrench } from 'lucide-react';
 
-export const BUSINESS_NAME_DEFAULT = "";
-export const OWNER_WHATSAPP_DEFAULT = "";
-export const BUSINESS_ADDRESS_DEFAULT = "";
-export const BUSINESS_EMAIL_DEFAULT = "";
+export const BUSINESS_NAME_DEFAULT = "Go Etnik NUSANTARA";
+export const OWNER_WHATSAPP_DEFAULT = "628123456789";
+export const BUSINESS_ADDRESS_DEFAULT = "Jl. Raya Teknologi No. 42, Kota Digital, Indonesia";
+export const BUSINESS_EMAIL_DEFAULT = "admin@goetnik.com";
 
 export const ICON_MAP: Record<string, any> = {
   Monitor,

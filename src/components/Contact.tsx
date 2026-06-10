@@ -20,6 +20,7 @@ export function Contact() {
   const address = settings?.address || BUSINESS_ADDRESS_DEFAULT;
   const email = settings?.email || BUSINESS_EMAIL_DEFAULT;
   const whatsapp = settings?.whatsapp || OWNER_WHATSAPP_DEFAULT;
+  const mapUrl = settings?.mapEmbedUrl || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126748.56347862248!2d107.5731163!3d-6.9034443!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68e6398252477f%3A0x3e18f2d87e0b57e!2sBandung%2C%20Jawa%20Barat!5e0!3m2!1sid!2sid!4v1700000000000!5m2!1sid!2sid";
 
   return (
     <section id="kontak" className="py-24 px-4 bg-background border-t border-border/30">
@@ -41,7 +42,7 @@ export function Contact() {
                   </div>
                   <div>
                     <h4 className="font-bold mb-1">Lokasi Kami</h4>
-                    <p className="text-muted-foreground text-sm">{address}</p>
+                    <p className="text-muted-foreground text-sm whitespace-pre-wrap">{address}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -78,7 +79,7 @@ export function Contact() {
           <div className="lg:col-span-7">
             <div className="rounded-3xl overflow-hidden border border-border h-[500px] shadow-2xl relative">
               <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126748.56347862248!2d107.5731163!3d-6.9034443!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68e6398252477f%3A0x3e18f2d87e0b57e!2sBandung%2C%20Jawa%20Barat!5e0!3m2!1sid!2sid!4v1700000000000!5m2!1sid!2sid" 
+                src={mapUrl}
                 width="100%" 
                 height="100%" 
                 style={{ border: 0 }} 
