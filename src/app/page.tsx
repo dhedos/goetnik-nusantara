@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useSearchParams } from 'next/navigation';
@@ -16,7 +17,7 @@ import { useFirestore, useCollection, useDoc, useMemoFirebase } from '@/firebase
 import { collection, doc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ICON_MAP } from '@/lib/constants';
 
@@ -28,20 +29,28 @@ export default function Home() {
   const businessId = searchParams.get('id') || DEFAULT_BUSINESS_ID;
   const firestore = useFirestore();
 
+  // Pastikan firestore siap sebelum membuat query
+  const canQuery = !!firestore;
+
   const servicesQuery = useMemoFirebase(() => 
-    firestore ? collection(firestore, 'businesses', businessId, 'services') : null, 
-    [firestore, businessId]
+    canQuery ? collection(firestore!, 'businesses', businessId, 'services') : null, 
+    [canQuery, businessId, firestore]
   );
   const { data: services, loading: servicesLoading } = useCollection(servicesQuery);
 
   const settingsRef = useMemoFirebase(() => 
-    firestore ? doc(firestore, 'businesses', businessId, 'settings', 'profile') : null, 
-    [firestore, businessId]
+    canQuery ? doc(firestore!, 'businesses', businessId, 'settings', 'profile') : null, 
+    [canQuery, businessId, firestore]
   );
   const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
 
   if (settingsLoading || (servicesLoading && !services)) {
-    return <div className="flex h-screen items-center justify-center">Memuat Bisnis...</div>;
+    return (
+      <div className="flex h-screen flex-col items-center justify-center gap-4 bg-background">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        <p className="text-muted-foreground animate-pulse">Menghubungkan ke Pusat Layanan...</p>
+      </div>
+    );
   }
 
   const heroPlaceholder = PlaceHolderImages.find(img => img.id === 'hero-tech');
@@ -59,30 +68,51 @@ export default function Home() {
       <main>
         <section className="relative min-h-screen flex items-center pt-20 px-4">
           <div className="absolute inset-0 -z-20">
-            {heroDisplayImage && <Image src={heroDisplayImage} alt="Hero" fill className="object-cover opacity-30" unoptimized={!!settings?.heroImageUrl} />}
+            {heroDisplayImage && (
+              <Image 
+                src={heroDisplayImage} 
+                alt="Hero" 
+                fill 
+                className="object-cover opacity-30" 
+                unoptimized={!!settings?.heroImageUrl} 
+              />
+            )}
             <div className="absolute inset-0 bg-background/90" />
           </div>
           <div className="max-w-7xl mx-auto">
             <div className="space-y-6 max-w-2xl">
-              <Badge variant="outline" className="animate-fade-in">{heroBadge}</Badge>
-              <h1 className="text-5xl md:text-7xl font-bold animate-fade-in">{heroTitle}</h1>
-              <p className="text-xl text-muted-foreground animate-fade-in">{heroSubtitle}</p>
-              <Button asChild size="lg" className="animate-fade-in"><Link href="#pesan">Pesan Sekarang <ArrowRight className="ml-2" /></Link></Button>
+              <Badge variant="outline" className="animate-fade-in border-primary/50 text-primary">{heroBadge}</Badge>
+              <h1 className="text-5xl md:text-7xl font-bold animate-fade-in tracking-tight">{heroTitle}</h1>
+              <p className="text-xl text-muted-foreground animate-fade-in leading-relaxed">{heroSubtitle}</p>
+              <Button asChild size="lg" className="animate-fade-in rounded-xl px-8 shadow-xl shadow-primary/20">
+                <Link href="#pesan">Pesan Sekarang <ArrowRight className="ml-2" /></Link>
+              </Button>
             </div>
           </div>
         </section>
 
         <AIAssistant businessId={businessId} />
         
-        <section id="layanan" className="py-24 px-4">
+        <section id="layanan" className="py-24 px-4 bg-secondary/10">
           <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <Badge variant="outline" className="mb-4">Layanan Unggulan</Badge>
+              <h2 className="text-3xl md:text-4xl font-bold">Solusi Digital Untuk Anda</h2>
+            </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {services?.map((s: any, i: number) => (
-                <ServiceCard key={s.id} {...s} icon={ICON_MAP[s.iconName] || ICON_MAP.Monitor} imageId={serviceImageIds[i % 4]} />
+                <ServiceCard 
+                  key={s.id} 
+                  {...s} 
+                  icon={ICON_MAP[s.iconName] || ICON_MAP.Monitor} 
+                  imageId={serviceImageIds[i % 4]} 
+                />
               ))}
             </div>
             {!services?.length && !servicesLoading && (
-              <p className="text-center text-muted-foreground py-12">Belum ada layanan yang ditambahkan oleh pengusaha ini.</p>
+              <Card className="max-w-md mx-auto p-12 text-center bg-card/30 border-dashed">
+                <p className="text-muted-foreground">Belum ada layanan yang tersedia saat ini.</p>
+              </Card>
             )}
           </div>
         </section>

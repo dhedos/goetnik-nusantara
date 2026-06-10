@@ -26,12 +26,6 @@ import { PRIVACY_POLICY_DEFAULT } from '@/lib/constants';
 
 type AdminSection = 'bookings' | 'services' | 'branding' | 'hero' | 'about' | 'contact' | 'privacy';
 
-const TikTokIcon = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className={className} xmlns="http://www.w3.org/2000/svg">
-    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.13-1.47V18.5c0 1.94-.53 3.89-1.93 5.08-1.47 1.25-3.5 1.55-5.32 1.07-2.31-.7-4.11-2.83-4.44-5.18-.33-2.34.82-4.72 2.79-6.03 1.48-1 3.26-1.33 4.99-1.01V16.5c-1.3-.46-2.82-.14-3.72.93-.65.75-.82 1.83-.54 2.75.29.9 1.1 1.6 2.05 1.77 1.03.19 2.18-.13 2.89-.89.75-.81.82-1.96.82-2.99V0l.08.02z"/>
-  </svg>
-);
-
 export default function AdminDashboard() {
   const { user, loading: authLoading } = useUser();
   const auth = useAuth();
@@ -40,29 +34,27 @@ export default function AdminDashboard() {
   const [activeSection, setActiveSection] = useState<AdminSection>('bookings');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isUploading, setIsUploading] = useState<string | null>(null);
-  const [locationQuery, setLocationQuery] = useState('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const heroInputRef = useRef<HTMLInputElement>(null);
   
-  const canFetchData = !authLoading && user && firestore;
+  // Pastikan data hanya diambil jika user sudah login
+  const canFetchData = !!(user?.uid && firestore);
 
   const servicesQuery = useMemoFirebase(() => 
-    canFetchData ? collection(firestore, 'businesses', user.uid, 'services') : null, 
+    canFetchData ? collection(firestore!, 'businesses', user!.uid, 'services') : null, 
     [canFetchData, firestore, user?.uid]
   );
   const { data: services, loading: servicesLoading } = useCollection(servicesQuery);
 
   const bookingsQuery = useMemoFirebase(() => 
-    canFetchData ? collection(firestore, 'businesses', user.uid, 'bookings') : null, 
+    canFetchData ? collection(firestore!, 'businesses', user!.uid, 'bookings') : null, 
     [canFetchData, firestore, user?.uid]
   );
   const { data: bookings, loading: bookingsLoading } = useCollection(bookingsQuery);
 
   const settingsRef = useMemoFirebase(() => 
-    canFetchData ? doc(firestore, 'businesses', user.uid, 'settings', 'profile') : null, 
+    canFetchData ? doc(firestore!, 'businesses', user!.uid, 'settings', 'profile') : null, 
     [canFetchData, firestore, user?.uid]
   );
-  const { data: settings } = useDoc(settingsRef);
+  const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
 
   const [businessInfo, setBusinessInfo] = useState({
     name: '',
@@ -123,10 +115,8 @@ export default function AdminDashboard() {
         socialYoutube: settings.socialYoutube || '',
         socialTiktok: settings.socialTiktok || ''
       });
-    } else if (!settings && canFetchData) {
-       setBusinessInfo(prev => ({ ...prev, privacyPolicy: PRIVACY_POLICY_DEFAULT }));
     }
-  }, [settings, canFetchData]);
+  }, [settings]);
 
   const handleLogout = async () => {
     if (!auth) return;
@@ -190,7 +180,7 @@ export default function AdminDashboard() {
   const handleAddService = () => {
     if (!firestore || !user) return;
     const colRef = collection(firestore, 'businesses', user.uid, 'services');
-    addDoc(colRef, {
+    const newService = {
       name: 'Layanan Baru',
       price: 'Rp 0',
       description: 'Deskripsi...',
@@ -199,7 +189,16 @@ export default function AdminDashboard() {
       features: ['Fitur 1'],
       ownerId: user.uid,
       createdAt: serverTimestamp()
+    };
+    
+    addDoc(colRef, newService).catch(async (e) => {
+      errorEmitter.emit('permission-error', new FirestorePermissionError({
+        path: colRef.path,
+        operation: 'create',
+        requestResourceData: newService
+      }));
     });
+    
     toast({ title: "Berhasil", description: "Layanan ditambahkan." });
   };
 
@@ -219,7 +218,7 @@ export default function AdminDashboard() {
     { id: 'branding', label: 'Branding & Logo', icon: Layout },
     { id: 'hero', label: 'Beranda (Hero)', icon: Globe },
     { id: 'about', label: 'Tentang Kami', icon: Info },
-    { id: 'contact', label: 'Kontak & Alamat', icon: Phone },
+    { id: 'contact', label: 'Kontak & Media Sosial', icon: Phone },
     { id: 'privacy', label: 'Kebijakan Privasi', icon: Shield },
   ];
 
@@ -248,35 +247,56 @@ export default function AdminDashboard() {
       <main className="flex-1 overflow-y-auto p-4 md:p-8">
         <div className="max-w-5xl mx-auto space-y-6">
           <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-bold capitalize">{activeSection}</h1>
+            <h1 className="text-3xl font-bold capitalize">{activeSection === 'bookings' ? 'Pesanan Masuk' : activeSection}</h1>
             <Button onClick={handleSaveBusinessInfo}><Save className="mr-2" size={18} /> Simpan</Button>
           </div>
 
-          {activeSection === 'bookings' && (
+          {(bookingsLoading || servicesLoading || settingsLoading) && (
+            <div className="flex justify-center p-12"><Loader2 className="animate-spin text-primary" /></div>
+          )}
+
+          {!bookingsLoading && activeSection === 'bookings' && (
             <Card>
-              <CardHeader><CardTitle>Daftar Pesanan Masuk</CardTitle></CardHeader>
+              <CardHeader><CardTitle>Daftar Pesanan</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 {bookings?.map((b: any) => (
-                  <div key={b.id} className="flex justify-between p-4 border rounded-lg">
-                    <div><p className="font-bold">{b.fullName}</p><p className="text-sm text-muted-foreground">{b.service} - {b.whatsapp}</p></div>
-                    <Badge>{b.status}</Badge>
+                  <div key={b.id} className="flex justify-between p-4 border rounded-lg bg-background/50">
+                    <div>
+                      <p className="font-bold">{b.fullName}</p>
+                      <p className="text-sm text-muted-foreground">{b.service} - {b.whatsapp}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Alamat: {b.address}</p>
+                    </div>
+                    <div className="flex flex-col items-end gap-2">
+                      <Badge variant={b.status === 'Selesai' ? 'default' : 'outline'}>{b.status}</Badge>
+                      <Button variant="ghost" size="sm" className="text-destructive" onClick={() => deleteDoc(doc(firestore!, 'businesses', user.uid, 'bookings', b.id))}><Trash2 size={14} /></Button>
+                    </div>
                   </div>
                 ))}
-                {!bookings?.length && <p className="text-center text-muted-foreground">Belum ada pesanan.</p>}
+                {!bookings?.length && <p className="text-center text-muted-foreground py-8">Belum ada pesanan masuk.</p>}
               </CardContent>
             </Card>
           )}
 
-          {activeSection === 'services' && (
+          {!servicesLoading && activeSection === 'services' && (
              <div className="space-y-6">
-                <Button onClick={handleAddService}><Plus className="mr-2" /> Tambah Layanan</Button>
+                <Button onClick={handleAddService}><Plus className="mr-2" size={18} /> Tambah Layanan</Button>
                 <div className="grid md:grid-cols-2 gap-4">
                   {services?.map((s: any) => (
-                    <Card key={s.id}>
+                    <Card key={s.id} className="bg-background/50">
                       <CardContent className="p-4 space-y-4">
-                        <Input defaultValue={s.name} onBlur={(e) => updateDoc(doc(firestore!, 'businesses', user.uid, 'services', s.id), { name: e.target.value })} />
-                        <Input defaultValue={s.price} onBlur={(e) => updateDoc(doc(firestore!, 'businesses', user.uid, 'services', s.id), { price: e.target.value })} />
-                        <Button variant="destructive" size="sm" onClick={() => deleteDoc(doc(firestore!, 'businesses', user.uid, 'services', s.id))}>Hapus</Button>
+                        <div className="space-y-2">
+                          <Label>Nama Layanan</Label>
+                          <Input defaultValue={s.name} onBlur={(e) => updateDoc(doc(firestore!, 'businesses', user.uid, 'services', s.id), { name: e.target.value })} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Harga (Mulai Dari)</Label>
+                          <Input defaultValue={s.price} onBlur={(e) => updateDoc(doc(firestore!, 'businesses', user.uid, 'services', s.id), { price: e.target.value })} />
+                        </div>
+                        <div className="flex justify-between pt-2">
+                          <Input type="file" className="hidden" id={`img-${s.id}`} onChange={(e) => handleImageUpload(e, s.id)} />
+                          <Button variant="outline" size="sm" asChild><label htmlFor={`img-${s.id}`} className="cursor-pointer"><Upload size={14} className="mr-2" /> {isUploading === s.id ? 'Mengunggah...' : 'Upload Gambar'}</label></Button>
+                          <Button variant="destructive" size="sm" onClick={() => deleteDoc(doc(firestore!, 'businesses', user.uid, 'services', s.id))}><Trash2 size={14} /></Button>
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
@@ -285,17 +305,74 @@ export default function AdminDashboard() {
           )}
 
           {activeSection === 'branding' && (
-            <Card><CardContent className="p-6 space-y-4">
-              <Label>Logo Bisnis</Label>
-              <Input type="file" onChange={(e) => handleImageUpload(e, 'logo')} />
+            <Card><CardContent className="p-6 space-y-6">
+              <div className="space-y-2">
+                <Label>Logo Bisnis (Gambar)</Label>
+                <div className="flex items-center gap-4">
+                  {businessInfo.logoUrl && <Image src={businessInfo.logoUrl} alt="Logo" width={50} height={50} className="rounded object-contain" unoptimized />}
+                  <Input type="file" onChange={(e) => handleImageUpload(e, 'logo')} />
+                </div>
+              </div>
               <div className="grid grid-cols-2 gap-4">
-                <Input placeholder="Teks Logo" value={businessInfo.logoText} onChange={(e) => setBusinessInfo({...businessInfo, logoText: e.target.value})} />
-                <Input placeholder="Aksen Teks" value={businessInfo.logoAccentText} onChange={(e) => setBusinessInfo({...businessInfo, logoAccentText: e.target.value})} />
+                <div className="space-y-2">
+                  <Label>Teks Utama Logo</Label>
+                  <Input placeholder="Contoh: Go Etnik" value={businessInfo.logoText} onChange={(e) => setBusinessInfo({...businessInfo, logoText: e.target.value})} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Teks Aksen Logo</Label>
+                  <Input placeholder="Contoh: NUSANTARA" value={businessInfo.logoAccentText} onChange={(e) => setBusinessInfo({...businessInfo, logoAccentText: e.target.value})} />
+                </div>
               </div>
             </CardContent></Card>
           )}
-          
-          {/* Section lain menyesuaikan pola businessInfo... */}
+
+          {activeSection === 'contact' && (
+            <Card><CardContent className="p-6 space-y-6">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2"><Label>WhatsApp Bisnis</Label><Input value={businessInfo.whatsapp} onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})} /></div>
+                <div className="space-y-2"><Label>Email</Label><Input value={businessInfo.email} onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})} /></div>
+              </div>
+              <div className="space-y-2"><Label>Alamat Lengkap</Label><Textarea value={businessInfo.address} onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})} /></div>
+              <div className="space-y-2">
+                <Label>Google Maps Embed URL</Label>
+                <Input placeholder="Paste <iframe> src attribute di sini" value={businessInfo.mapEmbedUrl} onChange={(e) => setBusinessInfo({...businessInfo, mapEmbedUrl: e.target.value})} />
+              </div>
+              <hr />
+              <div className="space-y-4">
+                <Label className="text-primary font-bold">Media Sosial (URL Lengkap)</Label>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-2"><Instagram size={18} /><Input placeholder="Instagram URL" value={businessInfo.socialInstagram} onChange={(e) => setBusinessInfo({...businessInfo, socialInstagram: e.target.value})} /></div>
+                  <div className="flex items-center gap-2"><Facebook size={18} /><Input placeholder="Facebook URL" value={businessInfo.socialFacebook} onChange={(e) => setBusinessInfo({...businessInfo, socialFacebook: e.target.value})} /></div>
+                  <div className="flex items-center gap-2"><Youtube size={18} /><Input placeholder="YouTube URL" value={businessInfo.socialYoutube} onChange={(e) => setBusinessInfo({...businessInfo, socialYoutube: e.target.value})} /></div>
+                  <div className="flex items-center gap-2"><Settings size={18} /><Input placeholder="TikTok URL" value={businessInfo.socialTiktok} onChange={(e) => setBusinessInfo({...businessInfo, socialTiktok: e.target.value})} /></div>
+                </div>
+              </div>
+            </CardContent></Card>
+          )}
+
+          {activeSection === 'privacy' && (
+            <Card><CardContent className="p-6 space-y-4">
+              <Label>Konten Kebijakan Privasi</Label>
+              <Textarea className="min-h-[400px]" value={businessInfo.privacyPolicy} onChange={(e) => setBusinessInfo({...businessInfo, privacyPolicy: e.target.value})} />
+            </CardContent></Card>
+          )}
+
+          {activeSection === 'hero' && (
+            <Card><CardContent className="p-6 space-y-4">
+              <Label>Gambar Hero</Label>
+              <Input type="file" onChange={(e) => handleImageUpload(e, 'hero')} />
+              <Input placeholder="Badge (e.g. Solusi Terpercaya)" value={businessInfo.heroBadge} onChange={(e) => setBusinessInfo({...businessInfo, heroBadge: e.target.value})} />
+              <Input placeholder="Judul Utama" value={businessInfo.heroTitle} onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})} />
+              <Textarea placeholder="Sub-judul" value={businessInfo.heroSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, heroSubtitle: e.target.value})} />
+            </CardContent></Card>
+          )}
+
+          {activeSection === 'about' && (
+            <Card><CardContent className="p-6 space-y-4">
+              <Input placeholder="Judul Tentang Kami" value={businessInfo.aboutTitle} onChange={(e) => setBusinessInfo({...businessInfo, aboutTitle: e.target.value})} />
+              <Textarea className="min-h-[200px]" placeholder="Konten Tentang Kami" value={businessInfo.aboutContent} onChange={(e) => setBusinessInfo({...businessInfo, aboutContent: e.target.value})} />
+            </CardContent></Card>
+          )}
         </div>
       </main>
     </div>
