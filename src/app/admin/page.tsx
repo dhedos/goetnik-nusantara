@@ -32,7 +32,7 @@ export default function AdminDashboard() {
   const firestore = useFirestore();
   const router = useRouter();
   const [activeSection, setActiveSection] = useState<AdminSection>('bookings');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isUploading, setIsUploading] = useState<string | null>(null);
   const [locationQuery, setLocationQuery] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -114,7 +114,6 @@ export default function AdminDashboard() {
         socialTwitter: settings.socialTwitter || ''
       });
     } else if (!settings && canFetchData) {
-       // Fill default privacy policy even if settings doc doesn't exist yet
        setBusinessInfo(prev => ({ ...prev, privacyPolicy: PRIVACY_POLICY_DEFAULT }));
     }
   }, [settings, canFetchData]);
@@ -249,6 +248,13 @@ export default function AdminDashboard() {
     toast({ title: "Berhasil", description: "Lokasi berhasil diterapkan ke pratinjau." });
   };
 
+  const handleNavClick = (sectionId: AdminSection) => {
+    setActiveSection(sectionId);
+    if (window.innerWidth < 768) {
+      setIsSidebarOpen(false);
+    }
+  };
+
   if (authLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -270,20 +276,31 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
+    <div className="flex h-screen overflow-hidden bg-background text-foreground">
+      {/* Overlay for Mobile Sidebar */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 bg-card border-r transition-transform duration-300 transform md:relative md:translate-x-0",
+        "fixed inset-y-0 left-0 z-50 w-64 bg-card border-r transition-transform duration-300 transform md:relative md:translate-x-0 shrink-0",
         isSidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex flex-col h-full">
-          <div className="p-6 border-b">
+          <div className="p-6 border-b flex items-center justify-between">
             <h2 className="text-xl font-bold text-primary">Admin Panel</h2>
+            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsSidebarOpen(false)}>
+              <X size={20} />
+            </Button>
           </div>
           <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
             {navItems.map((item) => (
               <button
                 key={item.id}
-                onClick={() => setActiveSection(item.id as AdminSection)}
+                onClick={() => handleNavClick(item.id as AdminSection)}
                 className={cn(
                   "flex items-center w-full gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
                   activeSection === item.id 
@@ -304,18 +321,18 @@ export default function AdminDashboard() {
         </div>
       </aside>
 
-      <main className="flex-1 p-4 md:p-8 overflow-y-auto">
-        <header className="flex items-center justify-between mb-8 md:hidden">
+      <main className="flex-1 overflow-y-auto relative h-full">
+        <header className="sticky top-0 z-30 flex items-center justify-between p-4 bg-background/80 backdrop-blur-md border-b md:hidden">
           <h2 className="text-xl font-bold">Admin Panel</h2>
-          <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-            {isSidebarOpen ? <X /> : <Menu />}
+          <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(true)}>
+            <Menu />
           </Button>
         </header>
 
-        <div className="max-w-5xl mx-auto space-y-6">
-          <div className="flex items-center justify-between">
+        <div className="p-4 md:p-8 max-w-5xl mx-auto space-y-6 pb-20">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <h1 className="text-3xl font-bold capitalize">Kelola {activeSection.replace('-', ' ')}</h1>
-            <Button onClick={handleSaveBusinessInfo} className="shadow-lg">
+            <Button onClick={handleSaveBusinessInfo} className="shadow-lg h-12">
               <Save className="mr-2" size={18} /> Simpan Perubahan
             </Button>
           </div>
@@ -594,7 +611,7 @@ export default function AdminDashboard() {
               <Card>
                 <CardHeader>
                   <CardTitle>Lokasi Peta (Google Maps)</CardTitle>
-                  <CardDescription>Cari nama lokasi atau masukkan URL &apos;src&apos; secara manual.</CardDescription>
+                  <CardDescription>Cari nama lokasi atau masukkan URL 'src' secara manual.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid gap-2 p-4 border rounded-xl bg-accent/5">
@@ -608,9 +625,6 @@ export default function AdminDashboard() {
                       />
                       <Button onClick={generateMapFromQuery}>Cari & Terapkan</Button>
                     </div>
-                    <p className="text-xs text-muted-foreground italic">
-                      Ketik nama tempat atau alamat lengkap, lalu klik &quot;Cari & Terapkan&quot; untuk mengupdate pratinjau peta di bawah.
-                    </p>
                   </div>
 
                   <div className="grid gap-2 mt-4">
@@ -620,9 +634,6 @@ export default function AdminDashboard() {
                       onChange={(e) => setBusinessInfo({...businessInfo, mapEmbedUrl: e.target.value})} 
                       placeholder="https://www.google.com/maps/embed?pb=..."
                     />
-                    <p className="text-xs text-muted-foreground">
-                      Pilihan manual: Masukkan URL di dalam tanda kutip src=&quot;...&quot; dari kode iframe Google Maps.
-                    </p>
                   </div>
 
                   {businessInfo.mapEmbedUrl && (
