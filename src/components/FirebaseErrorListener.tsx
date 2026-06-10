@@ -10,19 +10,22 @@ export function FirebaseErrorListener() {
   useEffect(() => {
     const handlePermissionError = (error: FirestorePermissionError) => {
       // Tampilkan detail error di console log untuk bantuan teknis
-      console.error('Firestore Permission Denied:', {
-        path: error.context.path,
-        operation: error.context.operation,
-      });
-
-      // Jangan tampilkan toast mengganggu ke pengunjung jika path adalah 'main'
-      // karena biasanya itu hanya masalah propagasi rules awal.
-      if (!error.context.path.includes('main')) {
-        toast({
-          variant: "destructive",
-          title: "Koneksi Terbatas",
-          description: `Gagal mengakses data. Silakan refresh halaman atau pastikan data sudah dipublikasikan.`,
+      if (error && error.context) {
+        console.error('Firestore Permission Denied:', {
+          path: error.context.path,
+          operation: error.context.operation,
+          data: error.context.requestResourceData
         });
+
+        // Jangan tampilkan toast mengganggu ke pengunjung jika path adalah 'main'
+        // karena biasanya itu hanya masalah propagasi rules awal.
+        if (!error.context.path.includes('main')) {
+          toast({
+            variant: "destructive",
+            title: "Koneksi Terbatas",
+            description: `Gagal mengakses data pada path: ${error.context.path}. Silakan refresh halaman.`,
+          });
+        }
       }
     };
 

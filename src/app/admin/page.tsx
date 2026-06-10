@@ -33,6 +33,7 @@ export default function AdminDashboard() {
   const [activeSection, setActiveSection] = useState<AdminSection>('bookings');
   const [isUploading, setIsUploading] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   
   const canFetchData = !!(firestore);
 
@@ -79,6 +80,10 @@ export default function AdminDashboard() {
     socialYoutube: '',
     socialTiktok: ''
   });
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -202,7 +207,7 @@ export default function AdminDashboard() {
     toast({ title: "Link Disalin", description: "Ini adalah alamat website utama Anda." });
   };
 
-  if (authLoading) return <div className="flex h-screen items-center justify-center bg-[#0B1120]"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
+  if (authLoading || !isMounted) return <div className="flex h-screen items-center justify-center bg-[#0B1120]"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   if (!user) return null;
 
   const navItems = [
@@ -215,6 +220,17 @@ export default function AdminDashboard() {
     { id: 'social', label: 'Media Sosial', icon: Instagram },
     { id: 'privacy', label: 'Privasi', icon: Shield },
   ];
+
+  const formatBookingDate = (createdAt: any) => {
+    if (!createdAt || !createdAt.seconds) return 'Baru Saja';
+    return new Date(createdAt.seconds * 1000).toLocaleString('id-ID', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#0B1120] text-foreground">
@@ -261,7 +277,7 @@ export default function AdminDashboard() {
                     <div>
                       <p className="font-bold text-white">{b.fullName}</p>
                       <p className="text-sm text-muted-foreground">{b.service} - {b.whatsapp}</p>
-                      <p className="text-xs text-muted-foreground/50">{b.createdAt?.seconds ? new Date(b.createdAt.seconds * 1000).toLocaleString() : 'Baru Saja'}</p>
+                      <p className="text-xs text-muted-foreground/50">{formatBookingDate(b.createdAt)}</p>
                     </div>
                     <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'bookings', b.id))}><Trash2 size={18} /></Button>
                   </div>
