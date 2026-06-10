@@ -14,7 +14,7 @@ import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, CheckCircle2, 
   Globe, Layout, Info, Phone, Shield, Image as ImageIcon,
-  Settings, ShoppingBag, Menu, X, Upload, Instagram, Facebook, Twitter, MapPin, Search
+  Settings, ShoppingBag, Menu, X, Upload, Instagram, Facebook, Twitter, MapPin, Search, ExternalLink
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -64,6 +64,7 @@ export default function AdminDashboard() {
     address: '',
     email: '',
     mapEmbedUrl: '',
+    mapDirectUrl: '',
     logoText: '',
     logoAccentText: '',
     logoUrl: '',
@@ -96,6 +97,7 @@ export default function AdminDashboard() {
         address: settings.address || '',
         email: settings.email || '',
         mapEmbedUrl: settings.mapEmbedUrl || '',
+        mapDirectUrl: settings.mapDirectUrl || '',
         logoText: settings.logoText || '',
         logoAccentText: settings.logoAccentText || '',
         logoUrl: settings.logoUrl || '',
@@ -244,7 +246,8 @@ export default function AdminDashboard() {
     }
     const encoded = encodeURIComponent(locationQuery);
     const embedUrl = `https://maps.google.com/maps?q=${encoded}&output=embed`;
-    setBusinessInfo({ ...businessInfo, mapEmbedUrl: embedUrl });
+    const directUrl = `https://www.google.com/maps/search/?api=1&query=${encoded}`;
+    setBusinessInfo({ ...businessInfo, mapEmbedUrl: embedUrl, mapDirectUrl: directUrl });
     toast({ title: "Berhasil", description: "Lokasi berhasil diterapkan ke pratinjau." });
   };
 
@@ -635,11 +638,19 @@ export default function AdminDashboard() {
                       placeholder="https://www.google.com/maps/embed?pb=..."
                     />
                   </div>
+                  <div className="grid gap-2">
+                    <Label>Google Maps Direct Link (Manual)</Label>
+                    <Input 
+                      value={businessInfo.mapDirectUrl} 
+                      onChange={(e) => setBusinessInfo({...businessInfo, mapDirectUrl: e.target.value})} 
+                      placeholder="https://www.google.com/maps/search/?api=1&query=..."
+                    />
+                  </div>
 
                   {businessInfo.mapEmbedUrl && (
                     <div className="mt-4">
                       <Label className="mb-2 block">Pratinjau Lokasi Aktif:</Label>
-                      <div className="rounded-xl overflow-hidden border border-border h-[300px] w-full bg-accent/5">
+                      <div className="rounded-xl overflow-hidden border border-border h-[300px] w-full bg-accent/5 relative">
                         <iframe 
                           src={businessInfo.mapEmbedUrl}
                           width="100%" 
@@ -648,6 +659,13 @@ export default function AdminDashboard() {
                           allowFullScreen={true} 
                           loading="lazy" 
                         />
+                        {businessInfo.mapDirectUrl && (
+                          <Button asChild size="sm" className="absolute top-4 left-4 shadow-lg h-9 bg-white text-primary hover:bg-white/90">
+                            <a href={businessInfo.mapDirectUrl} target="_blank">
+                              Open in Maps <ExternalLink size={14} className="ml-2" />
+                            </a>
+                          </Button>
+                        )}
                       </div>
                     </div>
                   )}

@@ -41,6 +41,7 @@
         "address": { "type": "string" },
         "email": { "type": "string" },
         "mapEmbedUrl": { "type": "string", "description": "The src URL from Google Maps Embed iframe code." },
+        "mapDirectUrl": { "type": "string", "description": "The direct link to Google Maps for navigation." },
         "logoText": { "type": "string" },
         "logoAccentText": { "type": "string" },
         "logoUrl": { "type": "string" },
