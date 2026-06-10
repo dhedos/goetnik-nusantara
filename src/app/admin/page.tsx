@@ -38,22 +38,24 @@ export default function AdminDashboard() {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // CRITICAL: Ensure we only query once auth state is settled and user is valid to avoid race conditions
+  // Only query data when we are sure the user is authenticated and loading is finished
+  const canFetchData = !authLoading && user && firestore;
+
   const servicesQuery = useMemoFirebase(() => 
-    (firestore && !authLoading && user) ? collection(firestore, 'services') : null, 
-    [firestore, authLoading, user]
+    canFetchData ? collection(firestore, 'services') : null, 
+    [canFetchData, firestore]
   );
   const { data: services, loading: servicesLoading } = useCollection(servicesQuery);
 
   const bookingsQuery = useMemoFirebase(() => 
-    (firestore && !authLoading && user) ? collection(firestore, 'bookings') : null, 
-    [firestore, authLoading, user]
+    canFetchData ? collection(firestore, 'bookings') : null, 
+    [canFetchData, firestore]
   );
   const { data: bookings, loading: bookingsLoading } = useCollection(bookingsQuery);
 
   const settingsRef = useMemoFirebase(() => 
-    (firestore && !authLoading && user) ? doc(firestore, 'settings', 'business') : null, 
-    [firestore, authLoading, user]
+    canFetchData ? doc(firestore, 'settings', 'business') : null, 
+    [canFetchData, firestore]
   );
   const { data: settings } = useDoc(settingsRef);
 
@@ -165,21 +167,12 @@ export default function AdminDashboard() {
         await setDoc(docRef, { logoUrl: downloadURL }, { merge: true });
       }
       
-      toast({ title: "Berhasil", description: "Logo berhasil diunggah dan diperbarui." });
+      toast({ title: "Berhasil", description: "Logo berhasil diunggah." });
     } catch (error: any) {
-      console.error("Upload Error:", error);
-      let errorMsg = "Terjadi kesalahan saat mengunggah.";
-      
-      if (error.code === 'storage/unauthorized') {
-        errorMsg = "Izin ditolak. Silakan atur Rules di tab STORAGE (bukan Firestore).";
-      } else if (error.code === 'storage/retry-limit-exceeded') {
-        errorMsg = "Waktu habis atau Storage belum diaktifkan di Console.";
-      }
-      
       toast({ 
         variant: "destructive", 
         title: "Gagal Unggah", 
-        description: errorMsg 
+        description: "Pastikan Storage Rules sudah diatur." 
       });
     } finally {
       setIsUploading(false);
@@ -395,19 +388,6 @@ export default function AdminDashboard() {
                         </Button>
                         <p className="text-xs text-muted-foreground">Optimal: PNG transparan atau SVG. Maks 2MB.</p>
                       </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-lg flex gap-3 items-start">
-                    <AlertCircle className="text-amber-500 shrink-0 mt-0.5" size={18} />
-                    <div className="text-sm">
-                      <p className="font-bold text-amber-500">Penting: Masih stuck loading?</p>
-                      <p className="text-muted-foreground mt-1">
-                        Aturan yang Anda kirimkan sebelumnya adalah untuk <b>Firestore</b>. Untuk upload logo, Anda harus pergi ke tab <b>STORAGE</b> (Penyimpanan) di Console dan memasang aturan ini:
-                      </p>
-                      <pre className="mt-2 p-2 bg-background/50 rounded text-[10px] overflow-x-auto">
-                        {`rules_version = '2';\nservice firebase.storage {\n  match /b/{bucket}/o {\n    match /{allPaths=**} {\n      allow read: if true;\n      allow write: if request.auth != null;\n    }\n  }\n}`}
-                      </pre>
                     </div>
                   </div>
 
