@@ -14,7 +14,7 @@ import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
-  Settings, ShoppingBag, Copy, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, ExternalLink
+  Settings, ShoppingBag, ExternalLink, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -180,10 +180,8 @@ export default function AdminDashboard() {
     toast({ title: "Layanan Ditambahkan", description: "Layanan baru muncul di daftar." });
   };
 
-  const copyPublicLink = () => {
-    const url = `${window.location.origin}`;
-    navigator.clipboard.writeText(url);
-    toast({ title: "Link Disalin", description: "Website Anda kini dapat diakses secara publik." });
+  const viewPublicSite = () => {
+    window.open(window.location.origin, '_blank');
   };
 
   if (authLoading || !isMounted) return <div className="flex h-screen items-center justify-center bg-[#0B1120]"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -221,7 +219,7 @@ export default function AdminDashboard() {
           ))}
         </nav>
         <div className="p-4 border-t border-white/5 space-y-2">
-          <Button variant="outline" className="w-full gap-2 rounded-xl text-xs" onClick={copyPublicLink}><Copy size={14} /> Salin Link Web</Button>
+          <Button variant="outline" className="w-full gap-2 rounded-xl text-xs" onClick={viewPublicSite}><ExternalLink size={14} /> Lihat Website</Button>
           <Button variant="destructive" className="w-full gap-2 rounded-xl text-xs" onClick={handleLogout}><LogOut size={14} /> Keluar</Button>
         </div>
       </aside>
