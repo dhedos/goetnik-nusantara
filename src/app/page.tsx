@@ -38,15 +38,15 @@ function HomeContent() {
   );
   const { data: services, loading: servicesLoading } = useCollection(servicesQuery);
 
-  // Query Settings
+  // Query Settings (Data Esensial)
   const settingsRef = useMemoFirebase(() => 
     firestore ? doc(firestore, 'businesses', businessId, 'settings', 'profile') : null, 
     [businessId, firestore]
   );
   const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
 
-  // LOADING SCREEN: Pastikan tampil sesuai desain asli user
-  if (!firestore || settingsLoading || (servicesLoading && !services)) {
+  // LAYAR PEMUATAN: Hanya blokir jika data esensial (settings) belum siap
+  if (!firestore || settingsLoading) {
     return (
       <div className="flex h-screen flex-col items-center justify-center gap-6 bg-[#0B1120] text-center p-4">
         <div className="relative">
@@ -103,17 +103,24 @@ function HomeContent() {
               <Badge variant="outline" className="mb-4">Layanan Unggulan</Badge>
               <h2 className="text-3xl md:text-4xl font-bold">Solusi Digital Untuk Anda</h2>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {services?.map((s: any, i: number) => (
-                <ServiceCard 
-                  key={s.id} 
-                  {...s} 
-                  icon={ICON_MAP[s.iconName] || ICON_MAP.Monitor} 
-                  imageId={serviceImageIds[i % 4]} 
-                />
-              ))}
-            </div>
-            {!services?.length && !servicesLoading && (
+            
+            {servicesLoading ? (
+              <div className="flex flex-col items-center justify-center py-20 gap-4">
+                <Loader2 className="h-10 w-10 animate-spin text-primary/50" />
+                <p className="text-muted-foreground animate-pulse">Memuat daftar layanan...</p>
+              </div>
+            ) : services && services.length > 0 ? (
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {services.map((s: any, i: number) => (
+                  <ServiceCard 
+                    key={s.id} 
+                    {...s} 
+                    icon={ICON_MAP[s.iconName] || ICON_MAP.Monitor} 
+                    imageId={serviceImageIds[i % 4]} 
+                  />
+                ))}
+              </div>
+            ) : (
               <Card className="max-w-md mx-auto p-12 text-center bg-card/30 border-dashed">
                 <p className="text-muted-foreground">Belum ada layanan yang tersedia saat ini.</p>
               </Card>
