@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useUser, useFirestore, useCollection, useDoc, useAuth } from '@/firebase';
+import { useUser, useFirestore, useCollection, useDoc, useAuth, useMemoFirebase } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
-import { Loader2, Plus, Trash2, Save, LogOut, CheckCircle2, Clock, Globe, Monitor, HardDrive, Palette, ShieldCheck, Layout } from 'lucide-react';
+import { Loader2, Plus, Trash2, Save, LogOut, CheckCircle2, Clock, Globe, Layout } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { BUSINESS_NAME_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT, ICON_MAP } from '@/lib/constants';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -25,15 +25,23 @@ export default function AdminDashboard() {
   const firestore = useFirestore();
   const router = useRouter();
   
-  const { data: services, loading: servicesLoading } = useCollection(
-    firestore ? collection(firestore, 'services') : null
+  const servicesQuery = useMemoFirebase(() => 
+    firestore ? collection(firestore, 'services') : null, 
+    [firestore]
   );
-  const { data: bookings, loading: bookingsLoading } = useCollection(
-    firestore ? collection(firestore, 'bookings') : null
+  const { data: services, loading: servicesLoading } = useCollection(servicesQuery);
+
+  const bookingsQuery = useMemoFirebase(() => 
+    firestore ? collection(firestore, 'bookings') : null, 
+    [firestore]
   );
-  const { data: settings } = useDoc(
-    firestore ? doc(firestore, 'settings', 'business') : null
+  const { data: bookings, loading: bookingsLoading } = useCollection(bookingsQuery);
+
+  const settingsRef = useMemoFirebase(() => 
+    firestore ? doc(firestore, 'settings', 'business') : null, 
+    [firestore]
   );
+  const { data: settings } = useDoc(settingsRef);
 
   const [businessInfo, setBusinessInfo] = useState({
     name: '',

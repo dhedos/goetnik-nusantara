@@ -4,13 +4,17 @@
 import { BUSINESS_NAME_DEFAULT } from '@/lib/constants';
 import { Cpu, Facebook, Instagram, Twitter, Linkedin, Lock } from 'lucide-react';
 import Link from 'next/link';
-import { useFirestore, useDoc } from '@/firebase';
+import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
   const firestore = useFirestore();
-  const { data: settings } = useDoc(firestore ? doc(firestore, 'settings', 'business') : null);
+  const settingsRef = useMemoFirebase(() => 
+    firestore ? doc(firestore, 'settings', 'business') : null, 
+    [firestore]
+  );
+  const { data: settings } = useDoc(settingsRef);
   
   const logoText = settings?.logoText || 'TechFlow';
   const logoAccentText = settings?.logoAccentText || 'Mandiri';

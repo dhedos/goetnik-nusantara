@@ -1,13 +1,14 @@
+
 "use client";
 
 import { useState } from 'react';
 import { recommendService, AIServiceRecommendationOutput } from '@/ai/flows/ai-service-recommendation';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Sparkles, Loader2, MessageSquare, AlertCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { useFirestore, useCollection } from '@/firebase';
+import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
 
 export function AIAssistant() {
@@ -17,7 +18,11 @@ export function AIAssistant() {
   const [error, setError] = useState<string | null>(null);
 
   const firestore = useFirestore();
-  const { data: services } = useCollection(firestore ? collection(firestore, 'services') : null);
+  const servicesQuery = useMemoFirebase(() => 
+    firestore ? collection(firestore, 'services') : null, 
+    [firestore]
+  );
+  const { data: services } = useCollection(servicesQuery);
 
   const handleDiagnose = async () => {
     if (!description.trim() || !services) return;
@@ -25,7 +30,6 @@ export function AIAssistant() {
     setLoading(true);
     setError(null);
     try {
-      // Extract only needed fields for the AI
       const availableServices = services.map(s => ({
         name: s.name,
         description: s.description

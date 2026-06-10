@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { useFirestore, useCollection, useDoc } from '@/firebase';
+import { useFirestore, useCollection, useDoc, useMemoFirebase } from '@/firebase';
 import { collection, addDoc, doc } from 'firebase/firestore';
 import { Send } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
@@ -28,8 +28,18 @@ const formSchema = z.object({
 export function BookingForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const firestore = useFirestore();
-  const { data: services } = useCollection(firestore ? collection(firestore, 'services') : null);
-  const { data: settings } = useDoc(firestore ? doc(firestore, 'settings', 'business') : null);
+
+  const servicesQuery = useMemoFirebase(() => 
+    firestore ? collection(firestore, 'services') : null, 
+    [firestore]
+  );
+  const { data: services } = useCollection(servicesQuery);
+
+  const settingsRef = useMemoFirebase(() => 
+    firestore ? doc(firestore, 'settings', 'business') : null, 
+    [firestore]
+  );
+  const { data: settings } = useDoc(settingsRef);
 
   const businessName = settings?.name || BUSINESS_NAME_DEFAULT;
   const ownerWhatsapp = settings?.whatsapp || OWNER_WHATSAPP_DEFAULT;
@@ -50,7 +60,6 @@ export function BookingForm() {
     setIsSubmitting(true);
     
     try {
-      // Save to Firestore
       await addDoc(collection(firestore, 'bookings'), {
         ...values,
         status: 'Pending',

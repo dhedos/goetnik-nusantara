@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useFirestore, useDoc } from '@/firebase';
+import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { MapPin, MessageCircle, Mail, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,11 @@ import { BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAUL
 
 export function Contact() {
   const firestore = useFirestore();
-  const { data: settings } = useDoc(firestore ? doc(firestore, 'settings', 'business') : null);
+  const settingsRef = useMemoFirebase(() => 
+    firestore ? doc(firestore, 'settings', 'business') : null, 
+    [firestore]
+  );
+  const { data: settings } = useDoc(settingsRef);
 
   const address = settings?.address || BUSINESS_ADDRESS_DEFAULT;
   const email = settings?.email || BUSINESS_EMAIL_DEFAULT;

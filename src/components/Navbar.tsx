@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { Menu, X, Cpu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useFirestore, useDoc } from '@/firebase';
+import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 
 const NAV_LINKS = [
@@ -21,7 +21,11 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   
   const firestore = useFirestore();
-  const { data: settings } = useDoc(firestore ? doc(firestore, 'settings', 'business') : null);
+  const settingsRef = useMemoFirebase(() => 
+    firestore ? doc(firestore, 'settings', 'business') : null, 
+    [firestore]
+  );
+  const { data: settings } = useDoc(settingsRef);
 
   const logoText = settings?.logoText || 'TechFlow';
   const logoAccentText = settings?.logoAccentText || 'Mandiri';

@@ -1,13 +1,17 @@
 
 "use client";
 
-import { useFirestore, useDoc } from '@/firebase';
+import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { OWNER_WHATSAPP_DEFAULT } from '@/lib/constants';
 
 export function WhatsAppPopup() {
   const firestore = useFirestore();
-  const { data: settings } = useDoc(firestore ? doc(firestore, 'settings', 'business') : null);
+  const settingsRef = useMemoFirebase(() => 
+    firestore ? doc(firestore, 'settings', 'business') : null, 
+    [firestore]
+  );
+  const { data: settings } = useDoc(settingsRef);
   
   const whatsappNumber = settings?.whatsapp || OWNER_WHATSAPP_DEFAULT;
   const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`;

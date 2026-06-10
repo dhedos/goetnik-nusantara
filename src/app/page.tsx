@@ -10,17 +10,27 @@ import { ServiceCard } from '@/components/ServiceCard';
 import { AboutUs } from '@/components/AboutUs';
 import { Contact } from '@/components/Contact';
 import { Footer } from '@/components/Footer';
-import { useFirestore, useCollection, useDoc } from '@/firebase';
+import { useFirestore, useCollection, useDoc, useMemoFirebase } from '@/firebase';
 import { collection, doc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, ChevronRight, Play } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ICON_MAP } from '@/lib/constants';
 
 export default function Home() {
   const firestore = useFirestore();
-  const { data: services } = useCollection(firestore ? collection(firestore, 'services') : null);
-  const { data: settings } = useDoc(firestore ? doc(firestore, 'settings', 'business') : null);
+
+  const servicesQuery = useMemoFirebase(() => 
+    firestore ? collection(firestore, 'services') : null, 
+    [firestore]
+  );
+  const { data: services } = useCollection(servicesQuery);
+
+  const settingsRef = useMemoFirebase(() => 
+    firestore ? doc(firestore, 'settings', 'business') : null, 
+    [firestore]
+  );
+  const { data: settings } = useDoc(settingsRef);
 
   const heroImage = PlaceHolderImages.find(img => img.id === 'hero-tech');
   const serviceImageIds = ['service-os', 'service-repair', 'service-design', 'service-web'];

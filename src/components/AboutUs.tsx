@@ -1,14 +1,19 @@
+
 "use client";
 
 import { ADVANTAGES, BUSINESS_NAME_DEFAULT } from '@/lib/constants';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { useFirestore, useDoc } from '@/firebase';
+import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 
 export function AboutUs() {
   const firestore = useFirestore();
-  const { data: settings } = useDoc(firestore ? doc(firestore, 'settings', 'business') : null);
+  const settingsRef = useMemoFirebase(() => 
+    firestore ? doc(firestore, 'settings', 'business') : null, 
+    [firestore]
+  );
+  const { data: settings } = useDoc(settingsRef);
   
   const businessName = settings?.name || BUSINESS_NAME_DEFAULT;
 
