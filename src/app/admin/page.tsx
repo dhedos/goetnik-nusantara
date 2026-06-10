@@ -589,7 +589,7 @@ export default function AdminDashboard() {
                       placeholder="https://www.google.com/maps/embed?pb=..."
                     />
                     <p className="text-xs text-muted-foreground italic">
-                      Cara mendapatkan: Buka Google Maps > Share > Embed a map > Salin bagian URL di dalam tanda kutip src="..."
+                      Cara mendapatkan: Buka Google Maps &gt; Share &gt; Embed a map &gt; Salin bagian URL di dalam tanda kutip src="..."
                     </p>
                   </div>
                 </CardContent>
