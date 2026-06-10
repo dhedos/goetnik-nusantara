@@ -592,6 +592,22 @@ export default function AdminDashboard() {
                       Cara mendapatkan: Buka Google Maps &gt; Share &gt; Embed a map &gt; Salin bagian URL di dalam tanda kutip src="..."
                     </p>
                   </div>
+
+                  {businessInfo.mapEmbedUrl && (
+                    <div className="mt-4">
+                      <Label className="mb-2 block">Pratinjau Lokasi:</Label>
+                      <div className="rounded-xl overflow-hidden border border-border h-[300px] w-full bg-accent/5">
+                        <iframe 
+                          src={businessInfo.mapEmbedUrl}
+                          width="100%" 
+                          height="100%" 
+                          style={{ border: 0 }} 
+                          allowFullScreen={true} 
+                          loading="lazy" 
+                        />
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
