@@ -21,8 +21,7 @@ import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import { Badge } from '@/components/ui/badge';
-import { PRIVACY_POLICY_DEFAULT, BUSINESS_NAME_DEFAULT } from '@/lib/constants';
+import { PRIVACY_POLICY_DEFAULT, BUSINESS_NAME_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT } from '@/lib/constants';
 
 type AdminSection = 'bookings' | 'services' | 'branding' | 'hero' | 'about' | 'contact' | 'social' | 'privacy';
 
@@ -57,9 +56,9 @@ export default function AdminDashboard() {
 
   const [businessInfo, setBusinessInfo] = useState({
     name: BUSINESS_NAME_DEFAULT,
-    whatsapp: '',
-    address: '',
-    email: '',
+    whatsapp: OWNER_WHATSAPP_DEFAULT,
+    address: BUSINESS_ADDRESS_DEFAULT,
+    email: BUSINESS_EMAIL_DEFAULT,
     mapEmbedUrl: '',
     mapDirectUrl: '',
     logoText: 'Go Etnik',
@@ -91,9 +90,9 @@ export default function AdminDashboard() {
     if (settings) {
       setBusinessInfo({
         name: settings.name || BUSINESS_NAME_DEFAULT,
-        whatsapp: settings.whatsapp || '',
-        address: settings.address || '',
-        email: settings.email || '',
+        whatsapp: settings.whatsapp || OWNER_WHATSAPP_DEFAULT,
+        address: settings.address || BUSINESS_ADDRESS_DEFAULT,
+        email: settings.email || BUSINESS_EMAIL_DEFAULT,
         mapEmbedUrl: settings.mapEmbedUrl || '',
         mapDirectUrl: settings.mapDirectUrl || '',
         logoText: settings.logoText || 'Go Etnik',
@@ -140,10 +139,10 @@ export default function AdminDashboard() {
     
     setDoc(docRef, data, { merge: true })
       .then(() => {
-        toast({ title: "Berhasil", description: "Pengaturan telah disimpan secara real-time." });
+        toast({ title: "Berhasil Disimpan", description: "Semua perubahan telah diterapkan ke website." });
         setIsSaving(false);
       })
-      .catch(async (e) => {
+      .catch((e) => {
         setIsSaving(false);
         errorEmitter.emit('permission-error', new FirestorePermissionError({
           path: docRef.path,
@@ -175,7 +174,7 @@ export default function AdminDashboard() {
         updateDoc(docRef, { imageUrl: base64String });
       }
       setIsUploading(null);
-      toast({ title: "Berhasil", description: "Gambar berhasil dimuat. Klik Simpan Semua untuk mengunci perubahan." });
+      toast({ title: "Gambar Dimuat", description: "Klik 'Simpan Semua' untuk menyimpan permanen." });
     };
     reader.readAsDataURL(file);
   };
@@ -194,14 +193,14 @@ export default function AdminDashboard() {
       createdAt: serverTimestamp()
     };
     addDoc(colRef, newService);
-    toast({ title: "Berhasil", description: "Layanan baru ditambahkan." });
+    toast({ title: "Layanan Ditambahkan", description: "Layanan baru muncul di daftar." });
   };
 
   const copyPublicLink = () => {
     if (!user) return;
     const url = `${window.location.origin}?id=${user.uid}`;
     navigator.clipboard.writeText(url);
-    toast({ title: "Link Disalin", description: "Bagikan tautan ini ke pelanggan." });
+    toast({ title: "Link Disalin", description: "Tautan ini adalah alamat website publik Anda." });
   };
 
   if (authLoading) return <div className="flex h-screen items-center justify-center bg-[#0B1120]"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -263,6 +262,7 @@ export default function AdminDashboard() {
                     <div>
                       <p className="font-bold text-white">{b.fullName}</p>
                       <p className="text-sm text-muted-foreground">{b.service} - {b.whatsapp}</p>
+                      <p className="text-xs text-muted-foreground/50">{new Date(b.createdAt?.seconds * 1000).toLocaleString()}</p>
                     </div>
                     <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteDoc(doc(firestore!, 'businesses', user.uid, 'bookings', b.id))}><Trash2 size={18} /></Button>
                   </div>
@@ -332,7 +332,7 @@ export default function AdminDashboard() {
               <CardContent className="p-8 space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2"><Label className="text-xs font-bold uppercase">Nama Bisnis</Label><Input value={businessInfo.name} onChange={(e) => setBusinessInfo({...businessInfo, name: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" /></div>
-                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Nomor WhatsApp (62xxx)</Label><Input value={businessInfo.whatsapp} onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" /></div>
+                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Nomor WhatsApp Admin (62xxx)</Label><Input value={businessInfo.whatsapp} onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" /></div>
                   <div className="space-y-2"><Label className="text-xs font-bold uppercase">Email Bisnis</Label><Input value={businessInfo.email} onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" /></div>
                   <div className="space-y-2"><Label className="text-xs font-bold uppercase">Alamat Lengkap</Label><Input value={businessInfo.address} onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" /></div>
                 </div>
@@ -381,9 +381,18 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                       <CardContent className="p-6 space-y-4">
-                        <Input defaultValue={s.name} className="rounded-lg h-10 bg-background/50 font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', user.uid, 'services', s.id), { name: e.target.value })} />
-                        <Input defaultValue={s.price} className="rounded-lg h-10 bg-background/50 text-primary font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', user.uid, 'services', s.id), { price: e.target.value })} />
-                        <Textarea defaultValue={s.description} className="rounded-lg min-h-[80px] bg-background/50 text-xs" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', user.uid, 'services', s.id), { description: e.target.value })} />
+                        <div className="space-y-2">
+                          <Label className="text-[10px] uppercase font-bold opacity-50">Nama Layanan</Label>
+                          <Input defaultValue={s.name} className="rounded-lg h-10 bg-background/50 font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', user.uid, 'services', s.id), { name: e.target.value })} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-[10px] uppercase font-bold opacity-50">Harga Mulai</Label>
+                          <Input defaultValue={s.price} className="rounded-lg h-10 bg-background/50 text-primary font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', user.uid, 'services', s.id), { price: e.target.value })} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-[10px] uppercase font-bold opacity-50">Deskripsi Singkat</Label>
+                          <Textarea defaultValue={s.description} className="rounded-lg min-h-[80px] bg-background/50 text-xs" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', user.uid, 'services', s.id), { description: e.target.value })} />
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
