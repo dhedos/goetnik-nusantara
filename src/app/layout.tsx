@@ -4,6 +4,7 @@ import './globals.css';
 import { FirebaseClientProvider } from '@/firebase';
 import { Toaster } from '@/components/ui/toaster';
 import { WhatsAppPopup } from '@/components/WhatsAppPopup';
+import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 
 export const metadata: Metadata = {
   title: 'TechFlow Mandiri | Solusi Service Laptop & Digital Profesional',
@@ -26,6 +27,7 @@ export default function RootLayout({
         <FirebaseClientProvider>
           {children}
           <WhatsAppPopup />
+          <FirebaseErrorListener />
           <Toaster />
         </FirebaseClientProvider>
       </body>
