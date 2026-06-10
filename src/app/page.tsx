@@ -131,12 +131,16 @@ function HomeContent() {
                 {heroSubtitle}
               </p>
               <div className="flex flex-wrap gap-6 animate-fade-in pt-8 delay-200">
-                <Button asChild size="lg" className="rounded-[1.5rem] px-12 shadow-2xl shadow-primary/40 h-20 text-xl font-black uppercase italic tracking-tighter hover:scale-105 transition-all">
-                  <Link href="#pesan">Mulai Pemesanan <ArrowRight className="ml-2 h-6 w-6" /></Link>
-                </Button>
-                <Button asChild variant="outline" size="lg" className="rounded-[1.5rem] px-12 h-20 text-xl font-bold border-white/10 bg-white/5 backdrop-blur-2xl hover:bg-white/10 transition-all">
-                  <Link href="#layanan">Daftar Layanan</Link>
-                </Button>
+                <Link href="#pesan">
+                  <Button size="lg" className="rounded-[1.5rem] px-12 shadow-2xl shadow-primary/40 h-20 text-xl font-black uppercase italic tracking-tighter hover:scale-105 transition-all">
+                    Mulai Pemesanan <ArrowRight className="ml-2 h-6 w-6" />
+                  </Button>
+                </Link>
+                <Link href="#layanan">
+                  <Button variant="outline" size="lg" className="rounded-[1.5rem] px-12 h-20 text-xl font-bold border-white/10 bg-white/5 backdrop-blur-2xl hover:bg-white/10 transition-all">
+                    Daftar Layanan
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
