@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
+import { useToast } from '@/hooks/use-toast';
 
 const TikTokIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className} xmlns="http://www.w3.org/2000/svg">
@@ -14,6 +15,7 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 );
 
 export function Footer() {
+  const { toast } = useToast();
   const currentYear = new Date().getFullYear();
   const firestore = useFirestore();
   const settingsRef = useMemoFirebase(() => 
@@ -28,12 +30,21 @@ export function Footer() {
   const businessName = settings?.name || 'Go Etnik NUSANTARA';
   const aboutSubtitle = settings?.heroSubtitle || 'Kami menyediakan layanan service laptop profesional, desain grafis estetik, dan pembuatan aplikasi modern.';
 
-  // Social Links with fallbacks for demonstration if empty
   const socialLinks = {
-    instagram: settings?.socialInstagram || '#',
-    facebook: settings?.socialFacebook || '#',
-    youtube: settings?.socialYoutube || '#',
-    tiktok: settings?.socialTiktok || '#'
+    instagram: settings?.socialInstagram || '',
+    facebook: settings?.socialFacebook || '',
+    youtube: settings?.socialYoutube || '',
+    tiktok: settings?.socialTiktok || ''
+  };
+
+  const handleSocialClick = (e: React.MouseEvent<HTMLAnchorElement>, url: string, platform: string) => {
+    if (!url) {
+      e.preventDefault();
+      toast({
+        title: "Informasi",
+        description: `Link ${platform} belum tersedia.`,
+      });
+    }
   };
 
   return (
@@ -67,16 +78,36 @@ export function Footer() {
           </p>
 
           <div className="flex gap-4 pt-2">
-            <a href={socialLinks.instagram} target="_blank" className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all">
+            <a 
+              href={socialLinks.instagram || '#'} 
+              target={socialLinks.instagram ? "_blank" : "_self"}
+              onClick={(e) => handleSocialClick(e, socialLinks.instagram, 'Instagram')}
+              className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all"
+            >
               <Instagram size={20} />
             </a>
-            <a href={socialLinks.facebook} target="_blank" className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all">
+            <a 
+              href={socialLinks.facebook || '#'} 
+              target={socialLinks.facebook ? "_blank" : "_self"}
+              onClick={(e) => handleSocialClick(e, socialLinks.facebook, 'Facebook')}
+              className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all"
+            >
               <Facebook size={20} />
             </a>
-            <a href={socialLinks.youtube} target="_blank" className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all">
+            <a 
+              href={socialLinks.youtube || '#'} 
+              target={socialLinks.youtube ? "_blank" : "_self"}
+              onClick={(e) => handleSocialClick(e, socialLinks.youtube, 'YouTube')}
+              className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all"
+            >
               <Youtube size={20} />
             </a>
-            <a href={socialLinks.tiktok} target="_blank" className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all">
+            <a 
+              href={socialLinks.tiktok || '#'} 
+              target={socialLinks.tiktok ? "_blank" : "_self"}
+              onClick={(e) => handleSocialClick(e, socialLinks.tiktok, 'TikTok')}
+              className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all"
+            >
               <TikTokIcon className="w-5 h-5" />
             </a>
           </div>
