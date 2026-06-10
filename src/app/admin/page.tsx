@@ -14,7 +14,7 @@ import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
-  Settings, ShoppingBag, Copy, Check, Cpu
+  Settings, ShoppingBag, Copy, Cpu
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -157,7 +157,7 @@ export default function AdminDashboard() {
     const file = e.target.files?.[0];
     if (!file || !user || !firestore) return;
 
-    if (file.size > 1024 * 1024) { // 1MB Limit
+    if (file.size > 1024 * 1024) { 
       toast({ variant: "destructive", title: "File Terlalu Besar", description: "Maksimal 1MB untuk performa terbaik di sistem Firestore." });
       return;
     }
@@ -227,7 +227,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#0B1120] text-foreground">
-      {/* Sidebar Admin */}
       <aside className="fixed inset-y-0 left-0 z-50 w-72 bg-card border-r border-white/5 md:relative md:translate-x-0 shrink-0">
         <div className="flex flex-col h-full">
           <div className="p-8 border-b border-white/5">
@@ -326,7 +325,7 @@ export default function AdminDashboard() {
                         <p className="text-sm text-muted-foreground leading-relaxed">Gunakan format PNG transparan untuk hasil terbaik di Navbar dan Footer.</p>
                       </div>
                       <div className="flex flex-wrap justify-center md:justify-start gap-4">
-                        <Input type="file" className="hidden" id="logo-upload" onChange={(e) => handleImageUpload(e, 'logo')} />
+                        <input type="file" className="hidden" id="logo-upload" onChange={(e) => handleImageUpload(e, 'logo')} />
                         <Button asChild variant="secondary" className="rounded-xl px-8 cursor-pointer h-12 font-bold"><label htmlFor="logo-upload">{isUploading === 'logo' ? 'Mengunggah...' : 'Pilih Gambar'}</label></Button>
                         {businessInfo.logoUrl && <Button variant="ghost" className="text-destructive h-12 hover:bg-destructive/10 rounded-xl font-bold" onClick={() => setBusinessInfo({...businessInfo, logoUrl: ''})}>Hapus Logo</Button>}
                       </div>
@@ -346,14 +345,6 @@ export default function AdminDashboard() {
                     <p className="text-[10px] text-muted-foreground">Teks ini akan tampil dengan warna aksen biru.</p>
                   </div>
                 </div>
-
-                <div className="p-8 bg-primary/10 rounded-3xl border border-primary/20 flex items-start gap-6">
-                  <div className="p-3 bg-primary rounded-2xl text-primary-foreground shrink-0 shadow-lg shadow-primary/20"><Layout size={24} /></div>
-                  <div className="space-y-1">
-                    <h5 className="font-black text-white uppercase tracking-widest text-sm">Mode Pratinjau</h5>
-                    <p className="text-sm text-muted-foreground">Logo dan Teks di atas akan otomatis membentuk identitas visual di pojok kiri atas website Anda.</p>
-                  </div>
-                </div>
               </CardContent>
             </Card>
           )}
@@ -370,7 +361,7 @@ export default function AdminDashboard() {
                       <Globe className="text-muted-foreground opacity-10" size={80} />
                     )}
                     <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Input type="file" className="hidden" id="hero-upload" onChange={(e) => handleImageUpload(e, 'hero')} />
+                      <input type="file" className="hidden" id="hero-upload" onChange={(e) => handleImageUpload(e, 'hero')} />
                       <Button asChild className="rounded-2xl px-8 h-12 font-bold cursor-pointer"><label htmlFor="hero-upload">{isUploading === 'hero' ? 'Sedang Memproses...' : 'Ganti Banner Utama'}</label></Button>
                     </div>
                     {!businessInfo.heroImageUrl && <p className="absolute text-muted-foreground/50 font-black italic">PRATINJAU BANNER</p>}
@@ -405,7 +396,7 @@ export default function AdminDashboard() {
                           <div className="flex items-center justify-center h-full text-muted-foreground font-black italic opacity-10 uppercase tracking-widest">No Image</div>
                         )}
                         <div className="absolute top-4 right-4 flex gap-2">
-                          <Input type="file" className="hidden" id={`img-${s.id}`} onChange={(e) => handleImageUpload(e, s.id)} />
+                          <input type="file" className="hidden" id={`img-${s.id}`} onChange={(e) => handleImageUpload(e, s.id)} />
                           <Button variant="secondary" size="sm" asChild className="rounded-full shadow-2xl h-9 px-4 font-bold"><label htmlFor={`img-${s.id}`} className="cursor-pointer">{isUploading === s.id ? '...' : 'Ganti Gambar'}</label></Button>
                           <Button variant="destructive" size="icon" className="rounded-full shadow-2xl h-9 w-9" onClick={() => deleteDoc(doc(firestore!, 'businesses', user.uid, 'services', s.id))}><Trash2 size={16} /></Button>
                         </div>
@@ -431,7 +422,6 @@ export default function AdminDashboard() {
                   <div className="space-y-2"><Label className="font-bold text-white">Email Bisnis</Label><Input placeholder="email@bisnis.com" value={businessInfo.email} onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})} className="rounded-xl h-14 bg-background/50 border-white/5" /></div>
                 </div>
                 <div className="space-y-2"><Label className="font-bold text-white">Alamat Kantor / Lokasi Toko</Label><Textarea placeholder="Jl. Raya Utama No. 1..." value={businessInfo.address} onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})} className="rounded-2xl min-h-[100px] bg-background/50 border-white/5" /></div>
-                <div className="space-y-2"><Label className="font-bold text-white">Google Maps Embed Link</Label><Input placeholder="Paste link dari Google Maps (Iframe Src)" value={businessInfo.mapEmbedUrl} onChange={(e) => setBusinessInfo({...businessInfo, mapEmbedUrl: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" /></div>
               </CardContent>
             </Card>
           )}
@@ -440,7 +430,7 @@ export default function AdminDashboard() {
             <Card className="rounded-[2rem] border-white/5 bg-card/50 shadow-2xl overflow-hidden">
               <CardContent className="p-10 space-y-8">
                 <div className="space-y-2"><Label className="font-black text-white text-lg uppercase">Judul Section 'Tentang Kami'</Label><Input placeholder="Mengenal Lebih Dekat" value={businessInfo.aboutTitle} onChange={(e) => setBusinessInfo({...businessInfo, aboutTitle: e.target.value})} className="rounded-xl h-14 bg-background/50 border-white/5 font-black" /></div>
-                <div className="space-y-2"><Label className="font-black text-white text-lg uppercase">Konten / Narasi Bisnis</Label><Textarea className="min-h-[350px] rounded-[2rem] p-10 bg-background/50 border-white/5 leading-relaxed text-lg" placeholder="Tuliskan sejarah, visi misi, atau kelebihan bisnis Anda..." value={businessInfo.aboutContent} onChange={(e) => setBusinessInfo({...businessInfo, aboutContent: e.target.value})} /></div>
+                <div className="space-y-2"><Label className="font-black text-white text-lg uppercase">Konten / Narasi Bisnis</Label><Textarea className="min-h-[350px] rounded-[2rem] p-10 bg-background/50 border-white/5 leading-relaxed text-lg" placeholder="Sejarah atau visi misi bisnis Anda..." value={businessInfo.aboutContent} onChange={(e) => setBusinessInfo({...businessInfo, aboutContent: e.target.value})} /></div>
               </CardContent>
             </Card>
           )}

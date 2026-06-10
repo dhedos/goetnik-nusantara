@@ -26,23 +26,16 @@ import { ICON_MAP, BUSINESS_NAME_DEFAULT } from '@/lib/constants';
 function LoadingScreen({ text }: { text: string }) {
   return (
     <div className="flex h-screen flex-col items-center justify-center gap-8 bg-[#0B1120] text-center p-4 overflow-hidden relative">
-      {/* Efek Cahaya Latar Belakang */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/20 rounded-full blur-[100px] animate-pulse" />
-      
       <div className="relative z-10 flex flex-col items-center">
-        {/* Spinner Modern dengan Glow */}
         <div className="relative h-20 w-20 mb-6">
           <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
           <div className="absolute inset-0 rounded-full border-4 border-t-primary border-r-transparent border-b-transparent border-l-transparent animate-spin shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
           <Loader2 className="absolute inset-0 m-auto h-10 w-10 text-primary animate-pulse" />
         </div>
-        
-        {/* Teks dengan Efek Ketik/Pudar */}
         <h2 className="text-gray-300 text-xl font-medium tracking-widest animate-pulse drop-shadow-lg">
           {text}
         </h2>
-        
-        {/* Progress Bar Kecil (Visual Saja) */}
         <div className="w-48 h-1 bg-white/5 rounded-full mt-6 overflow-hidden">
           <div className="h-full bg-primary animate-[loading-progress_2s_ease-in-out_infinite]" />
         </div>
@@ -64,7 +57,7 @@ function HomeContent() {
   const { data: services, loading: servicesLoading } = useCollection(servicesQuery);
 
   const settingsRef = useMemoFirebase(() => 
-    firestore ? doc(firestore, businessId === "goetnik-default" ? 'businesses/goetnik-default' : `businesses/${businessId}/settings/profile`) : null, 
+    firestore ? doc(firestore, 'businesses', businessId, 'settings', 'profile') : null, 
     [businessId, firestore]
   );
   const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
@@ -109,7 +102,6 @@ function HomeContent() {
             <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/80 to-background" />
           </div>
           
-          {/* Efek Partikel Dekoratif */}
           <div className="absolute top-1/4 right-0 w-96 h-96 bg-primary/10 rounded-full blur-[120px] -z-10 animate-pulse" />
           <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-accent/5 rounded-full blur-[120px] -z-10 animate-pulse" />
 
@@ -194,7 +186,7 @@ function HomeContent() {
 
 export default function Home() {
   return (
-    <Suspense fallback={<LoadingScreen text="Menyiapkan Pengalaman..." />}>
+    <Suspense fallback={<LoadingScreen text="Menghubungkan ke Pusat Layanan..." />}>
       <HomeContent />
     </Suspense>
   );
