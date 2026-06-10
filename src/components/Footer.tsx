@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Cpu, Facebook, Instagram, Youtube } from 'lucide-react';
@@ -160,8 +159,8 @@ export function Footer() {
       <div className="max-w-7xl mx-auto pt-8 border-t border-border/50 flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground text-sm">
         <div className="flex items-center gap-4">
           <p>© {currentYear} {businessName}. All Rights Reserved.</p>
-          <Link href="/login" className="opacity-20 hover:opacity-100 transition-opacity p-2" title="Admin Access">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-20 hover:opacity-100 transition-opacity"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 .6-.92l7-3a1 1 0 0 1 .8 0l7 3a1 1 0 0 1 .6.92v7Z"/><path d="M12 8a2 2 0 0 0-2 2"/><path d="M12 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><path d="M8 18a4 4 0 0 1 8 0"/></svg>
+          <Link href="/login" className="opacity-05 hover:opacity-20 transition-opacity p-2" title="Admin Access">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-20"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 .6-.92l7-3a1 1 0 0 1 .8 0l7 3a1 1 0 0 1 .6.92v7Z"/><path d="M12 8a2 2 0 0 0-2 2"/><path d="M12 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><path d="M8 18a4 4 0 0 1 8 0"/></svg>
           </Link>
         </div>
       </div>

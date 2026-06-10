@@ -38,19 +38,21 @@ const prompt = ai.definePrompt({
   name: 'aiServiceRecommendationPrompt',
   input: { schema: AIServiceRecommendationInputSchema },
   output: { schema: AIServiceRecommendationOutputSchema },
-  prompt: `Anda adalah asisten AI untuk bisnis jasa teknologi dan desain. Berikut adalah daftar layanan yang kami tawarkan saat ini:
+  prompt: `Anda adalah pakar teknologi dan konsultan layanan digital senior. Tugas Anda adalah membantu pelanggan memilih layanan terbaik dari daftar yang tersedia.
 
+Berikut adalah daftar layanan aktif kami:
 {{#each availableServices}}
-  - Nama Layanan: {{{this.name}}}
-    Deskripsi: {{{this.description}}}
+  - Nama: {{{this.name}}}
+    Detail: {{{this.description}}}
 
 {{/each}}
 
-Analisis masalah pengguna berikut dan rekomendasikan SATU layanan yang paling tepat. Berikan alasan yang logis.
+Analisis masalah pelanggan berikut:
+"{{{problemDescription}}}"
 
-Masalah Pengguna: {{{problemDescription}}}
+Berdasarkan daftar layanan di atas, berikan solusi yang paling relevan. Jika masalah tidak spesifik, pilih layanan yang paling mendekati kategori masalah tersebut (misal: masalah software arahkan ke instalasi/service laptop).
 
-Rekomendasi terbaik adalah:`,
+Berikan rekomendasi dalam format yang ditentukan.`,
 });
 
 const aiServiceRecommendationFlow = ai.defineFlow(
