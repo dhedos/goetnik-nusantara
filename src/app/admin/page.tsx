@@ -93,31 +93,18 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (settings) {
-      setBusinessInfo({
-        name: settings.name || BUSINESS_NAME_DEFAULT,
-        whatsapp: settings.whatsapp || OWNER_WHATSAPP_DEFAULT,
-        address: settings.address || BUSINESS_ADDRESS_DEFAULT,
-        email: settings.email || BUSINESS_EMAIL_DEFAULT,
-        mapEmbedUrl: settings.mapEmbedUrl || '',
-        mapDirectUrl: settings.mapDirectUrl || '',
-        logoText: settings.logoText || 'Go Etnik',
-        logoAccentText: settings.logoAccentText || 'NUSANTARA',
-        logoUrl: settings.logoUrl || '',
-        heroBadge: settings.heroBadge || 'Solusi Digital Terpercaya',
-        heroTitle: settings.heroTitle || BUSINESS_NAME_DEFAULT,
-        heroSubtitle: settings.heroSubtitle || 'Kami melayani kebutuhan teknologi, desain grafis, dan pembuatan aplikasi secara profesional.',
-        heroImageUrl: settings.heroImageUrl || '',
-        aboutTitle: settings.aboutTitle || 'Tentang Bisnis Kami',
-        aboutContent: settings.aboutContent || '',
-        servicesSectionBadge: settings.servicesSectionBadge || 'Katalog Layanan',
-        servicesSectionTitle: settings.servicesSectionTitle || 'Layanan Digital Premium',
-        servicesSectionSubtitle: settings.servicesSectionSubtitle || '',
-        privacyPolicy: settings.privacyPolicy || PRIVACY_POLICY_DEFAULT,
-        socialInstagram: settings.socialInstagram || '',
-        socialFacebook: settings.socialFacebook || '',
-        socialYoutube: settings.socialYoutube || '',
-        socialTiktok: settings.socialTiktok || ''
-      });
+      setBusinessInfo(prev => ({
+        ...prev,
+        ...settings,
+        name: settings.name || prev.name,
+        whatsapp: settings.whatsapp || prev.whatsapp,
+        address: settings.address || prev.address,
+        email: settings.email || prev.email,
+        logoText: settings.logoText || prev.logoText,
+        logoAccentText: settings.logoAccentText || prev.logoAccentText,
+        heroTitle: settings.heroTitle || prev.heroTitle,
+        privacyPolicy: settings.privacyPolicy || prev.privacyPolicy,
+      }));
     }
   }, [settings]);
 
@@ -221,17 +208,6 @@ export default function AdminDashboard() {
     { id: 'privacy', label: 'Privasi', icon: Shield },
   ];
 
-  const formatBookingDate = (createdAt: any) => {
-    if (!createdAt || !createdAt.seconds) return 'Baru Saja';
-    return new Date(createdAt.seconds * 1000).toLocaleString('id-ID', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
   return (
     <div className="flex h-screen overflow-hidden bg-[#0B1120] text-foreground">
       <aside className="w-64 bg-card border-r border-white/5 flex flex-col shrink-0">
@@ -277,7 +253,6 @@ export default function AdminDashboard() {
                     <div>
                       <p className="font-bold text-white">{b.fullName}</p>
                       <p className="text-sm text-muted-foreground">{b.service} - {b.whatsapp}</p>
-                      <p className="text-xs text-muted-foreground/50">{formatBookingDate(b.createdAt)}</p>
                     </div>
                     <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'bookings', b.id))}><Trash2 size={18} /></Button>
                   </div>

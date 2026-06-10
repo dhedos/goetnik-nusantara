@@ -10,14 +10,15 @@ export function FirebaseErrorListener() {
   useEffect(() => {
     const handlePermissionError = (error: FirestorePermissionError) => {
       if (error && error.context) {
-        // Log detail ke konsol dengan format yang jelas
-        console.error('Firestore Access Denied:', {
+        // Log detail ke konsol dengan format yang jelas untuk debugging
+        console.error('Firestore Access Denied Details:', {
           path: error.context.path,
           operation: error.context.operation,
-          message: error.message
+          message: error.message,
+          data: error.context.requestResourceData
         });
 
-        // Abaikan notifikasi untuk path 'main' karena seringkali hanya delay propagasi rules
+        // Abaikan notifikasi toast untuk path 'main' karena seringkali hanya delay propagasi rules di awal
         if (!error.context.path.includes('main')) {
           toast({
             variant: "destructive",
