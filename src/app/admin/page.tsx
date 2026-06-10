@@ -38,18 +38,21 @@ export default function AdminDashboard() {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
+  // Services can be read by anyone (public)
   const servicesQuery = useMemoFirebase(() => 
     firestore ? collection(firestore, 'services') : null, 
     [firestore]
   );
   const { data: services, loading: servicesLoading } = useCollection(servicesQuery);
 
+  // CRITICAL: Only query bookings if the user is authenticated to avoid Permission Denied error
   const bookingsQuery = useMemoFirebase(() => 
-    firestore ? collection(firestore, 'bookings') : null, 
-    [firestore]
+    (firestore && user) ? collection(firestore, 'bookings') : null, 
+    [firestore, user]
   );
   const { data: bookings, loading: bookingsLoading } = useCollection(bookingsQuery);
 
+  // Settings can be read by anyone (public)
   const settingsRef = useMemoFirebase(() => 
     firestore ? doc(firestore, 'settings', 'business') : null, 
     [firestore]
@@ -147,7 +150,6 @@ export default function AdminDashboard() {
       return;
     }
 
-    // Validate file size (2MB)
     if (file.size > 2 * 1024 * 1024) {
       toast({ variant: "destructive", title: "Gagal", description: "Ukuran file maksimal 2MB." });
       return;
@@ -255,13 +257,15 @@ export default function AdminDashboard() {
     toast({ title: "Berhasil", description: "Status pesanan diperbarui." });
   };
 
-  if (authLoading || !user) {
+  if (authLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
+
+  if (!user) return null;
 
   const navItems = [
     { id: 'bookings', label: 'Pesanan', icon: ShoppingBag },
