@@ -1,4 +1,3 @@
-
 'use client';
 
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
@@ -39,10 +38,12 @@ export function initializeFirebase(): FirebaseServices {
     const firestore = getFirestore(app);
     const auth = getAuth(app);
     
-    // Pastikan storage diinisialisasi hanya jika bucket tersedia
+    // Inisialisasi Storage. Jika bucket tidak ada di config, Firebase mungkin akan error saat pemanggilan fungsi storage.
     let storage = null;
-    if (firebaseConfig.storageBucket) {
+    try {
       storage = getStorage(app);
+    } catch (e) {
+      console.warn("Firebase Storage failed to initialize. Check if bucket is configured.");
     }
 
     return { firebaseApp: app, firestore, auth, storage };
