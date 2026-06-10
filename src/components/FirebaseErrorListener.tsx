@@ -9,23 +9,20 @@ import { toast } from '@/hooks/use-toast';
 export function FirebaseErrorListener() {
   useEffect(() => {
     const handlePermissionError = (error: FirestorePermissionError) => {
-      // Tampilkan detail error yang lebih lengkap di console
-      console.error('🔥 FIRESTORE ERROR:', {
-        message: error.message,
+      // Tampilkan detail error di console log untuk bantuan teknis
+      console.error('Firestore Permission Denied:', {
         path: error.context.path,
         operation: error.context.operation,
       });
 
-      // Tampilkan notifikasi kecil di pojok layar
-      toast({
-        variant: "destructive",
-        title: "Akses Terbatas",
-        description: `Gagal mengakses ${error.context.path}. Pastikan data sudah dipublikasikan oleh Admin.`,
-      });
-
-      // Di mode development, kita beri peringatan lebih keras
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('Pastikan Security Rules Anda di Firebase Console sudah di-Publish untuk path ini.');
+      // Jangan tampilkan toast mengganggu ke pengunjung jika path adalah 'main'
+      // karena biasanya itu hanya masalah propagasi rules awal.
+      if (!error.context.path.includes('main')) {
+        toast({
+          variant: "destructive",
+          title: "Koneksi Terbatas",
+          description: `Gagal mengakses data. Silakan refresh halaman atau pastikan data sudah dipublikasikan.`,
+        });
       }
     };
 

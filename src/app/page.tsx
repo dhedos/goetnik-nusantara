@@ -26,30 +26,31 @@ import { ICON_MAP, BUSINESS_NAME_DEFAULT, MAIN_BUSINESS_ID } from '@/lib/constan
 function LoadingScreen({ text }: { text: string }) {
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#0B1120] text-center p-4 overflow-hidden">
-      {/* Background Glows */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px] animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-[120px] animate-pulse delay-700" />
+      {/* Premium Background Glows */}
+      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[140px] animate-pulse" />
+      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[140px] animate-pulse delay-700" />
       
       <div className="relative z-10 flex flex-col items-center">
-        {/* Animated Icon Container */}
-        <div className="relative h-24 w-24 mb-10">
-          <div className="absolute inset-0 rounded-3xl border-2 border-primary/20 rotate-45 animate-[spin_4s_linear_infinite]" />
-          <div className="absolute inset-0 rounded-3xl border-2 border-t-primary border-r-transparent border-b-transparent border-l-transparent rotate-45 animate-[spin_1.5s_linear_infinite] shadow-[0_0_20px_rgba(59,130,246,0.3)]" />
+        {/* Animated Premium Loader */}
+        <div className="relative h-28 w-28 mb-12">
+          <div className="absolute inset-0 rounded-[2rem] border-2 border-primary/10 rotate-45 animate-[spin_6s_linear_infinite]" />
+          <div className="absolute inset-0 rounded-[2rem] border-2 border-t-primary/80 border-r-transparent border-b-transparent border-l-transparent rotate-45 animate-[spin_2s_linear_infinite] shadow-[0_0_30px_rgba(59,130,246,0.2)]" />
           <div className="absolute inset-0 flex items-center justify-center">
-            <Sparkles className="h-10 w-10 text-primary animate-pulse" />
+            <Sparkles className="h-12 w-12 text-primary animate-pulse" />
           </div>
         </div>
 
-        <h2 className="text-white text-2xl font-bold tracking-[0.2em] uppercase mb-8 animate-pulse italic">
+        <h2 className="text-white text-3xl font-black tracking-[0.2em] uppercase mb-10 animate-pulse italic">
           {text}
         </h2>
 
-        {/* Premium Progress Bar */}
-        <div className="w-64 h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5">
-          <div className="h-full bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] animate-[loading-progress_2s_ease-in-out_infinite]" />
+        {/* Premium Animated Progress Bar */}
+        <div className="w-72 h-2 bg-white/5 rounded-full overflow-hidden border border-white/5 relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent animate-[loading-progress_1.5s_infinite]" />
+          <div className="h-full bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] animate-[loading-progress_2.5s_ease-in-out_infinite]" />
         </div>
         
-        <p className="mt-4 text-muted-foreground/40 text-[10px] uppercase tracking-[0.4em] font-medium">
+        <p className="mt-6 text-muted-foreground/30 text-[11px] uppercase tracking-[0.6em] font-bold">
           Sistem Digital Nusantara
         </p>
       </div>
@@ -58,6 +59,7 @@ function LoadingScreen({ text }: { text: string }) {
 }
 
 function HomeContent() {
+  // Selalu gunakan ID 'main' agar terhubung otomatis dengan Admin
   const businessId = MAIN_BUSINESS_ID;
   const firestore = useFirestore();
   const [isTimeout, setIsTimeout] = useState(false);
@@ -75,14 +77,13 @@ function HomeContent() {
   const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
 
   useEffect(() => {
-    // Timeout 4 detik agar pengunjung tidak menunggu selamanya jika koneksi lambat
     const timer = setTimeout(() => {
       setIsTimeout(true);
-    }, 4000); 
+    }, 4500); 
     return () => clearTimeout(timer);
   }, []);
 
-  // Tampilkan loading screen hanya jika data belum ada sama sekali dan belum timeout
+  // Tampilkan loading screen jika sedang mengambil data awal
   if (!isTimeout && (settingsLoading && !settings)) {
     return <LoadingScreen text="Menghubungkan ke Pusat Layanan..." />;
   }
@@ -108,33 +109,33 @@ function HomeContent() {
                 src={heroDisplayImage} 
                 alt="Hero" 
                 fill 
-                className="object-cover opacity-30 animate-[subtle-zoom_20s_infinite_alternate]" 
+                className="object-cover opacity-20 animate-[subtle-zoom_30s_infinite_alternate]" 
                 unoptimized={!!settings?.heroImageUrl} 
                 priority
               />
             )}
-            <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/80 to-background" />
+            <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/80 to-background" />
           </div>
           
           <div className="max-w-7xl mx-auto w-full relative z-10">
-            <div className="space-y-8 max-w-3xl">
-              <Badge variant="outline" className="animate-fade-in border-primary/50 text-primary px-6 py-2 bg-primary/5 backdrop-blur-sm rounded-full tracking-wider uppercase text-xs font-bold">
+            <div className="space-y-10 max-w-4xl">
+              <Badge variant="outline" className="animate-fade-in border-primary/40 text-primary px-8 py-2.5 bg-primary/10 backdrop-blur-xl rounded-full tracking-[0.2em] uppercase text-[10px] font-black">
                 {heroBadge}
               </Badge>
-              <h1 className="text-6xl md:text-8xl font-black animate-fade-in tracking-tighter leading-[0.9] text-white">
+              <h1 className="text-6xl md:text-9xl font-black animate-fade-in tracking-tighter leading-[0.85] text-white">
                 {heroTitle.split(' ').map((word: string, i: number) => (
                   <span key={i} className={i === 1 ? "text-primary block" : "block"}>{word} </span>
                 ))}
               </h1>
-              <p className="text-xl text-muted-foreground animate-fade-in leading-relaxed max-w-xl delay-100">
+              <p className="text-xl md:text-2xl text-muted-foreground/80 animate-fade-in leading-relaxed max-w-2xl delay-100 font-medium">
                 {heroSubtitle}
               </p>
-              <div className="flex flex-wrap gap-5 animate-fade-in pt-6 delay-200">
-                <Button asChild size="lg" className="rounded-2xl px-10 shadow-2xl shadow-primary/30 h-16 text-lg font-bold hover:scale-105 transition-all">
-                  <Link href="#pesan">Mulai Pemesanan <ArrowRight className="ml-2" /></Link>
+              <div className="flex flex-wrap gap-6 animate-fade-in pt-8 delay-200">
+                <Button asChild size="lg" className="rounded-[1.5rem] px-12 shadow-2xl shadow-primary/40 h-20 text-xl font-black uppercase italic tracking-tighter hover:scale-105 transition-all">
+                  <Link href="#pesan">Mulai Pemesanan <ArrowRight className="ml-2 h-6 w-6" /></Link>
                 </Button>
-                <Button asChild variant="outline" size="lg" className="rounded-2xl px-10 h-16 text-lg border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 transition-all">
-                  <Link href="#layanan">Jelajahi Layanan</Link>
+                <Button asChild variant="outline" size="lg" className="rounded-[1.5rem] px-12 h-20 text-xl font-bold border-white/10 bg-white/5 backdrop-blur-2xl hover:bg-white/10 transition-all">
+                  <Link href="#layanan">Daftar Layanan</Link>
                 </Button>
               </div>
             </div>
@@ -144,23 +145,23 @@ function HomeContent() {
         <AIAssistant businessId={businessId} />
         
         {/* Services Section */}
-        <section id="layanan" className="py-32 px-4 bg-secondary/10 relative">
+        <section id="layanan" className="py-40 px-4 bg-secondary/5 relative">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-20 space-y-6">
-              <Badge variant="outline" className="uppercase tracking-[0.3em] px-6 py-1 border-primary/30 text-primary bg-primary/5">Premium Solutions</Badge>
-              <h2 className="text-4xl md:text-6xl font-black tracking-tight">Katalog Layanan Digital</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto text-lg">Hadirkan efisiensi dan kreativitas dalam setiap aspek kebutuhan teknologi Anda.</p>
+            <div className="text-center mb-28 space-y-8">
+              <Badge variant="outline" className="uppercase tracking-[0.4em] px-8 py-2 border-primary/20 text-primary bg-primary/5 font-black text-[10px]">Premium Solutions</Badge>
+              <h2 className="text-5xl md:text-8xl font-black tracking-tight leading-none italic uppercase">Katalog Layanan</h2>
+              <p className="text-muted-foreground/60 max-w-3xl mx-auto text-xl font-medium">Hadirkan efisiensi dan kreativitas dalam setiap aspek kebutuhan teknologi Anda.</p>
             </div>
             
             {servicesLoading ? (
-              <div className="flex flex-col items-center justify-center py-32 gap-6">
-                <Loader2 className="h-10 w-10 text-primary animate-spin" />
-                <p className="text-muted-foreground animate-pulse tracking-widest text-sm uppercase">Menyiapkan Katalog...</p>
+              <div className="flex flex-col items-center justify-center py-40 gap-8">
+                <div className="h-16 w-16 rounded-3xl border-2 border-primary/20 border-t-primary animate-spin" />
+                <p className="text-muted-foreground animate-pulse tracking-[0.5em] text-xs uppercase font-black">Menyiapkan Katalog...</p>
               </div>
             ) : services && services.length > 0 ? (
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
                 {services.map((s: any, i: number) => (
-                  <div key={s.id} className="animate-fade-in" style={{ animationDelay: `${i * 100}ms` }}>
+                  <div key={s.id} className="animate-fade-in" style={{ animationDelay: `${i * 150}ms` }}>
                     <ServiceCard 
                       {...s} 
                       icon={ICON_MAP[s.iconName] || ICON_MAP.Monitor} 
@@ -170,12 +171,12 @@ function HomeContent() {
                 ))}
               </div>
             ) : (
-              <Card className="max-w-2xl mx-auto p-16 text-center bg-card/20 border-dashed border-white/5 backdrop-blur-sm rounded-[2rem]">
-                <div className="w-20 h-20 bg-muted/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Loader2 className="h-10 w-10 text-muted-foreground opacity-20" />
+              <Card className="max-w-3xl mx-auto p-24 text-center bg-card/10 border-dashed border-white/5 backdrop-blur-2xl rounded-[3rem]">
+                <div className="w-24 h-24 bg-muted/10 rounded-full flex items-center justify-center mx-auto mb-8">
+                  <Loader2 className="h-12 w-12 text-muted-foreground opacity-10" />
                 </div>
-                <h3 className="text-2xl font-bold mb-2 text-white/50">Layanan Belum Tersedia</h3>
-                <p className="text-muted-foreground mb-8">Admin sedang menyiapkan paket-paket terbaik untuk Anda. Silakan cek kembali nanti.</p>
+                <h3 className="text-3xl font-black mb-4 text-white/40 uppercase italic">Layanan Belum Tersedia</h3>
+                <p className="text-muted-foreground/60 mb-10 text-lg">Admin sedang menyiapkan paket-paket terbaik untuk Anda. Silakan cek kembali nanti.</p>
               </Card>
             )}
           </div>
