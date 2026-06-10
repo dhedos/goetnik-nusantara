@@ -90,7 +90,7 @@ export function Footer() {
 
       <div className="max-w-7xl mx-auto pt-8 border-t border-border/50 flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground text-sm">
         <p>© {currentYear} {businessName}. All Rights Reserved.</p>
-        <Link href="/login" className="opacity-5 hover:opacity-100 transition-opacity p-2">
+        <Link href="/login" className="opacity-20 hover:opacity-100 transition-opacity p-2" title="Admin Access">
           <Fingerprint size={12} />
         </Link>
       </div>
