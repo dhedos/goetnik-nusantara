@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from 'next/link';
@@ -17,14 +16,18 @@ const NAV_LINKS = [
   { name: 'Kontak', href: '#kontak' },
 ];
 
-export function Navbar() {
+interface NavbarProps {
+  businessId: string;
+}
+
+export function Navbar({ businessId }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   
   const firestore = useFirestore();
   const settingsRef = useMemoFirebase(() => 
-    firestore ? doc(firestore, 'settings', 'business') : null, 
-    [firestore]
+    firestore ? doc(firestore, 'businesses', businessId, 'settings', 'profile') : null, 
+    [firestore, businessId]
   );
   const { data: settings } = useDoc(settingsRef);
 

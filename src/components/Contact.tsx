@@ -7,6 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT } from '@/lib/constants';
 
+interface ContactProps {
+  businessId: string;
+}
+
 const WhatsAppIcon = ({ className }: { className?: string }) => (
   <svg 
     viewBox="0 0 24 24" 
@@ -18,11 +22,11 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export function Contact() {
+export function Contact({ businessId }: ContactProps) {
   const firestore = useFirestore();
   const settingsRef = useMemoFirebase(() => 
-    firestore ? doc(firestore, 'settings', 'business') : null, 
-    [firestore]
+    firestore ? doc(firestore, 'businesses', businessId, 'settings', 'profile') : null, 
+    [firestore, businessId]
   );
   const { data: settings } = useDoc(settingsRef);
 

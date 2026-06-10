@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { useFirestore, useCollection, useDoc, useMemoFirebase } from '@/firebase';
-import { collection, addDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { Send } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { BUSINESS_NAME_DEFAULT, OWNER_WHATSAPP_DEFAULT } from '@/lib/constants';
@@ -24,19 +24,23 @@ const formSchema = z.object({
   notes: z.string().optional(),
 });
 
-export function BookingForm() {
+interface BookingFormProps {
+  businessId: string;
+}
+
+export function BookingForm({ businessId }: BookingFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const firestore = useFirestore();
 
   const servicesQuery = useMemoFirebase(() => 
-    firestore ? collection(firestore, 'services') : null, 
-    [firestore]
+    firestore ? collection(firestore, 'businesses', businessId, 'services') : null, 
+    [firestore, businessId]
   );
   const { data: services } = useCollection(servicesQuery);
 
   const settingsRef = useMemoFirebase(() => 
-    firestore ? doc(firestore, 'settings', 'business') : null, 
-    [firestore]
+    firestore ? doc(firestore, 'businesses', businessId, 'settings', 'profile') : null, 
+    [firestore, businessId]
   );
   const { data: settings } = useDoc(settingsRef);
 
@@ -60,10 +64,12 @@ export function BookingForm() {
     setIsSubmitting(true);
     
     try {
-      await addDoc(collection(firestore, 'bookings'), {
+      const bookingsColRef = collection(firestore, 'businesses', businessId, 'bookings');
+      await addDoc(bookingsColRef, {
         ...values,
+        businessId,
         status: 'Pending',
-        createdAt: new Date().toISOString(),
+        createdAt: serverTimestamp(),
       });
 
       const message = `*PESANAN BARU - ${businessName}*

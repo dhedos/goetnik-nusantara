@@ -5,12 +5,16 @@ import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { OWNER_WHATSAPP_DEFAULT } from '@/lib/constants';
 
-export function WhatsAppPopup() {
+interface WhatsAppPopupProps {
+  businessId: string;
+}
+
+export function WhatsAppPopup({ businessId }: WhatsAppPopupProps) {
   const [mounted, setMounted] = useState(false);
   const firestore = useFirestore();
   const settingsRef = useMemoFirebase(() => 
-    firestore ? doc(firestore, 'settings', 'business') : null, 
-    [firestore]
+    firestore ? doc(firestore, 'businesses', businessId, 'settings', 'profile') : null, 
+    [firestore, businessId]
   );
   const { data: settings } = useDoc(settingsRef);
   

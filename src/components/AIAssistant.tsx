@@ -10,7 +10,11 @@ import { Badge } from '@/components/ui/badge';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
 
-export function AIAssistant() {
+interface AIAssistantProps {
+  businessId: string;
+}
+
+export function AIAssistant({ businessId }: AIAssistantProps) {
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AIServiceRecommendationOutput | null>(null);
@@ -18,8 +22,8 @@ export function AIAssistant() {
 
   const firestore = useFirestore();
   const servicesQuery = useMemoFirebase(() => 
-    firestore ? collection(firestore, 'services') : null, 
-    [firestore]
+    firestore ? collection(firestore, 'businesses', businessId, 'services') : null, 
+    [firestore, businessId]
   );
   const { data: services } = useCollection(servicesQuery);
 

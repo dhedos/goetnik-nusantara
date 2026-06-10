@@ -1,4 +1,3 @@
-
 "use client";
 
 import { ADVANTAGES } from '@/lib/constants';
@@ -7,16 +6,20 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 
-export function AboutUs() {
+interface AboutUsProps {
+  businessId: string;
+}
+
+export function AboutUs({ businessId }: AboutUsProps) {
   const firestore = useFirestore();
   const settingsRef = useMemoFirebase(() => 
-    firestore ? doc(firestore, 'settings', 'business') : null, 
-    [firestore]
+    firestore ? doc(firestore, 'businesses', businessId, 'settings', 'profile') : null, 
+    [firestore, businessId]
   );
   const { data: settings } = useDoc(settingsRef);
   
-  const aboutTitle = settings?.aboutTitle || '';
-  const aboutContent = settings?.aboutContent || '';
+  const aboutTitle = settings?.aboutTitle || 'Tentang Kami';
+  const aboutContent = settings?.aboutContent || 'Kami adalah penyedia layanan digital profesional yang berdedikasi untuk memberikan solusi terbaik bagi pelanggan.';
 
   return (
     <section id="tentang" className="py-24 px-4 bg-secondary/20">

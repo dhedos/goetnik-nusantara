@@ -2,9 +2,7 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { FirebaseClientProvider } from '@/firebase';
 import { Toaster } from '@/components/ui/toaster';
-import { WhatsAppPopup } from '@/components/WhatsAppPopup';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
-import { DynamicTitle } from '@/components/DynamicTitle';
 
 export const metadata: Metadata = {
   title: 'Pusat Layanan Digital & Service',
@@ -25,9 +23,7 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased bg-background text-foreground">
         <FirebaseClientProvider>
-          <DynamicTitle />
           {children}
-          <WhatsAppPopup />
           <FirebaseErrorListener />
           <Toaster />
         </FirebaseClientProvider>

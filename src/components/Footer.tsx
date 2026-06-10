@@ -21,13 +21,17 @@ const TikTokIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export function Footer() {
+interface FooterProps {
+  businessId: string;
+}
+
+export function Footer({ businessId }: FooterProps) {
   const { toast } = useToast();
   const currentYear = new Date().getFullYear();
   const firestore = useFirestore();
   const settingsRef = useMemoFirebase(() => 
-    firestore ? doc(firestore, 'settings', 'business') : null, 
-    [firestore]
+    firestore ? doc(firestore, 'businesses', businessId, 'settings', 'profile') : null, 
+    [firestore, businessId]
   );
   const { data: settings } = useDoc(settingsRef);
   

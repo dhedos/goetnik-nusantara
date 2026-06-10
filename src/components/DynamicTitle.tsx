@@ -4,11 +4,15 @@ import { useEffect } from 'react';
 import { useDoc, useMemoFirebase, useFirestore } from '@/firebase';
 import { doc } from 'firebase/firestore';
 
-export function DynamicTitle() {
+interface DynamicTitleProps {
+  businessId: string;
+}
+
+export function DynamicTitle({ businessId }: DynamicTitleProps) {
   const firestore = useFirestore();
   const settingsRef = useMemoFirebase(() => 
-    firestore ? doc(firestore, 'settings', 'business') : null, 
-    [firestore]
+    firestore ? doc(firestore, 'businesses', businessId, 'settings', 'profile') : null, 
+    [firestore, businessId]
   );
   const { data: settings } = useDoc(settingsRef);
 

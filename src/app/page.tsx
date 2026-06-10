@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useSearchParams } from 'next/navigation';
@@ -11,9 +10,12 @@ import { ServiceCard } from '@/components/ServiceCard';
 import { AboutUs } from '@/components/AboutUs';
 import { Contact } from '@/components/Contact';
 import { Footer } from '@/components/Footer';
+import { WhatsAppPopup } from '@/components/WhatsAppPopup';
+import { DynamicTitle } from '@/components/DynamicTitle';
 import { useFirestore, useCollection, useDoc, useMemoFirebase } from '@/firebase';
 import { collection, doc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { ArrowRight } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ICON_MAP } from '@/lib/constants';
@@ -52,6 +54,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <DynamicTitle businessId={businessId} />
       <Navbar businessId={businessId} />
       <main>
         <section className="relative min-h-screen flex items-center pt-20 px-4">
@@ -61,10 +64,10 @@ export default function Home() {
           </div>
           <div className="max-w-7xl mx-auto">
             <div className="space-y-6 max-w-2xl">
-              <Badge variant="outline">{heroBadge}</Badge>
-              <h1 className="text-5xl md:text-7xl font-bold">{heroTitle}</h1>
-              <p className="text-xl text-muted-foreground">{heroSubtitle}</p>
-              <Button asChild size="lg"><Link href="#pesan">Pesan Sekarang <ArrowRight className="ml-2" /></Link></Button>
+              <Badge variant="outline" className="animate-fade-in">{heroBadge}</Badge>
+              <h1 className="text-5xl md:text-7xl font-bold animate-fade-in">{heroTitle}</h1>
+              <p className="text-xl text-muted-foreground animate-fade-in">{heroSubtitle}</p>
+              <Button asChild size="lg" className="animate-fade-in"><Link href="#pesan">Pesan Sekarang <ArrowRight className="ml-2" /></Link></Button>
             </div>
           </div>
         </section>
@@ -78,6 +81,9 @@ export default function Home() {
                 <ServiceCard key={s.id} {...s} icon={ICON_MAP[s.iconName] || ICON_MAP.Monitor} imageId={serviceImageIds[i % 4]} />
               ))}
             </div>
+            {!services?.length && !servicesLoading && (
+              <p className="text-center text-muted-foreground py-12">Belum ada layanan yang ditambahkan oleh pengusaha ini.</p>
+            )}
           </div>
         </section>
 
@@ -86,6 +92,7 @@ export default function Home() {
         <Contact businessId={businessId} />
       </main>
       <Footer businessId={businessId} />
+      <WhatsAppPopup businessId={businessId} />
     </div>
   );
 }
