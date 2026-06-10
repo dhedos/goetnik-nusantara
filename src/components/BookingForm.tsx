@@ -42,7 +42,9 @@ export function BookingForm() {
   const { data: settings } = useDoc(settingsRef);
 
   const businessName = settings?.name || BUSINESS_NAME_DEFAULT;
-  const ownerWhatsapp = settings?.whatsapp || OWNER_WHATSAPP_DEFAULT;
+  const rawWhatsapp = settings?.whatsapp || OWNER_WHATSAPP_DEFAULT;
+  // Bersihkan nomor agar hanya berisi angka untuk wa.me
+  const ownerWhatsapp = rawWhatsapp.replace(/[^0-9]/g, '');
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -60,31 +62,40 @@ export function BookingForm() {
     setIsSubmitting(true);
     
     try {
+      // 1. Simpan ke Firestore untuk arsip Admin
       await addDoc(collection(firestore, 'bookings'), {
         ...values,
         status: 'Pending',
         createdAt: new Date().toISOString(),
       });
 
+      // 2. Susun pesan untuk dikirim ke WhatsApp
       const message = `*PESANAN BARU - ${businessName}*
----
-*Nama:* ${values.fullName}
-*WA:* ${values.whatsapp}
-*Alamat:* ${values.address}
-*Layanan:* ${values.service}
-*Catatan:* ${values.notes || '-'}
----
-_Dikirim via Website ${businessName}_`;
+━━━━━━━━━━━━━━━━━━
+👤 *Pelanggan:* ${values.fullName}
+📱 *WhatsApp:* ${values.whatsapp}
+📍 *Alamat:* ${values.address}
+🛠️ *Layanan:* ${values.service}
+📝 *Catatan:* ${values.notes || '-'}
+━━━━━━━━━━━━━━━━━━
+_Dikirim melalui Sistem Pemesanan Website_`;
 
       const encodedMessage = encodeURIComponent(message);
       const whatsappUrl = `https://wa.me/${ownerWhatsapp}?text=${encodedMessage}`;
       
-      window.open(whatsappUrl, '_blank');
-      toast({ title: "Berhasil", description: "Pesanan Anda telah dikirim dan disimpan." });
-      form.reset();
+      // 3. Beri notifikasi sukses dan arahkan ke WhatsApp
+      toast({ title: "Berhasil", description: "Pesanan disimpan. Mengalihkan ke WhatsApp..." });
+      
+      // Gunakan setTimeout agar user sempat melihat toast sebelum pindah halaman
+      setTimeout(() => {
+        window.open(whatsappUrl, '_blank');
+        form.reset();
+        setIsSubmitting(false);
+      }, 1000);
+
     } catch (e) {
-      toast({ variant: "destructive", title: "Gagal", description: "Terjadi kesalahan saat menyimpan pesanan." });
-    } finally {
+      console.error(e);
+      toast({ variant: "destructive", title: "Gagal", description: "Terjadi kesalahan teknis. Silakan coba lagi." });
       setIsSubmitting(false);
     }
   }
@@ -95,15 +106,15 @@ _Dikirim via Website ${businessName}_`;
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold font-headline mb-4">Form Pemesanan</h2>
           <p className="text-muted-foreground text-lg">
-            Isi data di bawah ini untuk memesan layanan. Kami akan segera menghubungi Anda.
+            Isi data di bawah ini untuk memesan layanan. Kami akan segera menghubungi Anda melalui WhatsApp.
           </p>
         </div>
 
-        <Card className="border-border/50 bg-card/30 backdrop-blur-sm overflow-hidden shadow-2xl">
+        <Card className="border-border/50 bg-card/30 backdrop-blur-sm overflow-hidden shadow-2xl relative">
           <div className="h-2 bg-gradient-to-r from-primary to-accent w-full" />
           <CardHeader>
             <CardTitle>Rincian Pesanan</CardTitle>
-            <CardDescription>Semua data aman dan akan diteruskan langsung ke tim kami.</CardDescription>
+            <CardDescription>Setelah klik kirim, Anda akan diarahkan otomatis ke WhatsApp kami.</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
@@ -127,7 +138,7 @@ _Dikirim via Website ${businessName}_`;
                     name="whatsapp"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nomor WhatsApp</FormLabel>
+                        <FormLabel>Nomor WhatsApp Anda</FormLabel>
                         <FormControl>
                           <Input placeholder="Contoh: 08123456789" type="tel" {...field} />
                         </FormControl>
@@ -142,17 +153,20 @@ _Dikirim via Website ${businessName}_`;
                   name="service"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Jenis Layanan</FormLabel>
+                      <FormLabel>Pilih Layanan</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Pilih Layanan" />
+                            <SelectValue placeholder="Klik untuk memilih" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
                           {services?.map((s: any) => (
                             <SelectItem key={s.id} value={s.name}>{s.name}</SelectItem>
                           ))}
+                          {services?.length === 0 && (
+                            <SelectItem value="Umum" disabled>Belum ada layanan aktif</SelectItem>
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -167,7 +181,7 @@ _Dikirim via Website ${businessName}_`;
                     <FormItem>
                       <FormLabel>Alamat Lengkap</FormLabel>
                       <FormControl>
-                        <Input placeholder="Jl. Merdeka No. 123..." {...field} />
+                        <Input placeholder="Jl. Merdeka No. 123, Kelurahan..." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -179,10 +193,10 @@ _Dikirim via Website ${businessName}_`;
                   name="notes"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Catatan Tambahan (Opsional)</FormLabel>
+                      <FormLabel>Detail Masalah / Catatan (Opsional)</FormLabel>
                       <FormControl>
                         <Textarea 
-                          placeholder="Jelaskan detail kendala atau spesifikasi yang diinginkan..." 
+                          placeholder="Jelaskan kendala Anda agar kami bisa memberikan estimasi harga..." 
                           className="min-h-[100px]"
                           {...field} 
                         />
@@ -194,15 +208,20 @@ _Dikirim via Website ${businessName}_`;
 
                 <Button 
                   type="submit" 
-                  className="w-full py-6 text-lg rounded-xl font-bold flex items-center gap-2"
+                  className="w-full py-7 text-lg rounded-xl font-bold flex items-center justify-center gap-3 shadow-xl shadow-primary/20 hover:scale-[1.01] transition-all"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Memproses..." : (
+                  {isSubmitting ? (
+                    <>Sedang Memproses...</>
+                  ) : (
                     <>
-                      <Send size={20} /> Kirim Pesanan Sekarang
+                      <Send size={22} /> Kirim & Hubungi via WhatsApp
                     </>
                   )}
                 </Button>
+                <p className="text-center text-xs text-muted-foreground mt-2">
+                  *Dengan menekan tombol, pesanan akan tersimpan di sistem kami.
+                </p>
               </form>
             </Form>
           </CardContent>
