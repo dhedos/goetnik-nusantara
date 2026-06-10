@@ -34,12 +34,15 @@ export default function AdminDashboard() {
   const firestore = useFirestore();
   const storage = useStorage();
   const router = useRouter();
-  const [activeSection, setActiveSection] = useState<AdminSection>('bookings');
+  const [activeSection, setActiveSection] = useState<AdminSection>('branding');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const canFetchData = !authLoading && user && firestore;
+
+  // Cek apakah Storage sudah terkonfigurasi dengan benar di Firebase
+  const isStorageConfigured = !!storage?.app?.options?.storageBucket;
 
   const servicesQuery = useMemoFirebase(() => 
     canFetchData ? collection(firestore, 'services') : null, 
@@ -141,11 +144,11 @@ export default function AdminDashboard() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!storage) {
+    if (!isStorageConfigured) {
       toast({ 
         variant: "destructive", 
-        title: "Penyimpanan Tidak Aktif", 
-        description: "Firebase Storage belum terdeteksi. Pastikan Anda sudah mengklik 'Get Started' di menu Storage pada Firebase Console." 
+        title: "Konfigurasi Hilang", 
+        description: "Firebase Storage Bucket belum diatur. Pastikan anda sudah klik 'Get Started' di Firebase Console." 
       });
       return;
     }
@@ -156,18 +159,19 @@ export default function AdminDashboard() {
     }
 
     setIsUploading(true);
+    console.log("Memulai unggahan ke bucket:", storage?.app?.options?.storageBucket);
+
     try {
-      // Path file yang unik
       const storagePath = `branding/logo-${Date.now()}`;
-      const storageRef = ref(storage, storagePath);
+      const storageRef = ref(storage!, storagePath);
       
       const uploadResult = await uploadBytes(storageRef, file);
+      console.log("Unggahan berhasil, mengambil URL...");
+      
       const downloadURL = await getDownloadURL(uploadResult.ref);
       
-      // Update local state
       setBusinessInfo(prev => ({ ...prev, logoUrl: downloadURL }));
       
-      // Update Firestore secara otomatis
       if (firestore) {
         const docRef = doc(firestore, 'settings', 'business');
         await setDoc(docRef, { 
@@ -176,15 +180,15 @@ export default function AdminDashboard() {
         }, { merge: true });
       }
       
-      toast({ title: "Berhasil", description: "Logo berhasil diunggah dan sistem diperbarui." });
+      toast({ title: "Berhasil", description: "Logo berhasil diunggah dan disimpan." });
     } catch (error: any) {
-      console.error("Upload error detail:", error);
-      let errorMsg = "Terjadi kesalahan saat mengunggah.";
+      console.error("Kesalahan unggah detail:", error);
+      let errorMsg = "Terjadi kesalahan saat mengunggah. Cek koneksi atau Rules Storage Anda.";
       
       if (error.code === 'storage/unauthorized') {
         errorMsg = "Akses ditolak. Pastikan 'Storage Rules' sudah Anda Publish di Firebase Console.";
-      } else if (error.code === 'storage/canceled') {
-        errorMsg = "Unggahan dibatalkan.";
+      } else if (error.code === 'storage/retry-limit-exceeded') {
+        errorMsg = "Waktu unggah habis. Cek koneksi internet Anda.";
       }
       
       toast({ 
@@ -345,17 +349,17 @@ export default function AdminDashboard() {
 
           {activeSection === 'branding' && (
             <div className="space-y-6">
-              {!storage && (
+              {!isStorageConfigured && (
                 <Alert variant="destructive" className="border-destructive/50 bg-destructive/5">
                   <AlertTriangle className="h-4 w-4" />
-                  <AlertTitle>Konfigurasi Belum Selesai</AlertTitle>
+                  <AlertTitle>Firebase Storage Belum Aktif</AlertTitle>
                   <AlertDescription className="space-y-2">
-                    <p>Firebase Storage tidak terdeteksi. Silakan lakukan langkah berikut:</p>
+                    <p>Sistem tidak mendeteksi lokasi penyimpanan (Bucket). Unggah logo akan gagal.</p>
                     <ol className="list-decimal ml-4 text-xs space-y-1">
-                      <li>Buka Firebase Console Proyek Anda.</li>
-                      <li>Klik menu <b>Storage</b> di samping kiri.</li>
-                      <li>Klik tombol <b>Get Started</b> untuk mengaktifkannya.</li>
-                      <li>Setelah aktif, refresh halaman admin ini.</li>
+                      <li>Buka Firebase Console.</li>
+                      <li>Pilih menu <b>Storage</b>.</li>
+                      <li>Klik <b>Get Started</b> dan ikuti langkahnya sampai selesai.</li>
+                      <li>Pastikan Tab <b>Rules</b> di menu Storage sudah mengizinkan unggahan (auth != null).</li>
                     </ol>
                   </AlertDescription>
                 </Alert>
@@ -366,8 +370,8 @@ export default function AdminDashboard() {
                   <CardContent className="p-4 flex items-center gap-3">
                     <Database className="text-primary" size={20} />
                     <div>
-                      <p className="text-[10px] uppercase font-bold text-muted-foreground">Status Kuota</p>
-                      <p className="text-sm font-bold">Versi Gratis (Aman)</p>
+                      <p className="text-[10px] uppercase font-bold text-muted-foreground">Status Bucket</p>
+                      <p className="text-sm font-bold">{isStorageConfigured ? "Terkonfigurasi" : "Tidak Ada"}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -376,7 +380,7 @@ export default function AdminDashboard() {
                     <ImageIcon className="text-primary" size={20} />
                     <div>
                       <p className="text-[10px] uppercase font-bold text-muted-foreground">Kapasitas Gratis</p>
-                      <p className="text-sm font-bold">5 GB (Cukup untuk logo)</p>
+                      <p className="text-sm font-bold">5 GB (Sangat Aman)</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -420,22 +424,17 @@ export default function AdminDashboard() {
                         type="button" 
                         variant="outline" 
                         onClick={() => fileInputRef.current?.click()}
-                        disabled={isUploading}
+                        disabled={isUploading || !isStorageConfigured}
                         className="w-full md:w-auto"
                       >
-                        {isUploading ? "Mengunggah..." : "Pilih Logo Baru"}
+                        {isUploading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Mengunggah...
+                          </>
+                        ) : "Pilih Logo Baru"}
                       </Button>
                       <p className="text-xs text-muted-foreground">Rekomendasi: PNG transparan, rasio 1:1 atau memanjang. Maks 2MB.</p>
-                      
-                      {businessInfo.logoUrl && (
-                        <Button 
-                          variant="link" 
-                          className="text-destructive h-auto p-0 text-xs"
-                          onClick={() => setBusinessInfo(prev => ({ ...prev, logoUrl: '' }))}
-                        >
-                          Hapus Gambar (Gunakan Teks Logo)
-                        </Button>
-                      )}
                     </div>
                   </div>
 
