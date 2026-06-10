@@ -155,14 +155,10 @@ export default function AdminDashboard() {
 
     setIsUploading(true);
     try {
-      // Create a unique path for the logo
       const storageRef = ref(storage, `branding/logo-${Date.now()}`);
-      
-      // Upload the file
       const uploadResult = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(uploadResult.ref);
       
-      // Update state and Firestore
       setBusinessInfo(prev => ({ ...prev, logoUrl: downloadURL }));
       if (firestore) {
         const docRef = doc(firestore, 'settings', 'business');
@@ -175,9 +171,9 @@ export default function AdminDashboard() {
       let errorMsg = "Terjadi kesalahan saat mengunggah.";
       
       if (error.code === 'storage/unauthorized') {
-        errorMsg = "Izin ditolak. Pastikan Rules di tab STORAGE (bukan Firestore) sudah diatur.";
+        errorMsg = "Izin ditolak. Silakan atur Rules di tab STORAGE (bukan Firestore).";
       } else if (error.code === 'storage/retry-limit-exceeded') {
-        errorMsg = "Waktu habis. Periksa koneksi internet.";
+        errorMsg = "Waktu habis atau Storage belum diaktifkan di Console.";
       }
       
       toast({ 
@@ -338,7 +334,6 @@ export default function AdminDashboard() {
             )}
           </div>
 
-          {/* Branding Section with Upload logic */}
           {activeSection === 'branding' && (
             <Card>
               <CardHeader>
@@ -406,8 +401,11 @@ export default function AdminDashboard() {
                     <div className="text-sm">
                       <p className="font-bold text-amber-500">Penting: Masih stuck loading?</p>
                       <p className="text-muted-foreground mt-1">
-                        Pesan "Permission Denied" yang Anda kirimkan sebelumnya adalah untuk <b>Firestore Rules</b>. Untuk upload logo, Anda harus mengatur Rules di tab <b>STORAGE</b> (Penyimpanan), bukan Firestore. Pastikan Storage sudah aktif di Console.
+                        Aturan yang Anda kirimkan sebelumnya adalah untuk <b>Firestore</b>. Untuk upload logo, Anda harus pergi ke tab <b>STORAGE</b> (Penyimpanan) di Console dan memasang aturan ini:
                       </p>
+                      <pre className="mt-2 p-2 bg-background/50 rounded text-[10px] overflow-x-auto">
+                        {`rules_version = '2';\nservice firebase.storage {\n  match /b/{bucket}/o {\n    match /{allPaths=**} {\n      allow read: if true;\n      allow write: if request.auth != null;\n    }\n  }\n}`}
+                      </pre>
                     </div>
                   </div>
 
@@ -431,7 +429,6 @@ export default function AdminDashboard() {
             </Card>
           )}
 
-          {/* Sisa bagian Admin sama seperti sebelumnya... */}
           {activeSection === 'bookings' && (
             <Card>
               <CardHeader>
@@ -481,7 +478,6 @@ export default function AdminDashboard() {
             </Card>
           )}
 
-          {/* Services Section */}
           {activeSection === 'services' && (
             <div className="space-y-6">
               <div className="flex justify-end">
@@ -538,7 +534,6 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* Sisa bagian lain tetap dipertahankan... */}
           {activeSection === 'hero' && (
             <Card>
               <CardHeader>
