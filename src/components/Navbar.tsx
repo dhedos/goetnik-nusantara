@@ -28,8 +28,8 @@ export function Navbar() {
   );
   const { data: settings } = useDoc(settingsRef);
 
-  const logoText = settings?.logoText || '';
-  const logoAccentText = settings?.logoAccentText || '';
+  const logoText = settings?.logoText || 'Tech';
+  const logoAccentText = settings?.logoAccentText || 'Flow';
   const logoUrl = settings?.logoUrl || '';
 
   useEffect(() => {
@@ -48,26 +48,24 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 group">
           {logoUrl ? (
-            <div className="relative h-10 w-32 md:w-40">
+            <div className="relative h-10 w-10 shrink-0">
               <Image 
                 src={logoUrl} 
                 alt="Logo" 
                 fill 
-                className="object-contain object-left"
+                className="object-contain"
                 priority
                 unoptimized
               />
             </div>
           ) : (
-            <>
-              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
-                <Cpu size={24} />
-              </div>
-              <span className="text-xl font-bold font-headline tracking-tight">
-                {logoText}<span className="text-primary">{logoAccentText}</span>
-              </span>
-            </>
+            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform shrink-0">
+              <Cpu size={24} />
+            </div>
           )}
+          <span className="text-xl font-bold font-headline tracking-tight">
+            {logoText}<span className="text-primary">{logoAccentText}</span>
+          </span>
         </Link>
 
         {/* Desktop Links */}

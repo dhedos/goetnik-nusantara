@@ -16,11 +16,11 @@ export function Footer() {
   );
   const { data: settings } = useDoc(settingsRef);
   
-  const logoText = settings?.logoText || '';
-  const logoAccentText = settings?.logoAccentText || '';
+  const logoText = settings?.logoText || 'Tech';
+  const logoAccentText = settings?.logoAccentText || 'Flow';
   const logoUrl = settings?.logoUrl || '';
-  const businessName = settings?.name || '';
-  const aboutSubtitle = settings?.heroSubtitle || '';
+  const businessName = settings?.name || 'TechFlow Mandiri';
+  const aboutSubtitle = settings?.heroSubtitle || 'Solusi teknologi terpercaya untuk kebutuhan Anda.';
 
   return (
     <footer className="bg-card/30 border-t border-border/50 pt-16 pb-8 px-4">
@@ -28,22 +28,21 @@ export function Footer() {
         <div className="md:col-span-2 space-y-6">
           <Link href="/" className="flex items-center gap-3">
             {logoUrl ? (
-              <div className="relative h-12 w-36">
+              <div className="relative h-10 w-10 shrink-0">
                 <Image 
                   src={logoUrl} 
                   alt="Logo" 
                   fill 
-                  className="object-contain object-left"
+                  className="object-contain"
+                  unoptimized
                 />
               </div>
             ) : (
-              <>
-                <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground">
-                  <Cpu size={24} />
-                </div>
-                <span className="text-2xl font-bold font-headline">{logoText}<span className="text-primary">{logoAccentText}</span></span>
-              </>
+              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shrink-0">
+                <Cpu size={24} />
+              </div>
             )}
+            <span className="text-2xl font-bold font-headline">{logoText}<span className="text-primary">{logoAccentText}</span></span>
           </Link>
           <p className="text-muted-foreground max-w-md leading-relaxed">
             {aboutSubtitle}
