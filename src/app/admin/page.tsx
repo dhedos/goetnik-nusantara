@@ -38,7 +38,6 @@ export default function AdminDashboard() {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Only query data when we are sure the user is authenticated and loading is finished
   const canFetchData = !authLoading && user && firestore;
 
   const servicesQuery = useMemoFirebase(() => 
