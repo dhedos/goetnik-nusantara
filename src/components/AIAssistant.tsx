@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -40,8 +39,12 @@ export function AIAssistant() {
         availableServices
       });
       setResult(response);
-    } catch (err) {
-      setError('Gagal menganalisis masalah. Silakan coba lagi.');
+    } catch (err: any) {
+      if (err.message?.includes('503') || err.message?.includes('high demand')) {
+        setError('Server AI sedang sangat sibuk. Silakan coba lagi dalam beberapa detik.');
+      } else {
+        setError('Gagal menganalisis masalah. Silakan coba lagi.');
+      }
       console.error(err);
     } finally {
       setLoading(false);
