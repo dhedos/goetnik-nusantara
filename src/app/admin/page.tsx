@@ -22,6 +22,7 @@ import { FirestorePermissionError } from '@/firebase/errors';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
+import { PRIVACY_POLICY_DEFAULT } from '@/lib/constants';
 
 type AdminSection = 'bookings' | 'services' | 'branding' | 'hero' | 'about' | 'contact' | 'privacy';
 
@@ -107,13 +108,16 @@ export default function AdminDashboard() {
         servicesSectionBadge: settings.servicesSectionBadge || '',
         servicesSectionTitle: settings.servicesSectionTitle || '',
         servicesSectionSubtitle: settings.servicesSectionSubtitle || '',
-        privacyPolicy: settings.privacyPolicy || '',
+        privacyPolicy: settings.privacyPolicy || PRIVACY_POLICY_DEFAULT,
         socialInstagram: settings.socialInstagram || '',
         socialFacebook: settings.socialFacebook || '',
         socialTwitter: settings.socialTwitter || ''
       });
+    } else if (!settings && canFetchData) {
+       // Fill default privacy policy even if settings doc doesn't exist yet
+       setBusinessInfo(prev => ({ ...prev, privacyPolicy: PRIVACY_POLICY_DEFAULT }));
     }
-  }, [settings]);
+  }, [settings, canFetchData]);
 
   const handleLogout = async () => {
     if (!auth) return;
