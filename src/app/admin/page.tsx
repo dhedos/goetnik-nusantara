@@ -64,6 +64,7 @@ export default function AdminDashboard() {
     logoText: '',
     logoAccentText: '',
     logoUrl: '',
+    heroBadge: '',
     heroTitle: '',
     heroSubtitle: '',
     heroImageUrl: '',
@@ -91,6 +92,7 @@ export default function AdminDashboard() {
         logoText: settings.logoText || '',
         logoAccentText: settings.logoAccentText || '',
         logoUrl: settings.logoUrl || '',
+        heroBadge: settings.heroBadge || '',
         heroTitle: settings.heroTitle || '',
         heroSubtitle: settings.heroSubtitle || '',
         heroImageUrl: settings.heroImageUrl || '',
@@ -489,6 +491,10 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
+                <div className="grid gap-2">
+                  <Label>Teks Badge (Kecil di atas Judul)</Label>
+                  <Input value={businessInfo.heroBadge} onChange={(e) => setBusinessInfo({...businessInfo, heroBadge: e.target.value})} placeholder="Contoh: Solusi IT Terpercaya" />
+                </div>
                 <div className="grid gap-2"><Label>Judul Utama (Hero)</Label><Input value={businessInfo.heroTitle} onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})} /></div>
                 <div className="grid gap-2"><Label>Sub-judul (Hero)</Label><Textarea value={businessInfo.heroSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, heroSubtitle: e.target.value})} /></div>
               </CardContent>

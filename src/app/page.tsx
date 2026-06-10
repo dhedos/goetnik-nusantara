@@ -36,6 +36,7 @@ export default function Home() {
   const heroDisplayImage = settings?.heroImageUrl || heroPlaceholder?.imageUrl;
   const serviceImageIds = ['service-os', 'service-repair', 'service-design', 'service-web'];
 
+  const heroBadge = settings?.heroBadge || 'Solusi IT Terpercaya di Kota Anda';
   const heroTitle = settings?.heroTitle || 'Selamat Datang di Portal Kami';
   const heroSubtitle = settings?.heroSubtitle || 'Kami siap melayani berbagai kebutuhan teknis dan digital Anda dengan profesional.';
 
@@ -67,7 +68,7 @@ export default function Home() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                 </span>
-                Solusi IT Terpercaya di Kota Anda
+                {heroBadge}
               </div>
               
               <h1 className="text-5xl md:text-7xl font-extrabold font-headline leading-tight tracking-tighter">
