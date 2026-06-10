@@ -30,26 +30,29 @@ export default function Home() {
   const businessId = searchParams.get('id') || DEFAULT_BUSINESS_ID;
   const firestore = useFirestore();
 
-  // Pastikan firestore siap sebelum membuat query
-  const canQuery = !!firestore;
-
+  // Query Layanan
   const servicesQuery = useMemoFirebase(() => 
-    canQuery ? collection(firestore!, 'businesses', businessId, 'services') : null, 
-    [canQuery, businessId, firestore]
+    firestore ? collection(firestore, 'businesses', businessId, 'services') : null, 
+    [businessId, firestore]
   );
   const { data: services, loading: servicesLoading } = useCollection(servicesQuery);
 
+  // Query Settings
   const settingsRef = useMemoFirebase(() => 
-    canQuery ? doc(firestore!, 'businesses', businessId, 'settings', 'profile') : null, 
-    [canQuery, businessId, firestore]
+    firestore ? doc(firestore, 'businesses', businessId, 'settings', 'profile') : null, 
+    [businessId, firestore]
   );
   const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
 
-  if (settingsLoading || (servicesLoading && !services)) {
+  // LOADING SCREEN: Pastikan tampil saat inisialisasi Firestore atau saat fetching data
+  // Menggunakan background gelap dan styling yang sesuai dengan gambar user
+  if (!firestore || settingsLoading || (servicesLoading && !services)) {
     return (
-      <div className="flex h-screen flex-col items-center justify-center gap-4 bg-background">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-        <p className="text-muted-foreground animate-pulse">Menghubungkan ke Pusat Layanan...</p>
+      <div className="flex h-screen flex-col items-center justify-center gap-6 bg-[#0B1120] text-center p-4">
+        <div className="relative">
+           <Loader2 className="h-16 w-16 animate-spin text-primary" />
+        </div>
+        <p className="text-gray-400 text-xl font-medium tracking-tight">Menghubungkan ke Pusat Layanan...</p>
       </div>
     );
   }
