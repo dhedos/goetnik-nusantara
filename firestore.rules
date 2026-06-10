@@ -1,25 +1,25 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Services: Publik bisa melihat, Admin bisa edit
-    match /services/{serviceId} {
-      allow read: if true;
-      allow write: if request.auth != null;
+    // Helper function
+    function isOwner(businessId) {
+      return request.auth != null && request.auth.uid == businessId;
     }
 
-    // Bookings: Publik bisa kirim, Admin bisa kelola
-    match /bookings/{bookingId} {
+    // Business Data: Public can read, only Owner can write
+    match /businesses/{businessId}/{document=**} {
+      allow read: if true;
+      allow write: if isOwner(businessId);
+    }
+
+    // Bookings special case: Public can create, only Owner can read/update
+    match /businesses/{businessId}/bookings/{bookingId} {
       allow create: if true;
-      allow read, update, delete: if request.auth != null;
-    }
-
-    // Settings: Publik bisa melihat, Admin bisa edit
-    match /settings/{docId} {
-      allow read: if true;
-      allow write: if request.auth != null;
+      allow read, update, delete: if isOwner(businessId);
     }
     
-    // Default: Tolak akses lainnya
+    // Default: Deny all
     match /{document=**} {
       allow read, write: if false;
     }

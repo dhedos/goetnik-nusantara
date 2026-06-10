@@ -12,9 +12,10 @@
         "iconName": { "type": "string" },
         "imageUrl": { "type": "string", "description": "Base64 or URL of the service image." },
         "features": { "type": "array", "items": { "type": "string" } },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "createdAt": { "type": "string", "format": "date-time" },
+        "ownerId": { "type": "string" }
       },
-      "required": ["name", "price", "description", "iconName"]
+      "required": ["name", "price", "description", "iconName", "ownerId"]
     },
     "Booking": {
       "title": "Booking",
@@ -27,28 +28,30 @@
         "service": { "type": "string" },
         "notes": { "type": "string" },
         "status": { "type": "string", "enum": ["Pending", "Selesai"] },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "createdAt": { "type": "string", "format": "date-time" },
+        "businessId": { "type": "string" }
       },
-      "required": ["fullName", "whatsapp", "address", "service", "status"]
+      "required": ["fullName", "whatsapp", "address", "service", "status", "businessId"]
     },
     "BusinessSettings": {
       "title": "BusinessSettings",
       "description": "General settings for the business content and branding.",
       "type": "object",
       "properties": {
+        "ownerId": { "type": "string" },
         "name": { "type": "string" },
         "whatsapp": { "type": "string" },
         "address": { "type": "string" },
         "email": { "type": "string" },
-        "mapEmbedUrl": { "type": "string", "description": "The src URL from Google Maps Embed iframe code." },
-        "mapDirectUrl": { "type": "string", "description": "The direct link to Google Maps for navigation." },
+        "mapEmbedUrl": { "type": "string" },
+        "mapDirectUrl": { "type": "string" },
         "logoText": { "type": "string" },
         "logoAccentText": { "type": "string" },
         "logoUrl": { "type": "string" },
-        "heroBadge": { "type": "string", "description": "Short text shown in the hero badge." },
+        "heroBadge": { "type": "string" },
         "heroTitle": { "type": "string" },
         "heroSubtitle": { "type": "string" },
-        "heroImageUrl": { "type": "string", "description": "Base64 or URL of the hero background image." },
+        "heroImageUrl": { "type": "string" },
         "aboutTitle": { "type": "string" },
         "aboutContent": { "type": "string" },
         "servicesSectionBadge": { "type": "string" },
@@ -66,17 +69,17 @@
     "providers": ["email"]
   },
   "firestore": {
-    "/services/{serviceId}": {
+    "/businesses/{businessId}/services/{serviceId}": {
       "schema": "Service",
-      "description": "Collection of available service packages."
+      "description": "Collection of services for a specific business."
     },
-    "/bookings/{bookingId}": {
+    "/businesses/{businessId}/bookings/{bookingId}": {
       "schema": "Booking",
-      "description": "Collection of customer bookings."
+      "description": "Collection of bookings for a specific business."
     },
-    "/settings/business": {
+    "/businesses/{businessId}/settings/profile": {
       "schema": "BusinessSettings",
-      "description": "Singleton document for business settings."
+      "description": "Settings for a specific business."
     }
   }
 }
