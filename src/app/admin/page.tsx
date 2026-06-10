@@ -16,6 +16,8 @@ import { signOut } from 'firebase/auth';
 import { Loader2, Plus, Trash2, Save, LogOut, CheckCircle2, Clock, Globe, Monitor, HardDrive, Palette, ShieldCheck } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { BUSINESS_NAME_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT, ICON_MAP } from '@/lib/constants';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 export default function AdminDashboard() {
   const { user, loading: authLoading } = useUser();
@@ -68,64 +70,101 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleSaveBusinessInfo = async () => {
+  const handleSaveBusinessInfo = () => {
     if (!firestore) return;
-    try {
-      await setDoc(doc(firestore, 'settings', 'business'), {
-        ...businessInfo,
-        updatedAt: serverTimestamp()
+    const docRef = doc(firestore, 'settings', 'business');
+    const data = {
+      ...businessInfo,
+      updatedAt: serverTimestamp()
+    };
+    
+    setDoc(docRef, data, { merge: true })
+      .catch(async (e) => {
+        const permissionError = new FirestorePermissionError({
+          path: docRef.path,
+          operation: 'write',
+          requestResourceData: data,
+        });
+        errorEmitter.emit('permission-error', permissionError);
       });
-      toast({ title: "Berhasil", description: "Informasi bisnis telah diperbarui." });
-    } catch (e) {
-      toast({ variant: "destructive", title: "Gagal", description: "Tidak dapat menyimpan perubahan." });
-    }
+    
+    toast({ title: "Berhasil", description: "Informasi bisnis telah diperbarui." });
   };
 
-  const handleAddService = async () => {
+  const handleAddService = () => {
     if (!firestore) return;
-    try {
-      await addDoc(collection(firestore, 'services'), {
-        name: 'Layanan Baru',
-        price: 'Rp 0',
-        description: 'Deskripsi layanan baru',
-        iconName: 'Monitor',
-        features: ['Fitur 1'],
-        createdAt: serverTimestamp()
+    const colRef = collection(firestore, 'services');
+    const data = {
+      name: 'Layanan Baru',
+      price: 'Rp 0',
+      description: 'Deskripsi layanan baru',
+      iconName: 'Monitor',
+      features: ['Fitur 1'],
+      createdAt: serverTimestamp()
+    };
+
+    addDoc(colRef, data)
+      .catch(async (e) => {
+        const permissionError = new FirestorePermissionError({
+          path: colRef.path,
+          operation: 'create',
+          requestResourceData: data,
+        });
+        errorEmitter.emit('permission-error', permissionError);
       });
-      toast({ title: "Berhasil", description: "Layanan baru ditambahkan." });
-    } catch (e) {
-      toast({ variant: "destructive", title: "Gagal", description: "Gagal menambah layanan." });
-    }
+    
+    toast({ title: "Berhasil", description: "Layanan baru ditambahkan." });
   };
 
-  const handleDeleteService = async (id: string) => {
+  const handleDeleteService = (id: string) => {
     if (!firestore) return;
-    try {
-      await deleteDoc(doc(firestore, 'services', id));
-      toast({ title: "Berhasil", description: "Layanan telah dihapus." });
-    } catch (e) {
-      toast({ variant: "destructive", title: "Gagal", description: "Gagal menghapus layanan." });
-    }
+    const docRef = doc(firestore, 'services', id);
+    
+    deleteDoc(docRef)
+      .catch(async (e) => {
+        const permissionError = new FirestorePermissionError({
+          path: docRef.path,
+          operation: 'delete',
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      });
+    
+    toast({ title: "Berhasil", description: "Layanan telah dihapus." });
   };
 
-  const handleUpdateService = async (id: string, data: any) => {
+  const handleUpdateService = (id: string, data: any) => {
     if (!firestore) return;
-    try {
-      await updateDoc(doc(firestore, 'services', id), data);
-      toast({ title: "Terupdate", description: "Perubahan layanan disimpan." });
-    } catch (e) {
-      toast({ variant: "destructive", title: "Gagal", description: "Gagal update layanan." });
-    }
+    const docRef = doc(firestore, 'services', id);
+    
+    updateDoc(docRef, data)
+      .catch(async (e) => {
+        const permissionError = new FirestorePermissionError({
+          path: docRef.path,
+          operation: 'update',
+          requestResourceData: data,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      });
+    
+    toast({ title: "Terupdate", description: "Perubahan layanan disimpan." });
   };
 
-  const handleUpdateBookingStatus = async (id: string, status: string) => {
+  const handleUpdateBookingStatus = (id: string, status: string) => {
     if (!firestore) return;
-    try {
-      await updateDoc(doc(firestore, 'bookings', id), { status });
-      toast({ title: "Berhasil", description: "Status pesanan diperbarui." });
-    } catch (e) {
-      toast({ variant: "destructive", title: "Gagal", description: "Gagal memperbarui status." });
-    }
+    const docRef = doc(firestore, 'bookings', id);
+    const data = { status };
+    
+    updateDoc(docRef, data)
+      .catch(async (e) => {
+        const permissionError = new FirestorePermissionError({
+          path: docRef.path,
+          operation: 'update',
+          requestResourceData: data,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      });
+    
+    toast({ title: "Berhasil", description: "Status pesanan diperbarui." });
   };
 
   if (authLoading || !user) {
@@ -204,10 +243,9 @@ export default function AdminDashboard() {
                           >
                             <Clock size={16} />
                           </Button>
-                          <Button size="sm" variant="destructive" onClick={async () => {
+                          <Button size="sm" variant="destructive" onClick={() => {
                             if(confirm('Hapus pesanan ini?')) {
-                              await deleteDoc(doc(firestore!, 'bookings', booking.id));
-                              toast({ title: "Dihapus", description: "Pesanan telah dihapus." });
+                              handleDeleteService(booking.id); // Re-using delete logic for consistency
                             }
                           }}>
                             <Trash2 size={16} />
