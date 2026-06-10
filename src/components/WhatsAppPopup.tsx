@@ -1,11 +1,13 @@
 
 "use client";
 
+import { useEffect, useState } from 'react';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { OWNER_WHATSAPP_DEFAULT } from '@/lib/constants';
 
 export function WhatsAppPopup() {
+  const [mounted, setMounted] = useState(false);
   const firestore = useFirestore();
   const settingsRef = useMemoFirebase(() => 
     firestore ? doc(firestore, 'settings', 'business') : null, 
@@ -13,6 +15,12 @@ export function WhatsAppPopup() {
   );
   const { data: settings } = useDoc(settingsRef);
   
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   const whatsappNumber = settings?.whatsapp || OWNER_WHATSAPP_DEFAULT;
   const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`;
 

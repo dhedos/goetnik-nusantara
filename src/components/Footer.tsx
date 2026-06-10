@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Cpu, Facebook, Instagram, Twitter, Lock } from 'lucide-react';
+import { Cpu, Facebook, Instagram, Twitter, Fingerprint } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
@@ -76,11 +76,6 @@ export function Footer() {
             <li><Link href="#layanan" className="hover:text-primary transition-colors">Layanan</Link></li>
             <li><Link href="#tentang" className="hover:text-primary transition-colors">Tentang Kami</Link></li>
             <li><Link href="#kontak" className="hover:text-primary transition-colors">Kontak</Link></li>
-            <li>
-              <Link href="/login" className="hover:text-primary transition-colors flex items-center gap-2">
-                <Lock size={14} /> Admin Login
-              </Link>
-            </li>
           </ul>
         </div>
 
@@ -93,8 +88,11 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto pt-8 border-t border-border/50 text-center text-muted-foreground text-sm">
+      <div className="max-w-7xl mx-auto pt-8 border-t border-border/50 flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground text-sm">
         <p>© {currentYear} {businessName}. All Rights Reserved.</p>
+        <Link href="/login" className="opacity-5 hover:opacity-100 transition-opacity p-2">
+          <Fingerprint size={12} />
+        </Link>
       </div>
     </footer>
   );
