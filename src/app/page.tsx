@@ -4,7 +4,7 @@
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { AIAssistant } from '@/components/AIAssistant';
 import { BookingForm } from '@/components/BookingForm';
@@ -23,38 +23,38 @@ import { ArrowRight, Loader2 } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ICON_MAP } from '@/lib/constants';
 
-// ID Bisnis default jika tidak ada parameter ?id=...
 const DEFAULT_BUSINESS_ID = "goetnik-default"; 
+
+function LoadingScreen({ text }: { text: string }) {
+  return (
+    <div className="flex h-screen flex-col items-center justify-center gap-6 bg-[#0B1120] text-center p-4">
+      <div className="relative">
+         <Loader2 className="h-16 w-16 animate-spin text-primary" />
+      </div>
+      <p className="text-gray-400 text-xl font-medium tracking-tight">{text}</p>
+    </div>
+  );
+}
 
 function HomeContent() {
   const searchParams = useSearchParams();
   const businessId = searchParams.get('id') || DEFAULT_BUSINESS_ID;
   const firestore = useFirestore();
 
-  // Query Layanan
   const servicesQuery = useMemoFirebase(() => 
     firestore ? collection(firestore, 'businesses', businessId, 'services') : null, 
     [businessId, firestore]
   );
   const { data: services, loading: servicesLoading } = useCollection(servicesQuery);
 
-  // Query Settings (Data Esensial)
   const settingsRef = useMemoFirebase(() => 
     firestore ? doc(firestore, 'businesses', businessId, 'settings', 'profile') : null, 
     [businessId, firestore]
   );
   const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
 
-  // LAYAR PEMUATAN: Hanya blokir jika data esensial (settings) belum siap
   if (!firestore || settingsLoading) {
-    return (
-      <div className="flex h-screen flex-col items-center justify-center gap-6 bg-[#0B1120] text-center p-4">
-        <div className="relative">
-           <Loader2 className="h-16 w-16 animate-spin text-primary" />
-        </div>
-        <p className="text-gray-400 text-xl font-medium tracking-tight">Menghubungkan ke Pusat Layanan...</p>
-      </div>
-    );
+    return <LoadingScreen text="Menghubungkan ke Pusat Layanan..." />;
   }
 
   const heroPlaceholder = PlaceHolderImages.find(img => img.id === 'hero-tech');
@@ -140,12 +140,7 @@ function HomeContent() {
 
 export default function Home() {
   return (
-    <Suspense fallback={
-      <div className="flex h-screen flex-col items-center justify-center gap-6 bg-[#0B1120] text-center p-4">
-        <Loader2 className="h-16 w-16 animate-spin text-primary" />
-        <p className="text-gray-400 text-xl font-medium tracking-tight">Memuat Halaman...</p>
-      </div>
-    }>
+    <Suspense fallback={<LoadingScreen text="Memuat Halaman..." />}>
       <HomeContent />
     </Suspense>
   );

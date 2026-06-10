@@ -7,7 +7,7 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == businessId;
     }
 
-    // Aturan untuk dokumen Bisnis Utama (Opsional jika ingin menyimpan data di root bisnis)
+    // Aturan untuk dokumen Bisnis Utama
     match /businesses/{businessId} {
       allow read: if true;
       allow write: if isOwner(businessId);
@@ -31,7 +31,7 @@ service cloud.firestore {
       allow read, update, delete: if isOwner(businessId);
     }
     
-    // Default: Tolak semua akses lainnya
+    // Default: Tolak semua akses lainnya untuk keamanan
     match /{document=**} {
       allow read, write: if false;
     }
