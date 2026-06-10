@@ -77,9 +77,9 @@ function HomeContent() {
   const heroDisplayImage = settings?.heroImageUrl || heroPlaceholder?.imageUrl;
   const serviceImageIds = ['service-os', 'service-repair', 'service-design', 'service-web'];
 
-  const heroBadge = settings?.heroBadge || 'Solusi Terpercaya';
+  const heroBadge = settings?.heroBadge || 'Solusi Digital Terpercaya';
   const heroTitle = settings?.heroTitle || BUSINESS_NAME_DEFAULT;
-  const heroSubtitle = settings?.heroSubtitle || 'Kami siap melayani kebutuhan teknologi dan desain Anda secara profesional.';
+  const heroSubtitle = settings?.heroSubtitle || 'Kami melayani kebutuhan teknologi, desain grafis, dan pembuatan aplikasi secara profesional.';
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in">
@@ -102,9 +102,6 @@ function HomeContent() {
             <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/80 to-background" />
           </div>
           
-          <div className="absolute top-1/4 right-0 w-96 h-96 bg-primary/10 rounded-full blur-[120px] -z-10 animate-pulse" />
-          <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-accent/5 rounded-full blur-[120px] -z-10 animate-pulse" />
-
           <div className="max-w-7xl mx-auto w-full relative z-10">
             <div className="space-y-8 max-w-3xl">
               <Badge variant="outline" className="animate-fade-in border-primary/50 text-primary px-6 py-2 bg-primary/5 backdrop-blur-sm rounded-full tracking-wider uppercase text-xs font-bold">
@@ -143,10 +140,7 @@ function HomeContent() {
             
             {servicesLoading ? (
               <div className="flex flex-col items-center justify-center py-32 gap-6">
-                <div className="relative h-12 w-12">
-                  <div className="absolute inset-0 rounded-full border-2 border-primary/20" />
-                  <div className="absolute inset-0 rounded-full border-2 border-t-primary animate-spin" />
-                </div>
+                <Loader2 className="h-10 w-10 text-primary animate-spin" />
                 <p className="text-muted-foreground animate-pulse tracking-widest text-sm uppercase">Menyiapkan Katalog...</p>
               </div>
             ) : services && services.length > 0 ? (
@@ -168,7 +162,6 @@ function HomeContent() {
                 </div>
                 <h3 className="text-2xl font-bold mb-2 text-white/50">Layanan Belum Tersedia</h3>
                 <p className="text-muted-foreground mb-8">Admin sedang menyiapkan paket-paket terbaik untuk Anda. Silakan cek kembali nanti.</p>
-                <Button variant="outline" className="rounded-xl border-white/10" asChild><Link href="/login">Portal Admin</Link></Button>
               </Card>
             )}
           </div>

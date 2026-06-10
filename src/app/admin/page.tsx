@@ -267,10 +267,6 @@ export default function AdminDashboard() {
             </Button>
           </div>
 
-          {(bookingsLoading || servicesLoading || settingsLoading) && (
-            <div className="flex justify-center p-20"><Loader2 className="animate-spin text-primary h-12 w-12" /></div>
-          )}
-
           {activeSection === 'bookings' && (
             <Card className="rounded-[2rem] border-white/5 bg-card/50 shadow-2xl overflow-hidden">
               <CardHeader className="p-8 border-b border-white/5"><CardTitle className="text-2xl font-bold">Antrean Pesanan Masuk</CardTitle></CardHeader>
@@ -290,12 +286,6 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                 ))}
-                {!bookings?.length && !bookingsLoading && (
-                  <div className="text-center py-20 bg-background/20 rounded-[2rem] border border-dashed border-white/10">
-                    <div className="w-20 h-20 bg-muted/10 rounded-full flex items-center justify-center mx-auto mb-4"><ShoppingBag className="text-muted-foreground opacity-20" size={40} /></div>
-                    <p className="text-muted-foreground font-bold">Belum ada pesanan masuk hari ini.</p>
-                  </div>
-                )}
               </CardContent>
             </Card>
           )}
@@ -313,10 +303,7 @@ export default function AdminDashboard() {
                       {businessInfo.logoUrl ? (
                         <Image src={businessInfo.logoUrl} alt="Preview Logo" fill className="object-contain p-4" unoptimized />
                       ) : (
-                        <div className="flex flex-col items-center gap-2 opacity-20">
-                          <Cpu size={48} />
-                          <span className="text-[10px] font-bold">LOGO</span>
-                        </div>
+                        <Cpu size={48} className="opacity-20 text-white" />
                       )}
                     </div>
                     <div className="flex-1 space-y-6 w-full text-center md:text-left">
@@ -337,47 +324,11 @@ export default function AdminDashboard() {
                   <div className="space-y-3">
                     <Label className="font-black text-white uppercase tracking-wider text-xs">Teks Logo Utama (Putih)</Label>
                     <Input placeholder="Contoh: Go Etnik" value={businessInfo.logoText} onChange={(e) => setBusinessInfo({...businessInfo, logoText: e.target.value})} className="rounded-2xl h-14 bg-background/50 border-white/5 text-lg font-black" />
-                    <p className="text-[10px] text-muted-foreground">Teks ini akan tampil dengan warna putih di Navbar.</p>
                   </div>
                   <div className="space-y-3">
                     <Label className="font-black text-white uppercase tracking-wider text-xs">Teks Aksen (Warna Biru)</Label>
                     <Input placeholder="Contoh: NUSANTARA" value={businessInfo.logoAccentText} onChange={(e) => setBusinessInfo({...businessInfo, logoAccentText: e.target.value})} className="rounded-2xl h-14 bg-background/50 border-white/5 text-lg font-black text-primary" />
-                    <p className="text-[10px] text-muted-foreground">Teks ini akan tampil dengan warna aksen biru.</p>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {activeSection === 'hero' && (
-            <Card className="rounded-[2rem] border-white/5 bg-card/50 shadow-2xl overflow-hidden">
-              <CardContent className="p-10 space-y-8">
-                <div className="space-y-4">
-                  <Label className="text-lg font-black text-white uppercase tracking-wider">Banner Utama (Hero Section)</Label>
-                  <div className="relative h-72 w-full bg-[#0B1120] rounded-[2rem] border-2 border-dashed border-white/10 flex items-center justify-center overflow-hidden group">
-                    {businessInfo.heroImageUrl ? (
-                      <Image src={businessInfo.heroImageUrl} alt="Hero Banner" fill className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-500" unoptimized />
-                    ) : (
-                      <Globe className="text-muted-foreground opacity-10" size={80} />
-                    )}
-                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <input type="file" className="hidden" id="hero-upload" onChange={(e) => handleImageUpload(e, 'hero')} />
-                      <Button asChild className="rounded-2xl px-8 h-12 font-bold cursor-pointer"><label htmlFor="hero-upload">{isUploading === 'hero' ? 'Sedang Memproses...' : 'Ganti Banner Utama'}</label></Button>
-                    </div>
-                    {!businessInfo.heroImageUrl && <p className="absolute text-muted-foreground/50 font-black italic">PRATINJAU BANNER</p>}
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label className="font-bold text-white">Badge Atas (Teks Kecil)</Label>
-                  <Input placeholder="Contoh: Solusi Digital Terpercaya" value={businessInfo.heroBadge} onChange={(e) => setBusinessInfo({...businessInfo, heroBadge: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" />
-                </div>
-                <div className="space-y-2">
-                  <Label className="font-bold text-white">Judul Utama Halaman</Label>
-                  <Input placeholder="Judul besar website" value={businessInfo.heroTitle} onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})} className="rounded-xl h-14 bg-background/50 border-white/5 font-black text-xl" />
-                </div>
-                <div className="space-y-2">
-                  <Label className="font-bold text-white">Sub-judul / Penjelasan Singkat</Label>
-                  <Textarea placeholder="Tuliskan deskripsi singkat bisnis Anda..." value={businessInfo.heroSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, heroSubtitle: e.target.value})} className="rounded-2xl min-h-[140px] bg-background/50 border-white/5 text-lg p-6" />
                 </div>
               </CardContent>
             </Card>
@@ -412,36 +363,6 @@ export default function AdminDashboard() {
                   ))}
                 </div>
              </div>
-          )}
-
-          {activeSection === 'contact' && (
-            <Card className="rounded-[2rem] border-white/5 bg-card/50 shadow-2xl overflow-hidden">
-              <CardContent className="p-10 space-y-8">
-                <div className="grid md:grid-cols-2 gap-8">
-                  <div className="space-y-2"><Label className="font-bold text-white">WhatsApp Admin (62xxx)</Label><Input placeholder="Contoh: 628123456789" value={businessInfo.whatsapp} onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})} className="rounded-xl h-14 bg-background/50 border-white/5" /></div>
-                  <div className="space-y-2"><Label className="font-bold text-white">Email Bisnis</Label><Input placeholder="email@bisnis.com" value={businessInfo.email} onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})} className="rounded-xl h-14 bg-background/50 border-white/5" /></div>
-                </div>
-                <div className="space-y-2"><Label className="font-bold text-white">Alamat Kantor / Lokasi Toko</Label><Textarea placeholder="Jl. Raya Utama No. 1..." value={businessInfo.address} onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})} className="rounded-2xl min-h-[100px] bg-background/50 border-white/5" /></div>
-              </CardContent>
-            </Card>
-          )}
-
-          {activeSection === 'about' && (
-            <Card className="rounded-[2rem] border-white/5 bg-card/50 shadow-2xl overflow-hidden">
-              <CardContent className="p-10 space-y-8">
-                <div className="space-y-2"><Label className="font-black text-white text-lg uppercase">Judul Section 'Tentang Kami'</Label><Input placeholder="Mengenal Lebih Dekat" value={businessInfo.aboutTitle} onChange={(e) => setBusinessInfo({...businessInfo, aboutTitle: e.target.value})} className="rounded-xl h-14 bg-background/50 border-white/5 font-black" /></div>
-                <div className="space-y-2"><Label className="font-black text-white text-lg uppercase">Konten / Narasi Bisnis</Label><Textarea className="min-h-[350px] rounded-[2rem] p-10 bg-background/50 border-white/5 leading-relaxed text-lg" placeholder="Sejarah atau visi misi bisnis Anda..." value={businessInfo.aboutContent} onChange={(e) => setBusinessInfo({...businessInfo, aboutContent: e.target.value})} /></div>
-              </CardContent>
-            </Card>
-          )}
-
-          {activeSection === 'privacy' && (
-            <Card className="rounded-[2rem] border-white/5 bg-card/50 shadow-2xl overflow-hidden">
-              <CardContent className="p-10">
-                <Label className="text-xl font-black text-white mb-6 block uppercase italic">Konten Kebijakan Privasi</Label>
-                <Textarea className="min-h-[450px] rounded-[2rem] p-10 bg-background/50 border-white/5 text-muted-foreground leading-relaxed" value={businessInfo.privacyPolicy} onChange={(e) => setBusinessInfo({...businessInfo, privacyPolicy: e.target.value})} />
-              </CardContent>
-            </Card>
           )}
         </div>
       </main>
