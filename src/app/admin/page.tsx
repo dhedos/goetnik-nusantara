@@ -14,7 +14,7 @@ import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, CheckCircle2, 
   Globe, Layout, Info, Phone, Shield, Image as ImageIcon,
-  Settings, ShoppingBag, Menu, X, Upload, Instagram, Facebook, Twitter, MapPin, Search, ExternalLink
+  Settings, ShoppingBag, Menu, X, Upload, Instagram, Facebook, Youtube, MapPin, Search, ExternalLink
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -25,6 +25,13 @@ import { Badge } from '@/components/ui/badge';
 import { PRIVACY_POLICY_DEFAULT } from '@/lib/constants';
 
 type AdminSection = 'bookings' | 'services' | 'branding' | 'hero' | 'about' | 'contact' | 'privacy';
+
+// Custom TikTok Icon
+const TikTokIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className} xmlns="http://www.w3.org/2000/svg">
+    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.13-1.47V18.5c0 1.94-.53 3.89-1.93 5.08-1.47 1.25-3.5 1.55-5.32 1.07-2.31-.7-4.11-2.83-4.44-5.18-.33-2.34.82-4.72 2.79-6.03 1.48-1 3.26-1.33 4.99-1.01V16.5c-1.3-.46-2.82-.14-3.72.93-.65.75-.82 1.83-.54 2.75.29.9 1.1 1.6 2.05 1.77 1.03.19 2.18-.13 2.89-.89.75-.81.82-1.96.82-2.99V0l.08.02z"/>
+  </svg>
+);
 
 export default function AdminDashboard() {
   const { user, loading: authLoading } = useUser();
@@ -80,7 +87,8 @@ export default function AdminDashboard() {
     privacyPolicy: '',
     socialInstagram: '',
     socialFacebook: '',
-    socialTwitter: ''
+    socialYoutube: '',
+    socialTiktok: ''
   });
 
   useEffect(() => {
@@ -113,7 +121,8 @@ export default function AdminDashboard() {
         privacyPolicy: settings.privacyPolicy || PRIVACY_POLICY_DEFAULT,
         socialInstagram: settings.socialInstagram || '',
         socialFacebook: settings.socialFacebook || '',
-        socialTwitter: settings.socialTwitter || ''
+        socialYoutube: settings.socialYoutube || '',
+        socialTiktok: settings.socialTiktok || ''
       });
     } else if (!settings && canFetchData) {
        setBusinessInfo(prev => ({ ...prev, privacyPolicy: PRIVACY_POLICY_DEFAULT }));
@@ -686,8 +695,12 @@ export default function AdminDashboard() {
                     <Input value={businessInfo.socialFacebook} onChange={(e) => setBusinessInfo({...businessInfo, socialFacebook: e.target.value})} placeholder="https://facebook.com/akunanda" />
                   </div>
                   <div className="grid gap-2">
-                    <Label className="flex items-center gap-2"><Twitter size={14} /> Twitter URL</Label>
-                    <Input value={businessInfo.socialTwitter} onChange={(e) => setBusinessInfo({...businessInfo, socialTwitter: e.target.value})} placeholder="https://twitter.com/akunanda" />
+                    <Label className="flex items-center gap-2"><Youtube size={14} /> YouTube URL</Label>
+                    <Input value={businessInfo.socialYoutube} onChange={(e) => setBusinessInfo({...businessInfo, socialYoutube: e.target.value})} placeholder="https://youtube.com/c/channelanda" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label className="flex items-center gap-2"><TikTokIcon className="w-3.5 h-3.5" /> TikTok URL</Label>
+                    <Input value={businessInfo.socialTiktok} onChange={(e) => setBusinessInfo({...businessInfo, socialTiktok: e.target.value})} placeholder="https://tiktok.com/@akunanda" />
                   </div>
                 </CardContent>
               </Card>

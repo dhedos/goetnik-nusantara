@@ -57,7 +57,8 @@
         "privacyPolicy": { "type": "string" },
         "socialInstagram": { "type": "string" },
         "socialFacebook": { "type": "string" },
-        "socialTwitter": { "type": "string" }
+        "socialYoutube": { "type": "string" },
+        "socialTiktok": { "type": "string" }
       }
     }
   },

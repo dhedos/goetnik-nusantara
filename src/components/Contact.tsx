@@ -3,7 +3,7 @@
 
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
-import { MapPin, MessageCircle, Mail, ExternalLink } from 'lucide-react';
+import { MapPin, MessageCircle, Mail, ExternalLink, Map as MapIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -20,7 +20,7 @@ export function Contact() {
   const address = settings?.address || BUSINESS_ADDRESS_DEFAULT;
   const email = settings?.email || BUSINESS_EMAIL_DEFAULT;
   const whatsapp = settings?.whatsapp || OWNER_WHATSAPP_DEFAULT;
-  const mapUrl = settings?.mapEmbedUrl || "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126748.56347862248!2d107.5731163!3d-6.9034443!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68e6398252477f%3A0x3e18f2d87e0b57e!2sBandung%2C%20Jawa%20Barat!5e0!3m2!1sid!2sid!4v1700000000000!5m2!1sid!2sid";
+  const mapUrl = settings?.mapEmbedUrl;
   
   // Direct link to Google Maps
   const directMapUrl = settings?.mapDirectUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
@@ -80,23 +80,39 @@ export function Contact() {
           </div>
 
           <div className="lg:col-span-7">
-            <div className="rounded-3xl overflow-hidden border border-border h-[500px] shadow-2xl relative">
-              <iframe 
-                src={mapUrl}
-                width="100%" 
-                height="100%" 
-                style={{ border: 0 }} 
-                allowFullScreen={true} 
-                loading="lazy" 
-                referrerPolicy="no-referrer-when-downgrade"
-              />
-              <div className="absolute top-4 left-4">
-                <Button asChild size="sm" className="shadow-lg h-9 bg-white text-primary hover:bg-white/90 font-semibold">
-                  <a href={directMapUrl} target="_blank">
-                    Open in Maps <ExternalLink size={14} className="ml-2" />
-                  </a>
-                </Button>
-              </div>
+            <div className="rounded-3xl overflow-hidden border border-border h-[500px] shadow-2xl relative bg-secondary/10 flex items-center justify-center">
+              {mapUrl ? (
+                <>
+                  <iframe 
+                    src={mapUrl}
+                    width="100%" 
+                    height="100%" 
+                    style={{ border: 0 }} 
+                    allowFullScreen={true} 
+                    loading="lazy" 
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                  <div className="absolute top-4 left-4">
+                    <Button asChild size="sm" className="shadow-lg h-9 bg-white text-primary hover:bg-white/90 font-semibold">
+                      <a href={directMapUrl} target="_blank">
+                        Open in Maps <ExternalLink size={14} className="ml-2" />
+                      </a>
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-center gap-4 p-8 text-center max-w-sm">
+                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
+                    <MapIcon size={32} />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-lg mb-2">Peta Belum Tersedia</h4>
+                    <p className="text-muted-foreground text-sm">
+                      Admin belum mengonfigurasi alamat peta di panel pengaturan.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
