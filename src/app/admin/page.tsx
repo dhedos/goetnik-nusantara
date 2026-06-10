@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
@@ -15,7 +16,7 @@ import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, CheckCircle2, 
   Globe, Layout, Info, Phone, Shield, Image as ImageIcon,
-  Settings, ShoppingBag, Menu, X, Upload, AlertTriangle, InfoIcon
+  Settings, ShoppingBag, Menu, X, Upload, AlertTriangle, InfoIcon, Database
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { ICON_MAP } from '@/lib/constants';
@@ -143,8 +144,8 @@ export default function AdminDashboard() {
     if (!storage) {
       toast({ 
         variant: "destructive", 
-        title: "Firebase Storage Error", 
-        description: "Layanan Storage tidak aktif. Pastikan bucket name sudah benar di file .env" 
+        title: "Penyimpanan Tidak Aktif", 
+        description: "Firebase Storage belum terdeteksi. Pastikan Anda sudah mengklik 'Get Started' di menu Storage pada Firebase Console." 
       });
       return;
     }
@@ -156,31 +157,39 @@ export default function AdminDashboard() {
 
     setIsUploading(true);
     try {
+      // Path file yang unik
       const storagePath = `branding/logo-${Date.now()}`;
       const storageRef = ref(storage, storagePath);
       
       const uploadResult = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(uploadResult.ref);
       
+      // Update local state
       setBusinessInfo(prev => ({ ...prev, logoUrl: downloadURL }));
       
+      // Update Firestore secara otomatis
       if (firestore) {
         const docRef = doc(firestore, 'settings', 'business');
-        await setDoc(docRef, { logoUrl: downloadURL }, { merge: true });
+        await setDoc(docRef, { 
+          logoUrl: downloadURL,
+          updatedAt: serverTimestamp() 
+        }, { merge: true });
       }
       
-      toast({ title: "Berhasil", description: "Logo berhasil diunggah dan disimpan." });
+      toast({ title: "Berhasil", description: "Logo berhasil diunggah dan sistem diperbarui." });
     } catch (error: any) {
       console.error("Upload error detail:", error);
-      let errorMsg = "Gagal mengunggah logo.";
+      let errorMsg = "Terjadi kesalahan saat mengunggah.";
+      
       if (error.code === 'storage/unauthorized') {
-        errorMsg = "Akses ditolak. Periksa Storage Rules di Firebase Console.";
-      } else if (error.code === 'storage/retry-limit-exceeded') {
-        errorMsg = "Waktu unggah habis. Periksa koneksi internet.";
+        errorMsg = "Akses ditolak. Pastikan 'Storage Rules' sudah Anda Publish di Firebase Console.";
+      } else if (error.code === 'storage/canceled') {
+        errorMsg = "Unggahan dibatalkan.";
       }
+      
       toast({ 
         variant: "destructive", 
-        title: "Upload Gagal", 
+        title: "Gagal Unggah", 
         description: errorMsg 
       });
     } finally {
@@ -337,19 +346,46 @@ export default function AdminDashboard() {
           {activeSection === 'branding' && (
             <div className="space-y-6">
               {!storage && (
-                <Alert variant="destructive">
+                <Alert variant="destructive" className="border-destructive/50 bg-destructive/5">
                   <AlertTriangle className="h-4 w-4" />
-                  <AlertTitle>Storage Belum Aktif</AlertTitle>
-                  <AlertDescription>
-                    Firebase Storage belum terkonfigurasi. Pastikan bucket name ada di file .env dan layanan Storage sudah diaktifkan di Firebase Console.
+                  <AlertTitle>Konfigurasi Belum Selesai</AlertTitle>
+                  <AlertDescription className="space-y-2">
+                    <p>Firebase Storage tidak terdeteksi. Silakan lakukan langkah berikut:</p>
+                    <ol className="list-decimal ml-4 text-xs space-y-1">
+                      <li>Buka Firebase Console Proyek Anda.</li>
+                      <li>Klik menu <b>Storage</b> di samping kiri.</li>
+                      <li>Klik tombol <b>Get Started</b> untuk mengaktifkannya.</li>
+                      <li>Setelah aktif, refresh halaman admin ini.</li>
+                    </ol>
                   </AlertDescription>
                 </Alert>
               )}
 
+              <div className="grid md:grid-cols-3 gap-4">
+                <Card className="bg-primary/5 border-primary/20">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <Database className="text-primary" size={20} />
+                    <div>
+                      <p className="text-[10px] uppercase font-bold text-muted-foreground">Status Kuota</p>
+                      <p className="text-sm font-bold">Versi Gratis (Aman)</p>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-primary/5 border-primary/20">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <ImageIcon className="text-primary" size={20} />
+                    <div>
+                      <p className="text-[10px] uppercase font-bold text-muted-foreground">Kapasitas Gratis</p>
+                      <p className="text-sm font-bold">5 GB (Cukup untuk logo)</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
               <Card>
                 <CardHeader>
                   <CardTitle>Logo Website</CardTitle>
-                  <CardDescription>Logo ini akan muncul di Navbar dan Footer.</CardDescription>
+                  <CardDescription>Pilih gambar logo profesional untuk identitas bisnis Anda.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
@@ -385,6 +421,7 @@ export default function AdminDashboard() {
                         variant="outline" 
                         onClick={() => fileInputRef.current?.click()}
                         disabled={isUploading}
+                        className="w-full md:w-auto"
                       >
                         {isUploading ? "Mengunggah..." : "Pilih Logo Baru"}
                       </Button>
