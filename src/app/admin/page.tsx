@@ -142,12 +142,10 @@ export default function AdminDashboard() {
       toast({ 
         variant: "destructive", 
         title: "Konfigurasi Error", 
-        description: "Firebase Storage belum terdeteksi. Pastikan file .env sudah benar." 
+        description: "Firebase Storage belum terdeteksi. Silakan aktifkan Storage di Console." 
       });
       return;
     }
-
-    if (!firestore) return;
 
     // Validate file size (2MB)
     if (file.size > 2 * 1024 * 1024) {
@@ -157,28 +155,29 @@ export default function AdminDashboard() {
 
     setIsUploading(true);
     try {
-      const storageRef = ref(storage, `logos/business-logo-${Date.now()}`);
+      // Create a unique path for the logo
+      const storageRef = ref(storage, `branding/logo-${Date.now()}`);
       
-      // Upload file with a shorter timeout or explicit error handling
+      // Upload the file
       const uploadResult = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(uploadResult.ref);
       
-      // Auto save the URL to Firestore and state immediately
+      // Update state and Firestore
       setBusinessInfo(prev => ({ ...prev, logoUrl: downloadURL }));
-      const docRef = doc(firestore, 'settings', 'business');
-      await setDoc(docRef, { logoUrl: downloadURL }, { merge: true });
+      if (firestore) {
+        const docRef = doc(firestore, 'settings', 'business');
+        await setDoc(docRef, { logoUrl: downloadURL }, { merge: true });
+      }
       
-      toast({ title: "Berhasil", description: "Logo telah diperbarui secara otomatis." });
+      toast({ title: "Berhasil", description: "Logo berhasil diunggah dan diperbarui." });
     } catch (error: any) {
       console.error("Upload Error:", error);
-      let errorMsg = "Gagal mengunggah logo.";
+      let errorMsg = "Terjadi kesalahan saat mengunggah.";
       
       if (error.code === 'storage/unauthorized') {
-        errorMsg = "Izin ditolak. Pastikan Security Rules di Firebase Storage sudah diatur.";
+        errorMsg = "Izin ditolak. Pastikan Rules di tab STORAGE (bukan Firestore) sudah diatur.";
       } else if (error.code === 'storage/retry-limit-exceeded') {
-        errorMsg = "Waktu unggah habis. Periksa koneksi internet Anda.";
-      } else if (error.code === 'storage/unknown') {
-        errorMsg = "Terjadi kesalahan sistem. Pastikan Storage sudah diaktifkan di Firebase Console.";
+        errorMsg = "Waktu habis. Periksa koneksi internet.";
       }
       
       toast({ 
@@ -402,12 +401,12 @@ export default function AdminDashboard() {
                     </div>
                   </div>
 
-                  <div className="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-lg flex gap-3 items-start">
-                    <AlertCircle className="text-yellow-500 shrink-0 mt-0.5" size={18} />
+                  <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-lg flex gap-3 items-start">
+                    <AlertCircle className="text-amber-500 shrink-0 mt-0.5" size={18} />
                     <div className="text-sm">
-                      <p className="font-bold text-yellow-500">Penting: Masih stuck loading?</p>
+                      <p className="font-bold text-amber-500">Penting: Masih stuck loading?</p>
                       <p className="text-muted-foreground mt-1">
-                        Jika masih macet, pastikan Anda sudah mengaktifkan <b>Storage</b> di Firebase Console dan mengatur <b>Rules</b>-nya agar bisa diakses.
+                        Pesan "Permission Denied" yang Anda kirimkan sebelumnya adalah untuk <b>Firestore Rules</b>. Untuk upload logo, Anda harus mengatur Rules di tab <b>STORAGE</b> (Penyimpanan), bukan Firestore. Pastikan Storage sudah aktif di Console.
                       </p>
                     </div>
                   </div>
@@ -432,7 +431,7 @@ export default function AdminDashboard() {
             </Card>
           )}
 
-          {/* Bookings Section */}
+          {/* Sisa bagian Admin sama seperti sebelumnya... */}
           {activeSection === 'bookings' && (
             <Card>
               <CardHeader>
@@ -539,7 +538,7 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* Hero Section */}
+          {/* Sisa bagian lain tetap dipertahankan... */}
           {activeSection === 'hero' && (
             <Card>
               <CardHeader>
@@ -559,7 +558,6 @@ export default function AdminDashboard() {
             </Card>
           )}
 
-          {/* About Us Section */}
           {activeSection === 'about' && (
             <Card>
               <CardHeader>
@@ -579,7 +577,6 @@ export default function AdminDashboard() {
             </Card>
           )}
 
-          {/* Contact Section */}
           {activeSection === 'contact' && (
             <Card>
               <CardHeader>
@@ -613,7 +610,6 @@ export default function AdminDashboard() {
             </Card>
           )}
 
-          {/* Privacy Policy Section */}
           {activeSection === 'privacy' && (
             <Card>
               <CardHeader>
