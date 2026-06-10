@@ -42,7 +42,7 @@ export function Footer() {
                 <Cpu size={20} />
               </div>
             )}
-            <div className="flex items-center text-xl md:text-2xl font-black font-headline tracking-tighter leading-none">
+            <div className="flex items-center text-xl md:text-2xl font-black font-headline tracking-tight leading-none gap-1.5">
               <span className="text-white">{logoText}</span>
               <span className="text-primary">{logoAccentText}</span>
             </div>
