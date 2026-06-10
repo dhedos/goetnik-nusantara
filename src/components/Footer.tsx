@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Cpu, Facebook, Instagram, Youtube, Fingerprint } from 'lucide-react';
+import { Cpu, Facebook, Instagram, Youtube } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
@@ -26,7 +26,15 @@ export function Footer() {
   const logoAccentText = settings?.logoAccentText || 'NUSANTARA';
   const logoUrl = settings?.logoUrl || '';
   const businessName = settings?.name || 'Go Etnik NUSANTARA';
-  const aboutSubtitle = settings?.heroSubtitle || 'Solusi teknologi terpercaya untuk kebutuhan Anda.';
+  const aboutSubtitle = settings?.heroSubtitle || 'Kami menyediakan layanan service laptop profesional, desain grafis estetik, dan pembuatan aplikasi modern.';
+
+  // Social Links with fallbacks for demonstration if empty
+  const socialLinks = {
+    instagram: settings?.socialInstagram || '#',
+    facebook: settings?.socialFacebook || '#',
+    youtube: settings?.socialYoutube || '#',
+    tiktok: settings?.socialTiktok || '#'
+  };
 
   return (
     <footer className="bg-card/30 border-t border-border/50 pt-16 pb-8 px-4">
@@ -53,30 +61,24 @@ export function Footer() {
               <span className="text-primary">{logoAccentText}</span>
             </div>
           </Link>
+          
           <p className="text-muted-foreground max-w-md leading-relaxed">
             {aboutSubtitle}
           </p>
-          <div className="flex gap-4">
-            {settings?.socialInstagram && (
-              <a href={settings.socialInstagram} target="_blank" className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all">
-                <Instagram size={20} />
-              </a>
-            )}
-            {settings?.socialFacebook && (
-              <a href={settings.socialFacebook} target="_blank" className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all">
-                <Facebook size={20} />
-              </a>
-            )}
-            {settings?.socialYoutube && (
-              <a href={settings.socialYoutube} target="_blank" className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all">
-                <Youtube size={20} />
-              </a>
-            )}
-            {settings?.socialTiktok && (
-              <a href={settings.socialTiktok} target="_blank" className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all">
-                <TikTokIcon className="w-5 h-5" />
-              </a>
-            )}
+
+          <div className="flex gap-4 pt-2">
+            <a href={socialLinks.instagram} target="_blank" className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all">
+              <Instagram size={20} />
+            </a>
+            <a href={socialLinks.facebook} target="_blank" className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all">
+              <Facebook size={20} />
+            </a>
+            <a href={socialLinks.youtube} target="_blank" className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all">
+              <Youtube size={20} />
+            </a>
+            <a href={socialLinks.tiktok} target="_blank" className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all">
+              <TikTokIcon className="w-5 h-5" />
+            </a>
           </div>
         </div>
 
@@ -100,10 +102,12 @@ export function Footer() {
       </div>
 
       <div className="max-w-7xl mx-auto pt-8 border-t border-border/50 flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground text-sm">
-        <p>© {currentYear} {businessName}. All Rights Reserved.</p>
-        <Link href="/login" className="opacity-20 hover:opacity-100 transition-opacity p-2" title="Admin Access">
-          <Fingerprint size={12} />
-        </Link>
+        <div className="flex items-center gap-4">
+          <p>© {currentYear} {businessName}. All Rights Reserved.</p>
+          <Link href="/login" className="opacity-20 hover:opacity-100 transition-opacity p-2" title="Admin Access">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+          </Link>
+        </div>
       </div>
     </footer>
   );
