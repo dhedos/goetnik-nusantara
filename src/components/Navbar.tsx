@@ -48,13 +48,14 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 group">
           {logoUrl ? (
-            <div className="relative h-10 w-32">
+            <div className="relative h-10 w-32 md:w-40">
               <Image 
                 src={logoUrl} 
                 alt="Logo" 
                 fill 
-                className="object-contain"
+                className="object-contain object-left"
                 priority
+                unoptimized
               />
             </div>
           ) : (

@@ -138,24 +138,30 @@ export default function AdminDashboard() {
     const file = e.target.files?.[0];
     if (!file || !storage || !firestore) return;
 
+    // Validate file size (2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ variant: "destructive", title: "Gagal", description: "Ukuran file maksimal 2MB." });
+      return;
+    }
+
     setIsUploading(true);
     try {
-      const storageRef = ref(storage, 'logos/business-logo');
+      const storageRef = ref(storage, `logos/business-logo-${Date.now()}`);
       await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(storageRef);
       
+      // Auto save the URL to Firestore and state immediately
       setBusinessInfo(prev => ({ ...prev, logoUrl: downloadURL }));
-      
-      // Auto save the URL to Firestore
       const docRef = doc(firestore, 'settings', 'business');
-      await updateDoc(docRef, { logoUrl: downloadURL });
+      await setDoc(docRef, { logoUrl: downloadURL }, { merge: true });
       
-      toast({ title: "Berhasil", description: "Logo telah diperbarui." });
+      toast({ title: "Berhasil", description: "Logo telah diperbarui secara otomatis." });
     } catch (error) {
       console.error(error);
-      toast({ variant: "destructive", title: "Gagal", description: "Gagal mengunggah logo." });
+      toast({ variant: "destructive", title: "Gagal", description: "Gagal mengunggah logo. Pastikan Firebase Storage Rules sudah dikonfigurasi." });
     } finally {
       setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -210,7 +216,6 @@ export default function AdminDashboard() {
         });
         errorEmitter.emit('permission-error', permissionError);
       });
-    toast({ title: "Terupdate", description: "Perubahan layanan disimpan." });
   };
 
   const handleUpdateBookingStatus = (id: string, status: string) => {
@@ -256,7 +261,7 @@ export default function AdminDashboard() {
         <div className="flex flex-col h-full">
           <div className="p-6 border-b">
             <h2 className="text-xl font-bold text-primary">Admin Panel</h2>
-            <p className="text-xs text-muted-foreground mt-1">Management Console</p>
+            <p className="text-xs text-muted-foreground mt-1">Sistem Konten Dinamis</p>
           </div>
           
           <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
@@ -278,7 +283,7 @@ export default function AdminDashboard() {
           </nav>
 
           <div className="p-4 border-t space-y-2">
-             <Button variant="outline" className="w-full justify-start gap-3" onClick={() => router.push('/')}>
+             <Button variant="outline" className="w-full justify-start gap-3" onClick={() => window.open('/', '_blank')}>
               <Globe size={18} /> Lihat Website
             </Button>
             <Button variant="destructive" className="w-full justify-start gap-3" onClick={handleLogout}>
@@ -302,7 +307,7 @@ export default function AdminDashboard() {
             <h1 className="text-3xl font-bold capitalize">Kelola {activeSection.replace('-', ' ')}</h1>
             {(activeSection !== 'bookings' && activeSection !== 'services') && (
               <Button onClick={handleSaveBusinessInfo} className="shadow-lg shadow-primary/20">
-                <Save className="mr-2" size={18} /> Simpan Semua Perubahan
+                <Save className="mr-2" size={18} /> Simpan Perubahan Teks
               </Button>
             )}
           </div>
@@ -419,26 +424,27 @@ export default function AdminDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle>Branding & Identitas Logo</CardTitle>
-                <CardDescription>Atur nama bisnis, teks logo, atau unggah logo gambar.</CardDescription>
+                <CardDescription>Logo gambar akan diunggah ke Storage dan disimpan otomatis.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-8">
                 <div className="grid gap-6">
                   <div className="space-y-4">
-                    <Label>Logo Gambar (Opsional)</Label>
+                    <Label>Logo Gambar (Penyimpanan Storage)</Label>
                     <div className="flex items-center gap-6">
-                      <div className="relative w-24 h-24 rounded-2xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center overflow-hidden bg-accent/10">
+                      <div className="relative w-24 h-24 rounded-2xl border-2 border-dashed border-muted-foreground/20 flex items-center justify-center overflow-hidden bg-accent/5">
                         {businessInfo.logoUrl ? (
                           <Image 
                             src={businessInfo.logoUrl} 
                             alt="Logo Preview" 
                             fill 
                             className="object-contain p-2"
+                            unoptimized
                           />
                         ) : (
                           <ImageIcon className="text-muted-foreground/40" size={32} />
                         )}
                         {isUploading && (
-                          <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
+                          <div className="absolute inset-0 bg-background/60 flex items-center justify-center backdrop-blur-sm">
                             <Loader2 className="animate-spin text-primary" />
                           </div>
                         )}
@@ -457,27 +463,28 @@ export default function AdminDashboard() {
                           size="sm" 
                           onClick={() => fileInputRef.current?.click()}
                           disabled={isUploading}
+                          className="w-full"
                         >
-                          <Upload className="mr-2" size={16} /> Unggah Logo Baru
+                          <Upload className="mr-2" size={16} /> {isUploading ? "Mengunggah..." : "Ganti Logo Gambar"}
                         </Button>
-                        <p className="text-xs text-muted-foreground">Format: PNG, JPG atau SVG. Maks 2MB.</p>
+                        <p className="text-xs text-muted-foreground">Optimal: PNG transparan atau SVG. Maks 2MB.</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="grid gap-2">
-                    <Label>Nama Bisnis (Nama Tab Web)</Label>
+                    <Label>Nama Bisnis (Muncul di Tab & Footer)</Label>
                     <Input value={businessInfo.name} onChange={(e) => setBusinessInfo({...businessInfo, name: e.target.value})} />
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div className="grid gap-2">
-                      <Label>Logo Text (Utama)</Label>
-                      <Input value={businessInfo.logoText} onChange={(e) => setBusinessInfo({...businessInfo, logoText: e.target.value})} />
+                      <Label>Teks Logo Utama</Label>
+                      <Input value={businessInfo.logoText} onChange={(e) => setBusinessInfo({...businessInfo, logoText: e.target.value})} placeholder="Misal: Tech" />
                     </div>
                     <div className="grid gap-2">
-                      <Label>Logo Text (Aksen)</Label>
-                      <Input value={businessInfo.logoAccentText} onChange={(e) => setBusinessInfo({...businessInfo, logoAccentText: e.target.value})} />
+                      <Label>Teks Logo Aksen</Label>
+                      <Input value={businessInfo.logoAccentText} onChange={(e) => setBusinessInfo({...businessInfo, logoAccentText: e.target.value})} placeholder="Misal: Flow" />
                     </div>
                   </div>
                 </div>
@@ -535,24 +542,24 @@ export default function AdminDashboard() {
               <CardContent className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="grid gap-2">
-                    <Label>WhatsApp (Kode Negara, misal: 628123456789)</Label>
+                    <Label>WhatsApp (Misal: 628123456789)</Label>
                     <Input value={businessInfo.whatsapp} onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})} />
                   </div>
                   <div className="grid gap-2">
-                    <Label>Email</Label>
+                    <Label>Email Bisnis</Label>
                     <Input value={businessInfo.email} onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})} />
                   </div>
                   <div className="grid gap-2">
-                    <Label>Instagram (Link/Username)</Label>
-                    <Input value={businessInfo.socialInstagram} onChange={(e) => setBusinessInfo({...businessInfo, socialInstagram: e.target.value})} />
+                    <Label>URL Instagram</Label>
+                    <Input value={businessInfo.socialInstagram} onChange={(e) => setBusinessInfo({...businessInfo, socialInstagram: e.target.value})} placeholder="https://instagram.com/akunanda" />
                   </div>
                   <div className="grid gap-2">
-                    <Label>Facebook (Link)</Label>
+                    <Label>URL Facebook</Label>
                     <Input value={businessInfo.socialFacebook} onChange={(e) => setBusinessInfo({...businessInfo, socialFacebook: e.target.value})} />
                   </div>
                 </div>
                 <div className="grid gap-2">
-                  <Label>Alamat Lengkap</Label>
+                  <Label>Alamat Lengkap Kantor/Toko</Label>
                   <Textarea value={businessInfo.address} onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})} rows={3} />
                 </div>
               </CardContent>
@@ -564,12 +571,12 @@ export default function AdminDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle>Kebijakan Privasi</CardTitle>
-                <CardDescription>Teks kebijakan yang akan muncul di halaman khusus atau tautan footer.</CardDescription>
+                <CardDescription>Teks kebijakan hukum untuk pengunjung web.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid gap-2">
-                  <Label>Teks Kebijakan Privasi</Label>
-                  <Textarea value={businessInfo.privacyPolicy} onChange={(e) => setBusinessInfo({...businessInfo, privacyPolicy: e.target.value})} rows={20} placeholder="Tuliskan kebijakan privasi bisnis Anda di sini..." />
+                  <Label>Teks Lengkap Kebijakan</Label>
+                  <Textarea value={businessInfo.privacyPolicy} onChange={(e) => setBusinessInfo({...businessInfo, privacyPolicy: e.target.value})} rows={20} placeholder="Tuliskan kebijakan privasi bisnis Anda..." />
                 </div>
               </CardContent>
             </Card>
