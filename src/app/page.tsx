@@ -19,34 +19,45 @@ import { collection, doc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2, Sparkles } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ICON_MAP, BUSINESS_NAME_DEFAULT, MAIN_BUSINESS_ID } from '@/lib/constants';
 
 function LoadingScreen({ text }: { text: string }) {
   return (
-    <div className="flex h-screen flex-col items-center justify-center gap-8 bg-[#0B1120] text-center p-4 overflow-hidden relative">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/20 rounded-full blur-[100px] animate-pulse" />
+    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#0B1120] text-center p-4 overflow-hidden">
+      {/* Background Glows */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[120px] animate-pulse" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-[120px] animate-pulse delay-700" />
+      
       <div className="relative z-10 flex flex-col items-center">
-        <div className="relative h-20 w-20 mb-6">
-          <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
-          <div className="absolute inset-0 rounded-full border-4 border-t-primary border-r-transparent border-b-transparent border-l-transparent animate-spin shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
-          <Loader2 className="absolute inset-0 m-auto h-10 w-10 text-primary animate-pulse" />
+        {/* Animated Icon Container */}
+        <div className="relative h-24 w-24 mb-10">
+          <div className="absolute inset-0 rounded-3xl border-2 border-primary/20 rotate-45 animate-[spin_4s_linear_infinite]" />
+          <div className="absolute inset-0 rounded-3xl border-2 border-t-primary border-r-transparent border-b-transparent border-l-transparent rotate-45 animate-[spin_1.5s_linear_infinite] shadow-[0_0_20px_rgba(59,130,246,0.3)]" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Sparkles className="h-10 w-10 text-primary animate-pulse" />
+          </div>
         </div>
-        <h2 className="text-gray-300 text-xl font-medium tracking-widest animate-pulse drop-shadow-lg">
+
+        <h2 className="text-white text-2xl font-bold tracking-[0.2em] uppercase mb-8 animate-pulse italic">
           {text}
         </h2>
-        <div className="w-48 h-1 bg-white/5 rounded-full mt-6 overflow-hidden">
-          <div className="h-full bg-primary animate-[loading-progress_2s_ease-in-out_infinite]" />
+
+        {/* Premium Progress Bar */}
+        <div className="w-64 h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5">
+          <div className="h-full bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] animate-[loading-progress_2s_ease-in-out_infinite]" />
         </div>
+        
+        <p className="mt-4 text-muted-foreground/40 text-[10px] uppercase tracking-[0.4em] font-medium">
+          Sistem Digital Nusantara
+        </p>
       </div>
     </div>
   );
 }
 
 function HomeContent() {
-  const searchParams = useSearchParams();
-  // Selalu gunakan MAIN_BUSINESS_ID agar terhubung otomatis ke satu database
   const businessId = MAIN_BUSINESS_ID;
   const firestore = useFirestore();
   const [isTimeout, setIsTimeout] = useState(false);
@@ -64,13 +75,15 @@ function HomeContent() {
   const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
 
   useEffect(() => {
+    // Timeout 4 detik agar pengunjung tidak menunggu selamanya jika koneksi lambat
     const timer = setTimeout(() => {
       setIsTimeout(true);
     }, 4000); 
     return () => clearTimeout(timer);
   }, []);
 
-  if (!isTimeout && (!firestore || (settingsLoading && !settings))) {
+  // Tampilkan loading screen hanya jika data belum ada sama sekali dan belum timeout
+  if (!isTimeout && (settingsLoading && !settings)) {
     return <LoadingScreen text="Menghubungkan ke Pusat Layanan..." />;
   }
 

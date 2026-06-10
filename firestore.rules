@@ -7,13 +7,14 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Aturan untuk koleksi bisnis utama
+    // Izinkan akses ke koleksi businesses dan semua dokumen di dalamnya
     match /businesses/{businessId} {
-      // Semua orang bisa baca profil bisnis dan layanan
+      // Siapapun bisa baca profil bisnis utama
       allow read: if true;
-      // Hanya admin yang bisa ubah data profil
+      // Hanya admin yang bisa menulis ke dokumen bisnis utama
       allow write: if isAdmin();
 
+      // Aturan eksplisit untuk sub-koleksi
       match /services/{serviceId} {
         allow read: if true;
         allow write: if isAdmin();
@@ -27,7 +28,7 @@ service cloud.firestore {
       match /bookings/{bookingId} {
         // Pengunjung bisa buat pesanan
         allow create: if true;
-        // Hanya admin yang bisa kelola pesanan
+        // Hanya admin yang bisa mengelola (baca/edit/hapus) pesanan
         allow read, update, delete: if isAdmin();
       }
     }
