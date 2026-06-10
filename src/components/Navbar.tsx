@@ -28,8 +28,8 @@ export function Navbar() {
   );
   const { data: settings } = useDoc(settingsRef);
 
-  const logoText = settings?.logoText || 'Tech';
-  const logoAccentText = settings?.logoAccentText || 'Flow';
+  const logoText = settings?.logoText || 'Go Etnik';
+  const logoAccentText = settings?.logoAccentText || 'NUSANTARA';
   const logoUrl = settings?.logoUrl || '';
 
   useEffect(() => {
@@ -43,12 +43,12 @@ export function Navbar() {
   return (
     <nav className={cn(
       "fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-4 py-3",
-      scrolled ? "bg-background/80 backdrop-blur-lg border-b border-border py-2" : "bg-transparent"
+      scrolled ? "bg-background/90 backdrop-blur-lg border-b border-border py-2" : "bg-transparent"
     )}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3 group">
+        <Link href="/" className="flex items-center gap-2 group">
           {logoUrl ? (
-            <div className="relative h-10 w-10 shrink-0">
+            <div className="relative h-9 w-9 shrink-0">
               <Image 
                 src={logoUrl} 
                 alt="Logo" 
@@ -59,13 +59,14 @@ export function Navbar() {
               />
             </div>
           ) : (
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform shrink-0">
-              <Cpu size={24} />
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform shrink-0">
+              <Cpu size={18} />
             </div>
           )}
-          <span className="text-xl font-bold font-headline tracking-tight">
-            {logoText}<span className="text-primary">{logoAccentText}</span>
-          </span>
+          <div className="flex items-center text-xl md:text-2xl font-black font-headline tracking-tighter leading-none">
+            <span className="text-white">{logoText}</span>
+            <span className="text-primary">{logoAccentText}</span>
+          </div>
         </Link>
 
         {/* Desktop Links */}
@@ -74,19 +75,19 @@ export function Navbar() {
             <Link 
               key={link.name} 
               href={link.href}
-              className="text-sm font-medium hover:text-primary transition-colors"
+              className="text-sm font-semibold hover:text-primary transition-colors text-white/80 hover:text-white"
             >
               {link.name}
             </Link>
           ))}
-          <Button asChild size="sm" className="rounded-full px-6">
+          <Button asChild size="sm" className="rounded-full px-6 font-bold">
             <Link href="#pesan">Pesan Sekarang</Link>
           </Button>
         </div>
 
         {/* Mobile Toggle */}
         <button 
-          className="md:hidden text-foreground"
+          className="md:hidden text-white"
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? <X size={28} /> : <Menu size={28} />}
@@ -100,13 +101,13 @@ export function Navbar() {
             <Link 
               key={link.name} 
               href={link.href}
-              className="text-lg font-medium py-2 border-b border-border/50"
+              className="text-lg font-bold py-3 border-b border-border/50"
               onClick={() => setIsOpen(false)}
             >
               {link.name}
             </Link>
           ))}
-          <Button asChild className="w-full rounded-xl py-6 text-lg">
+          <Button asChild className="w-full rounded-xl py-6 text-lg font-bold">
             <Link href="#pesan" onClick={() => setIsOpen(false)}>Pesan Sekarang</Link>
           </Button>
         </div>

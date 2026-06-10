@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Cpu, Facebook, Instagram, Twitter, Linkedin, Lock } from 'lucide-react';
+import { Cpu, Facebook, Instagram, Twitter, Lock } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
@@ -16,19 +16,19 @@ export function Footer() {
   );
   const { data: settings } = useDoc(settingsRef);
   
-  const logoText = settings?.logoText || 'Tech';
-  const logoAccentText = settings?.logoAccentText || 'Flow';
+  const logoText = settings?.logoText || 'Go Etnik';
+  const logoAccentText = settings?.logoAccentText || 'NUSANTARA';
   const logoUrl = settings?.logoUrl || '';
-  const businessName = settings?.name || 'TechFlow Mandiri';
+  const businessName = settings?.name || 'Go Etnik NUSANTARA';
   const aboutSubtitle = settings?.heroSubtitle || 'Solusi teknologi terpercaya untuk kebutuhan Anda.';
 
   return (
     <footer className="bg-card/30 border-t border-border/50 pt-16 pb-8 px-4">
       <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 mb-12">
         <div className="md:col-span-2 space-y-6">
-          <Link href="/" className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-2">
             {logoUrl ? (
-              <div className="relative h-10 w-10 shrink-0">
+              <div className="relative h-9 w-9 shrink-0">
                 <Image 
                   src={logoUrl} 
                   alt="Logo" 
@@ -38,11 +38,14 @@ export function Footer() {
                 />
               </div>
             ) : (
-              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shrink-0">
-                <Cpu size={24} />
+              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shrink-0">
+                <Cpu size={20} />
               </div>
             )}
-            <span className="text-2xl font-bold font-headline">{logoText}<span className="text-primary">{logoAccentText}</span></span>
+            <div className="flex items-center text-xl md:text-2xl font-black font-headline tracking-tighter leading-none">
+              <span className="text-white">{logoText}</span>
+              <span className="text-primary">{logoAccentText}</span>
+            </div>
           </Link>
           <p className="text-muted-foreground max-w-md leading-relaxed">
             {aboutSubtitle}
