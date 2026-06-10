@@ -49,7 +49,6 @@ export function Navbar() {
           </div>
           <span className="text-xl font-bold font-headline tracking-tight">
             {logoText}<span className="text-primary">{logoAccentText}</span>
-            {!logoText && !logoAccentText && <span className="text-muted-foreground opacity-50 italic text-sm">Set Logo In Admin</span>}
           </span>
         </Link>
 
