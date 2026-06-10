@@ -46,8 +46,8 @@ function LoadingScreen({ text }: { text: string }) {
 
 function HomeContent() {
   const searchParams = useSearchParams();
-  // Gunakan MAIN_BUSINESS_ID sebagai default otomatis
-  const businessId = searchParams.get('id') || MAIN_BUSINESS_ID;
+  // Selalu gunakan MAIN_BUSINESS_ID agar terhubung otomatis ke satu database
+  const businessId = MAIN_BUSINESS_ID;
   const firestore = useFirestore();
   const [isTimeout, setIsTimeout] = useState(false);
 
@@ -66,7 +66,7 @@ function HomeContent() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsTimeout(true);
-    }, 5000); 
+    }, 4000); 
     return () => clearTimeout(timer);
   }, []);
 
@@ -109,7 +109,7 @@ function HomeContent() {
                 {heroBadge}
               </Badge>
               <h1 className="text-6xl md:text-8xl font-black animate-fade-in tracking-tighter leading-[0.9] text-white">
-                {heroTitle.split(' ').map((word, i) => (
+                {heroTitle.split(' ').map((word: string, i: number) => (
                   <span key={i} className={i === 1 ? "text-primary block" : "block"}>{word} </span>
                 ))}
               </h1>

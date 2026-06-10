@@ -2,14 +2,16 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper function untuk cek apakah user sudah login sebagai admin
+    // Fungsi pembantu untuk cek admin
     function isAdmin() {
       return request.auth != null;
     }
 
-    // Izinkan akses ke bisnis dengan ID 'main' atau ID user sendiri
+    // Aturan untuk koleksi bisnis utama
     match /businesses/{businessId} {
+      // Semua orang bisa baca profil bisnis dan layanan
       allow read: if true;
+      // Hanya admin yang bisa ubah data profil
       allow write: if isAdmin();
 
       match /services/{serviceId} {
@@ -23,11 +25,14 @@ service cloud.firestore {
       }
 
       match /bookings/{bookingId} {
+        // Pengunjung bisa buat pesanan
         allow create: if true;
+        // Hanya admin yang bisa kelola pesanan
         allow read, update, delete: if isAdmin();
       }
     }
     
+    // Tolak akses ke dokumen lain secara default
     match /{document=**} {
       allow read, write: if false;
     }
