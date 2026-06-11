@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -62,9 +63,6 @@ export function AIAssistant({ businessId }: AIAssistantProps) {
       
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <Badge variant="outline" className="mb-4 py-1 px-4 border-primary/50 text-primary uppercase tracking-widest flex w-fit mx-auto gap-2 items-center text-[10px] md:text-xs">
-            <Sparkles size={14} /> AI Diagnostic Tool
-          </Badge>
           <h2 className="text-2xl md:text-4xl font-bold font-headline mb-4">Bingung Pilih Layanan?</h2>
           <p className="text-muted-foreground text-sm md:text-lg max-w-2xl mx-auto px-2">
             Ceritakan masalah teknis Anda, dan asisten AI kami akan merekomendasikan paket layanan yang paling tepat.

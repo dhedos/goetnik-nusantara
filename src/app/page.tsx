@@ -138,10 +138,6 @@ function HomeContent() {
             
             <div className="max-w-7xl mx-auto w-full relative z-10">
               <div className="space-y-6 md:space-y-8 max-w-4xl">
-                <Badge variant="outline" className="border-primary/20 text-primary px-4 md:px-5 py-1.5 md:py-2 bg-primary/5 backdrop-blur-xl rounded-full tracking-wider uppercase text-[9px] md:text-[10px] font-bold w-fit">
-                  {heroBadge}
-                </Badge>
-                
                 <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.2] md:leading-[1] text-foreground break-words">
                   {heroTitle}
                 </h1>
@@ -172,7 +168,6 @@ function HomeContent() {
           <section id="layanan" className="py-20 md:py-32 px-4 md:px-8 bg-secondary/5 relative">
             <div className="max-w-7xl mx-auto">
               <div className="text-center mb-12 md:mb-20 space-y-4">
-                <Badge variant="outline" className="uppercase tracking-widest px-4 py-1 border-primary/20 text-primary bg-primary/5 font-bold text-[9px] md:text-[10px]">{servicesBadge}</Badge>
                 <h2 className="text-2xl md:text-5xl font-bold text-foreground uppercase">{servicesTitle}</h2>
                 <p className="text-muted-foreground max-w-2xl mx-auto text-xs md:text-base font-medium px-4">{servicesSubtitle}</p>
               </div>

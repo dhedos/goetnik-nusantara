@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from 'next/image';
@@ -31,7 +32,6 @@ export function Portfolio({ businessId }: PortfolioProps) {
     <section id="portofolio" className="py-24 px-4 bg-background relative overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16 space-y-4">
-          <Badge variant="outline" className="uppercase tracking-[0.3em] px-4 py-1 border-primary/20 text-primary bg-primary/5 font-bold text-[10px]">Pameran Karya</Badge>
           <h2 className="text-3xl md:text-5xl font-bold text-foreground uppercase tracking-tight">Portofolio Kami</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-sm md:text-base font-medium">Beberapa contoh hasil kerja nyata yang telah kami selesaikan dengan sepenuh hati.</p>
         </div>

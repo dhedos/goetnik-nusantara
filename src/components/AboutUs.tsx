@@ -1,3 +1,4 @@
+
 "use client";
 
 import { ADVANTAGES } from '@/lib/constants';
@@ -27,7 +28,6 @@ export function AboutUs({ businessId }: AboutUsProps) {
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div className="space-y-8">
             <div>
-              <Badge variant="outline" className="mb-4 py-1 px-4 border-primary text-primary">Tentang Kami</Badge>
               <h2 className="text-4xl md:text-5xl font-bold font-headline mb-6">{aboutTitle}</h2>
               <div className="text-lg text-muted-foreground leading-relaxed whitespace-pre-wrap">
                 {aboutContent}
