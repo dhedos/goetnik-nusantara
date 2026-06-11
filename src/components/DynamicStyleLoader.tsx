@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect } from 'react';
@@ -73,10 +72,15 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
     root.style.setProperty('--input', input);
     root.style.setProperty('--card', card);
 
-    // 3. Handle Logo for Loading Screen
+    // 3. Handle Logo for Loading Screen and Favicon
     if (settings.logoUrl) {
       root.style.setProperty('--loading-logo', `url(${settings.logoUrl})`);
       root.classList.add('has-loading-logo');
+      
+      const favicon = document.getElementById('dynamic-favicon') as HTMLLinkElement;
+      if (favicon) {
+        favicon.href = settings.logoUrl;
+      }
     }
 
     // Save to Cache for instant reload

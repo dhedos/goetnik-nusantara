@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from 'react';
@@ -50,7 +49,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md shadow-2xl border-primary/20">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Admin Login</CardTitle>
-          <CardDescription>Masuk untuk mengelola website TechFlow Mandiri</CardDescription>
+          <CardDescription>Masuk untuk mengelola portal layanan digital Anda</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
