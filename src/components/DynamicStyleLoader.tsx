@@ -44,25 +44,25 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
     const lValue = parseInt(bgParts[2]);
     const isLight = lValue > 60;
     
-    // Set Foreground and Muted colors based on background brightness
+    // Set Foreground, Muted, and Border colors based on background brightness
     if (isLight) {
-      document.documentElement.style.setProperty('--foreground', '20 20% 10%');
-      document.documentElement.style.setProperty('--card-foreground', '20 20% 10%');
-      document.documentElement.style.setProperty('--muted-foreground', '20 10% 40%');
-      document.documentElement.style.setProperty('--border', '40 20% 80%');
-      document.documentElement.style.setProperty('--input', '40 20% 85%');
+      document.documentElement.style.setProperty('--foreground', '20 30% 12%'); // Dark Brown/Black
+      document.documentElement.style.setProperty('--card-foreground', '20 30% 12%');
+      document.documentElement.style.setProperty('--muted-foreground', '20 10% 45%'); // Soft Grey
+      document.documentElement.style.setProperty('--border', '20 20% 85%'); // Light Border
+      document.documentElement.style.setProperty('--input', '20 20% 90%');
     } else {
-      document.documentElement.style.setProperty('--foreground', '210 40% 98%');
-      document.documentElement.style.setProperty('--card-foreground', '210 40% 98%');
-      document.documentElement.style.setProperty('--muted-foreground', '215 20.2% 65.1%');
-      document.documentElement.style.setProperty('--border', '0 0% 20%');
-      document.documentElement.style.setProperty('--input', '0 0% 15%');
+      document.documentElement.style.setProperty('--foreground', '45 40% 98%'); // Near White Cream
+      document.documentElement.style.setProperty('--card-foreground', '45 40% 98%');
+      document.documentElement.style.setProperty('--muted-foreground', '45 10% 75%'); // Bright Muted for visibility
+      document.documentElement.style.setProperty('--border', '0 0% 100% / 0.15'); // Transparent white border
+      document.documentElement.style.setProperty('--input', '0 0% 100% / 0.1');
     }
 
     // Update card background for subtle contrast
     const h = bgParts[0];
     const s = bgParts[1];
-    const l = isLight ? lValue - 5 : lValue + 4;
+    const l = isLight ? lValue - 6 : lValue + 5;
     document.documentElement.style.setProperty('--card', `${h} ${s} ${l}%`);
 
   }, [settings]);

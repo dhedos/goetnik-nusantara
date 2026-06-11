@@ -61,29 +61,29 @@ export const THEMES = [
   {
     id: 'heritage-red',
     label: 'Heritage Red (Utama)',
-    primary: '40 45% 55%',
-    accent: '40 40% 90%',
-    background: '0 80% 20%'
+    primary: '45 90% 45%', // Emas Cerah
+    accent: '45 40% 95%',  // Cream sangat terang
+    background: '0 80% 12%' // Marun Gelap yang elegan
   },
   {
     id: 'midnight-gold',
     label: 'Midnight Gold (Gelap)',
-    primary: '40 45% 55%',
-    accent: '0 80% 25%',
-    background: '0 0% 10%'
+    primary: '45 90% 45%', // Emas Cerah
+    accent: '0 0% 100%',   // Putih Bersih
+    background: '220 30% 4%' // Hampir Hitam (Deep Navy)
   },
   {
     id: 'golden-java',
     label: 'Golden Java (Emas)',
-    primary: '0 80% 20%',
-    accent: '0 0% 10%',
-    background: '40 45% 55%'
+    primary: '0 80% 20%',  // Marun untuk tombol
+    accent: '30 20% 10%',  // Coklat Gelap
+    background: '45 70% 50%' // Emas Jawa yang hangat
   },
   {
     id: 'vintage-cream',
     label: 'Vintage Cream (Terang)',
-    primary: '40 45% 55%',
-    accent: '0 80% 20%',
-    background: '40 40% 90%'
+    primary: '45 80% 35%', // Emas Tua
+    accent: '0 80% 15%',   // Marun Gelap
+    background: '40 50% 94%' // Cream Kertas Kuno
   }
 ];

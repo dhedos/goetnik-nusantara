@@ -62,7 +62,7 @@ export function Footer({ businessId }: FooterProps) {
   };
 
   return (
-    <footer className="bg-card/30 border-t border-border/50 pt-16 pb-8 px-4">
+    <footer className="bg-card/30 border-t border-border pt-16 pb-8 px-4">
       <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 mb-12">
         <div className="md:col-span-2 space-y-6">
           <Link href="/" className="flex items-center gap-2">
@@ -87,12 +87,12 @@ export function Footer({ businessId }: FooterProps) {
               </div>
             )}
             <div className="flex items-center text-lg md:text-xl font-bold gap-2">
-              <span className="text-white">{logoText}</span>
+              <span className="text-foreground">{logoText}</span>
               <span className="text-primary">{logoAccentText}</span>
             </div>
           </Link>
           
-          <p className="text-white/50 max-w-sm text-sm leading-relaxed">
+          <p className="text-muted-foreground max-w-sm text-sm leading-relaxed">
             {aboutSubtitle}
           </p>
 
@@ -101,7 +101,7 @@ export function Footer({ businessId }: FooterProps) {
               href={socialLinks.instagram || '#'} 
               target={socialLinks.instagram ? "_blank" : "_self"}
               onClick={(e) => handleSocialClick(e, socialLinks.instagram, 'Instagram')}
-              className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-white/50 hover:bg-primary hover:text-white transition-all"
+              className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all"
             >
               <Instagram size={18} />
             </a>
@@ -109,7 +109,7 @@ export function Footer({ businessId }: FooterProps) {
               href={socialLinks.facebook || '#'} 
               target={socialLinks.facebook ? "_blank" : "_self"}
               onClick={(e) => handleSocialClick(e, socialLinks.facebook, 'Facebook')}
-              className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-white/50 hover:bg-primary hover:text-white transition-all"
+              className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all"
             >
               <Facebook size={18} />
             </a>
@@ -117,7 +117,7 @@ export function Footer({ businessId }: FooterProps) {
               href={socialLinks.youtube || '#'} 
               target={socialLinks.youtube ? "_blank" : "_self"}
               onClick={(e) => handleSocialClick(e, socialLinks.youtube, 'YouTube')}
-              className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-white/50 hover:bg-primary hover:text-white transition-all"
+              className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all"
             >
               <Youtube size={18} />
             </a>
@@ -125,7 +125,7 @@ export function Footer({ businessId }: FooterProps) {
               href={socialLinks.tiktok || '#'} 
               target={socialLinks.tiktok ? "_blank" : "_self"}
               onClick={(e) => handleSocialClick(e, socialLinks.tiktok, 'TikTok')}
-              className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-white/50 hover:bg-primary hover:text-white transition-all"
+              className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all"
             >
               <TikTokIcon className="w-4 h-4" />
             </a>
@@ -133,8 +133,8 @@ export function Footer({ businessId }: FooterProps) {
         </div>
 
         <div>
-          <h4 className="font-bold text-base mb-6 uppercase tracking-wider text-white/90">Navigasi</h4>
-          <ul className="space-y-4 text-white/40 text-sm">
+          <h4 className="font-bold text-base mb-6 uppercase tracking-wider text-foreground">Navigasi</h4>
+          <ul className="space-y-4 text-muted-foreground text-sm font-medium">
             <li><Link href="/" className="hover:text-primary transition-colors">Beranda</Link></li>
             <li><Link href="#layanan" className="hover:text-primary transition-colors">Layanan</Link></li>
             <li><Link href="#tentang" className="hover:text-primary transition-colors">Tentang Kami</Link></li>
@@ -143,20 +143,20 @@ export function Footer({ businessId }: FooterProps) {
         </div>
 
         <div>
-          <h4 className="font-bold text-base mb-6 uppercase tracking-wider text-white/90">Informasi</h4>
-          <ul className="space-y-4 text-white/40 text-sm">
+          <h4 className="font-bold text-base mb-6 uppercase tracking-wider text-foreground">Informasi</h4>
+          <ul className="space-y-4 text-muted-foreground text-sm font-medium">
              <li><Link href="#pesan" className="hover:text-primary transition-colors">Pesan Layanan</Link></li>
              <li>
                 <Dialog>
                   <DialogTrigger asChild>
                     <button className="hover:text-primary transition-colors text-left">Kebijakan Privasi</button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-2xl max-h-[80vh] rounded-2xl">
+                  <DialogContent className="max-w-2xl max-h-[80vh] rounded-2xl border-border bg-card">
                     <DialogHeader>
-                      <DialogTitle className="text-xl font-bold">Kebijakan Privasi</DialogTitle>
+                      <DialogTitle className="text-xl font-bold text-foreground">Kebijakan Privasi</DialogTitle>
                     </DialogHeader>
                     <ScrollArea className="h-full max-h-[60vh] mt-4 pr-4">
-                      <div className="text-white/60 text-sm whitespace-pre-wrap leading-relaxed">
+                      <div className="text-muted-foreground text-sm whitespace-pre-wrap leading-relaxed">
                         {privacyPolicyContent}
                       </div>
                     </ScrollArea>
@@ -167,10 +167,10 @@ export function Footer({ businessId }: FooterProps) {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto pt-8 border-t border-border/50 flex flex-col md:flex-row justify-between items-center gap-4 text-white/20 text-xs">
+      <div className="max-w-7xl mx-auto pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground/40 text-[10px] font-bold uppercase tracking-widest">
         <div className="flex items-center gap-4">
-          <p>© {currentYear} {businessName}. Hak Cipta Dilindungi.</p>
-          <Link href="/login" className="opacity-10 hover:opacity-100 transition-opacity p-2" title="Admin Access">
+          <p>© {currentYear} {businessName}. All Rights Reserved.</p>
+          <Link href="/login" className="opacity-30 hover:opacity-100 transition-opacity p-2" title="Admin Access">
             <Fingerprint size={12} />
           </Link>
         </div>
