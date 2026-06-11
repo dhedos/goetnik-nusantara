@@ -17,6 +17,18 @@
       },
       "required": ["name", "price", "description", "iconName", "ownerId"]
     },
+    "PortfolioItem": {
+      "title": "PortfolioItem",
+      "description": "An image demonstrating past work or results.",
+      "type": "object",
+      "properties": {
+        "imageUrl": { "type": "string" },
+        "title": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "ownerId": { "type": "string" }
+      },
+      "required": ["imageUrl", "ownerId"]
+    },
     "Booking": {
       "title": "Booking",
       "description": "A service request from a customer.",
@@ -77,6 +89,10 @@
     "/businesses/{businessId}/services/{serviceId}": {
       "schema": "Service",
       "description": "Collection of services for a specific business."
+    },
+    "/businesses/{businessId}/portfolio/{itemId}": {
+      "schema": "PortfolioItem",
+      "description": "Collection of portfolio images for a specific business."
     },
     "/businesses/{businessId}/bookings/{bookingId}": {
       "schema": "Booking",

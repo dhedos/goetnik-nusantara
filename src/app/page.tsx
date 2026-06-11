@@ -8,6 +8,7 @@ import { Navbar } from '@/components/Navbar';
 import { AIAssistant } from '@/components/AIAssistant';
 import { BookingForm } from '@/components/BookingForm';
 import { ServiceCard } from '@/components/ServiceCard';
+import { Portfolio } from '@/components/Portfolio';
 import { AboutUs } from '@/components/AboutUs';
 import { Contact } from '@/components/Contact';
 import { Footer } from '@/components/Footer';
@@ -188,6 +189,7 @@ function HomeContent() {
             </div>
           </section>
 
+          <Portfolio businessId={businessId} />
           <AboutUs businessId={businessId} />
           <BookingForm businessId={businessId} />
           <Contact businessId={businessId} />

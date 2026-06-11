@@ -12,12 +12,12 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
-  Settings, ShoppingBag, ExternalLink, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, MoveVertical, Maximize, Type, Image as ImageIcon, Palette, Map as MapIcon, Search
+  Settings, ShoppingBag, ExternalLink, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, MoveVertical, Maximize, Type, Image as ImageIcon, Palette, Map as MapIcon, Search, Grid3X3, UploadCloud
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -26,7 +26,7 @@ import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { PRIVACY_POLICY_DEFAULT, BUSINESS_NAME_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT, MAIN_BUSINESS_ID, THEMES } from '@/lib/constants';
 
-type AdminSection = 'bookings' | 'services' | 'branding' | 'hero' | 'about' | 'contact' | 'social' | 'privacy';
+type AdminSection = 'bookings' | 'services' | 'portfolio' | 'branding' | 'hero' | 'about' | 'contact' | 'social' | 'privacy';
 
 const ETHNIC_FONTS = [
   { name: 'Cinzel', label: 'Cinzel (Etnik Nusantara)' },
@@ -57,6 +57,12 @@ export default function AdminDashboard() {
     [canFetchData, firestore]
   );
   const { data: services } = useCollection(servicesQuery);
+
+  const portfolioQuery = useMemoFirebase(() => 
+    canFetchData ? query(collection(firestore!, 'businesses', MAIN_BUSINESS_ID, 'portfolio'), orderBy('createdAt', 'desc')) : null, 
+    [canFetchData, firestore]
+  );
+  const { data: portfolio } = useCollection(portfolioQuery);
 
   const bookingsQuery = useMemoFirebase(() => 
     canFetchData ? collection(firestore!, 'businesses', MAIN_BUSINESS_ID, 'bookings') : null, 
@@ -127,7 +133,6 @@ export default function AdminDashboard() {
     }
   }, [settings]);
 
-  // Live Theme Preview Logic for Admin Dashboard
   useEffect(() => {
     const theme = THEMES.find(t => t.id === businessInfo.themeId) || THEMES[0];
     document.documentElement.style.setProperty('--primary', theme.primary);
@@ -135,8 +140,8 @@ export default function AdminDashboard() {
     document.documentElement.style.setProperty('--background', theme.background);
     document.documentElement.style.setProperty('--selected-font', `'${businessInfo.fontFamily}', sans-serif`);
     
-    // Auto adjust text/border colors for Admin Panel contrast
-    const bgL = parseInt(theme.background.split(' ')[2]);
+    const bgParts = theme.background.split(' ');
+    const bgL = parseInt(bgParts[2]);
     if (bgL > 60) {
       document.documentElement.style.setProperty('--foreground', '20 20% 12%');
       document.documentElement.style.setProperty('--border', '30 20% 80%');
@@ -144,7 +149,7 @@ export default function AdminDashboard() {
     } else {
       document.documentElement.style.setProperty('--foreground', '210 40% 98%');
       document.documentElement.style.setProperty('--border', '222 47% 25% / 0.3');
-      document.documentElement.style.setProperty('--card', theme.background.split(' ').slice(0, 2).concat([`${bgL + 5}%`]).join(' '));
+      document.documentElement.style.setProperty('--card', `${bgParts[0]} ${bgParts[1]} ${bgL + 5}%`);
     }
   }, [businessInfo.themeId, businessInfo.fontFamily]);
 
@@ -217,6 +222,38 @@ export default function AdminDashboard() {
     reader.readAsDataURL(file);
   };
 
+  const handleMultiplePortfolioUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0 || !user || !firestore) return;
+
+    setIsUploading('portfolio');
+    let uploadedCount = 0;
+
+    for (const file of files) {
+      if (file.size > 1024 * 1024) {
+        toast({ variant: "destructive", title: "File Terlalu Besar", description: `${file.name} melebihi 1MB.` });
+        continue;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64String = reader.result as string;
+        const colRef = collection(firestore, 'businesses', MAIN_BUSINESS_ID, 'portfolio');
+        await addDoc(colRef, {
+          imageUrl: base64String,
+          createdAt: serverTimestamp(),
+          ownerId: user.uid
+        });
+        uploadedCount++;
+        if (uploadedCount === files.length) {
+          setIsUploading(null);
+          toast({ title: "Berhasil", description: `${uploadedCount} foto portofolio telah diunggah.` });
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleAddService = () => {
     if (!firestore || !user) return;
     const colRef = collection(firestore, 'businesses', MAIN_BUSINESS_ID, 'services');
@@ -246,6 +283,7 @@ export default function AdminDashboard() {
   const navItems = [
     { id: 'bookings', label: 'Pesanan', icon: ShoppingBag },
     { id: 'services', label: 'Layanan', icon: Settings },
+    { id: 'portfolio', label: 'Portofolio', icon: Grid3X3 },
     { id: 'branding', label: 'Logo & Tema', icon: Layout },
     { id: 'hero', label: 'Banner Utama', icon: Globe },
     { id: 'about', label: 'Tentang Kami', icon: Info },
@@ -316,6 +354,53 @@ export default function AdminDashboard() {
                 {bookings?.length === 0 && <p className="text-center text-muted-foreground py-16 font-medium">Belum ada pesanan terbaru.</p>}
               </CardContent>
             </Card>
+          )}
+
+          {activeSection === 'portfolio' && (
+            <div className="space-y-6">
+              <Card className="rounded-3xl border-border bg-card shadow-xl overflow-hidden">
+                <CardHeader className="p-8 border-b border-border">
+                  <CardTitle className="flex items-center gap-2"><Grid3X3 size={20} className="text-primary" /> Galeri Portofolio</CardTitle>
+                </CardHeader>
+                <CardContent className="p-8 space-y-8">
+                  <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-border rounded-3xl bg-primary/5 group hover:bg-primary/10 transition-all">
+                    <input 
+                      type="file" 
+                      id="portfolio-up" 
+                      className="hidden" 
+                      multiple 
+                      accept="image/*" 
+                      onChange={handleMultiplePortfolioUpload} 
+                    />
+                    <label htmlFor="portfolio-up" className="flex flex-col items-center gap-4 cursor-pointer">
+                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                        {isUploading === 'portfolio' ? <Loader2 className="animate-spin" size={32} /> : <UploadCloud size={32} />}
+                      </div>
+                      <div className="text-center">
+                        <p className="font-bold text-lg">Klik untuk Unggah Foto Karya</p>
+                        <p className="text-sm text-muted-foreground uppercase tracking-widest mt-1">Bisa pilih banyak foto sekaligus (Maks 1MB/foto)</p>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {portfolio?.map((item: any) => (
+                      <div key={item.id} className="relative aspect-square rounded-2xl overflow-hidden border border-border group shadow-lg">
+                        <Image src={item.imageUrl} alt="Portfolio" fill className="object-cover transition-transform group-hover:scale-110" unoptimized />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <Button variant="destructive" size="icon" className="rounded-full h-10 w-10" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'portfolio', item.id))}>
+                            <Trash2 size={18} />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    {portfolio?.length === 0 && (
+                      <div className="col-span-full py-20 text-center opacity-20 uppercase font-black tracking-widest text-xs">Belum ada foto hasil karya</div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
 
           {activeSection === 'branding' && (
@@ -475,7 +560,6 @@ export default function AdminDashboard() {
              </div>
           )}
 
-          {/* Sections below are similar with theme updates */}
           {activeSection === 'contact' && (
             <Card className="rounded-3xl border-border bg-card shadow-xl">
               <CardContent className="p-8 space-y-8">
