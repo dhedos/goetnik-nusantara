@@ -1,7 +1,6 @@
 
 "use client";
 
-import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense, useEffect, useState } from 'react';
@@ -19,19 +18,17 @@ import { collection, doc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { ArrowRight, Loader2, Sparkles, Cpu } from 'lucide-react';
+import { ArrowRight, Loader2, Sparkles } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ICON_MAP, BUSINESS_NAME_DEFAULT, MAIN_BUSINESS_ID } from '@/lib/constants';
 
 function LoadingScreen({ text }: { text: string }) {
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#0B1120] text-center p-4 overflow-hidden">
-      {/* Premium Background Glows */}
       <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[140px] animate-pulse" />
       <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[140px] animate-pulse delay-700" />
       
       <div className="relative z-10 flex flex-col items-center">
-        {/* Animated Premium Loader */}
         <div className="relative h-28 w-28 mb-12">
           <div className="absolute inset-0 rounded-[2rem] border-2 border-primary/10 rotate-45 animate-[spin_6s_linear_infinite]" />
           <div className="absolute inset-0 rounded-[2rem] border-2 border-t-primary/80 border-r-transparent border-b-transparent border-l-transparent rotate-45 animate-[spin_2s_linear_infinite] shadow-[0_0_30px_rgba(59,130,246,0.2)]" />
@@ -44,7 +41,6 @@ function LoadingScreen({ text }: { text: string }) {
           {text}
         </h2>
 
-        {/* Premium Animated Progress Bar */}
         <div className="w-72 h-2 bg-white/5 rounded-full overflow-hidden border border-white/5 relative">
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent animate-[loading-progress_1.5s_infinite]" />
           <div className="h-full bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] animate-[loading-progress_2.5s_ease-in-out_infinite]" />
@@ -61,7 +57,6 @@ function LoadingScreen({ text }: { text: string }) {
 function HomeContent() {
   const businessId = MAIN_BUSINESS_ID;
   const firestore = useFirestore();
-  const [isTimeout, setIsTimeout] = useState(false);
 
   const servicesQuery = useMemoFirebase(() => 
     firestore ? collection(firestore, 'businesses', businessId, 'services') : null, 
@@ -75,14 +70,8 @@ function HomeContent() {
   );
   const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsTimeout(true);
-    }, 3000); 
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (!isTimeout && (settingsLoading || !settings)) {
+  // loadingState: Tampilkan loading screen hanya jika data primer (settings) belum ada dan masih loading.
+  if (settingsLoading && !settings) {
     return <LoadingScreen text="Menghubungkan ke Pusat Layanan..." />;
   }
 
@@ -191,7 +180,6 @@ function HomeContent() {
         </main>
         <Footer businessId={businessId} />
       </div>
-      {/* WhatsAppPopup diletakkan di luar kontainer animasi agar benar-benar fixed terhadap layar */}
       <WhatsAppPopup businessId={businessId} />
     </>
   );

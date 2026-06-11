@@ -35,7 +35,7 @@ export default function AdminDashboard() {
   const [isSaving, setIsSaving] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   
-  // Pastikan data hanya diambil jika user sudah terotentikasi
+  // Pastikan data hanya diambil jika user sudah terotentikasi dan firestore tersedia
   const canFetchData = !!(firestore && user);
 
   const servicesQuery = useMemoFirebase(() => 
