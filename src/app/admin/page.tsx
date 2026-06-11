@@ -17,7 +17,7 @@ import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
-  Settings, ShoppingBag, ExternalLink, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, MoveVertical, Maximize, Type, Image as ImageIcon, Palette, Map as MapIcon
+  Settings, ShoppingBag, ExternalLink, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, MoveVertical, Maximize, Type, Image as ImageIcon, Palette, Map as MapIcon, Search
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -48,6 +48,7 @@ export default function AdminDashboard() {
   const [isMounted, setIsMounted] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const hasLoadedSettings = useRef(false);
+  const [searchLocation, setSearchLocation] = useState('');
   
   const canFetchData = !!(firestore && user);
 
@@ -215,6 +216,23 @@ export default function AdminDashboard() {
     };
     addDoc(colRef, newService);
     toast({ title: "Layanan Ditambahkan", description: "Layanan baru muncul di daftar." });
+  };
+
+  const handleAutoSearchMap = () => {
+    if (!searchLocation.trim()) return;
+    const embedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(searchLocation)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+    const directUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchLocation)}`;
+    
+    setBusinessInfo({
+      ...businessInfo,
+      mapEmbedUrl: embedUrl,
+      mapDirectUrl: directUrl
+    });
+    
+    toast({ 
+      title: "Peta Diperbarui", 
+      description: `Lokasi "${searchLocation}" telah diterapkan ke pratinjau.` 
+    });
   };
 
   const viewPublicSite = () => {
@@ -517,17 +535,51 @@ export default function AdminDashboard() {
                   <div className="space-y-2"><Label className="text-xs font-bold uppercase">Email Bisnis</Label><Input value={businessInfo.email} onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" /></div>
                   <div className="space-y-2"><Label className="text-xs font-bold uppercase">Alamat Lengkap</Label><Input value={businessInfo.address} onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" /></div>
                 </div>
-                <div className="space-y-4 pt-6 border-t border-white/5">
+                
+                <div className="space-y-6 pt-6 border-t border-white/5">
                   <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label className="text-xs font-bold uppercase flex items-center gap-2"><MapPin size={14} /> Link Embed Google Maps (Src Iframe)</Label>
-                      <Input placeholder="https://www.google.com/maps/embed?pb=..." value={businessInfo.mapEmbedUrl} onChange={(e) => setBusinessInfo({...businessInfo, mapEmbedUrl: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" />
-                      <p className="text-[10px] text-muted-foreground mt-1">Buka Google Maps &gt; Bagikan &gt; Sematkan Peta &gt; Ambil link di atribut <code>src="..."</code></p>
+                    <div className="space-y-4 p-5 bg-primary/5 rounded-2xl border border-primary/10">
+                      <Label className="text-xs font-bold uppercase flex items-center gap-2">
+                        <Search size={14} className="text-primary" /> Pencarian Lokasi Otomatis
+                      </Label>
+                      <div className="flex gap-2">
+                        <Input 
+                          placeholder="Ketik Nama Bisnis atau Alamat..." 
+                          value={searchLocation}
+                          onChange={(e) => setSearchLocation(e.target.value)}
+                          className="rounded-xl h-12 bg-background/50 border-white/5"
+                          onKeyDown={(e) => e.key === 'Enter' && handleAutoSearchMap()}
+                        />
+                        <Button onClick={handleAutoSearchMap} className="h-12 w-12 rounded-xl shrink-0" variant="secondary">
+                          <Search size={18} />
+                        </Button>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground">Ketik nama lokasi lalu klik cari untuk memperbarui peta secara otomatis.</p>
                     </div>
-                    <div className="space-y-2">
-                      <Label className="text-xs font-bold uppercase flex items-center gap-2"><Globe size={14} /> Link Google Maps Langsung</Label>
-                      <Input placeholder="https://maps.app.goo.gl/..." value={businessInfo.mapDirectUrl} onChange={(e) => setBusinessInfo({...businessInfo, mapDirectUrl: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" />
+
+                    <div className="space-y-2 p-5 bg-background/20 rounded-2xl border border-white/5">
+                      <Label className="text-xs font-bold uppercase flex items-center gap-2">
+                        <ExternalLink size={14} className="text-primary" /> Link Google Maps Langsung
+                      </Label>
+                      <Input 
+                        placeholder="https://maps.app.goo.gl/..." 
+                        value={businessInfo.mapDirectUrl} 
+                        onChange={(e) => setBusinessInfo({...businessInfo, mapDirectUrl: e.target.value})} 
+                        className="rounded-xl h-12 bg-background/50 border-white/5" 
+                      />
                     </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-xs font-bold uppercase flex items-center gap-2">
+                      <MapPin size={14} className="text-primary" /> Link Embed Manual (Src Iframe)
+                    </Label>
+                    <Input 
+                      placeholder="https://www.google.com/maps/embed?pb=..." 
+                      value={businessInfo.mapEmbedUrl} 
+                      onChange={(e) => setBusinessInfo({...businessInfo, mapEmbedUrl: e.target.value})} 
+                      className="rounded-xl h-12 bg-background/50 border-white/5" 
+                    />
                   </div>
 
                   {/* Peta Pratinjau Admin */}
