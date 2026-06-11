@@ -219,8 +219,11 @@ export default function AdminDashboard() {
   };
 
   const handleAutoSearchMap = () => {
-    if (!searchLocation.trim()) return;
-    const embedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(searchLocation)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+    if (!searchLocation.trim()) {
+      toast({ variant: "destructive", title: "Input Kosong", description: "Ketik lokasi yang ingin dicari." });
+      return;
+    }
+    const embedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(searchLocation)}&output=embed`;
     const directUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchLocation)}`;
     
     setBusinessInfo({
@@ -231,7 +234,7 @@ export default function AdminDashboard() {
     
     toast({ 
       title: "Peta Diperbarui", 
-      description: `Lokasi "${searchLocation}" telah diterapkan ke pratinjau.` 
+      description: `Lokasi "${searchLocation}" telah diterapkan.` 
     });
   };
 
@@ -540,7 +543,7 @@ export default function AdminDashboard() {
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-4 p-5 bg-primary/5 rounded-2xl border border-primary/10">
                       <Label className="text-xs font-bold uppercase flex items-center gap-2">
-                        <Search size={14} className="text-primary" /> Pencarian Lokasi Otomatis
+                        <Search size={14} className="text-primary" /> 1. Pencarian Lokasi Otomatis
                       </Label>
                       <div className="flex gap-2">
                         <Input 
@@ -554,7 +557,7 @@ export default function AdminDashboard() {
                           <Search size={18} />
                         </Button>
                       </div>
-                      <p className="text-[10px] text-muted-foreground">Ketik nama lokasi lalu klik cari untuk memperbarui peta secara otomatis.</p>
+                      <p className="text-[10px] text-muted-foreground">Cukup ketik nama tempat Anda, lalu klik cari untuk mengisi peta di bawah.</p>
                     </div>
 
                     <div className="space-y-2 p-5 bg-background/20 rounded-2xl border border-white/5">
@@ -572,7 +575,7 @@ export default function AdminDashboard() {
 
                   <div className="space-y-2">
                     <Label className="text-xs font-bold uppercase flex items-center gap-2">
-                      <MapPin size={14} className="text-primary" /> Link Embed Manual (Src Iframe)
+                      <MapPin size={14} className="text-primary" /> 2. Link Embed Manual (Gunakan URL Resmi Saja)
                     </Label>
                     <Input 
                       placeholder="https://www.google.com/maps/embed?pb=..." 
@@ -580,13 +583,14 @@ export default function AdminDashboard() {
                       onChange={(e) => setBusinessInfo({...businessInfo, mapEmbedUrl: e.target.value})} 
                       className="rounded-xl h-12 bg-background/50 border-white/5" 
                     />
+                    <p className="text-[10px] text-muted-foreground">*Jangan mengetik nama tempat di sini, gunakan fitur Pencarian Otomatis di atas atau tempel link resmi.</p>
                   </div>
 
                   {/* Peta Pratinjau Admin */}
                   <div className="mt-4">
                     <Label className="text-xs font-bold uppercase flex items-center gap-2 mb-3"><MapIcon size={14} className="text-primary" /> Pratinjau Lokasi Peta</Label>
                     <div className="rounded-2xl overflow-hidden border border-white/10 h-[300px] bg-background/20 relative flex items-center justify-center">
-                      {businessInfo.mapEmbedUrl ? (
+                      {businessInfo.mapEmbedUrl && businessInfo.mapEmbedUrl.startsWith('http') ? (
                         <iframe 
                           src={businessInfo.mapEmbedUrl}
                           width="100%" 
@@ -596,9 +600,9 @@ export default function AdminDashboard() {
                           loading="lazy" 
                         />
                       ) : (
-                        <div className="flex flex-col items-center gap-2 opacity-20">
+                        <div className="flex flex-col items-center gap-2 opacity-20 p-6 text-center">
                           <MapIcon size={48} />
-                          <span className="text-xs font-bold uppercase tracking-widest">Peta Belum Diatur</span>
+                          <span className="text-xs font-bold uppercase tracking-widest">Gunakan Pencarian Otomatis di atas untuk menampilkan peta</span>
                         </div>
                       )}
                     </div>
@@ -647,15 +651,15 @@ export default function AdminDashboard() {
                       <CardContent className="p-6 space-y-4">
                         <div className="space-y-2">
                           <Label className="text-[10px] uppercase font-bold opacity-50">Nama Layanan</Label>
-                          <Input defaultValue={s.name} className="rounded-lg h-10 bg-background/50 font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { name: e.target.value })} />
+                          <Input defaultValue={s.name} className="rounded-lg h-10 bg-background/50 font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { name: (e.target as HTMLInputElement).value })} />
                         </div>
                         <div className="space-y-2">
                           <Label className="text-[10px] uppercase font-bold opacity-50">Harga Mulai</Label>
-                          <Input defaultValue={s.price} className="rounded-lg h-10 bg-background/50 text-primary font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { price: e.target.value })} />
+                          <Input defaultValue={s.price} className="rounded-lg h-10 bg-background/50 text-primary font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { price: (e.target as HTMLInputElement).value })} />
                         </div>
                         <div className="space-y-2">
                           <Label className="text-[10px] uppercase font-bold opacity-50">Deskripsi Singkat</Label>
-                          <Textarea defaultValue={s.description} className="rounded-lg min-h-[80px] bg-background/50 text-xs" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { description: e.target.value })} />
+                          <Textarea defaultValue={s.description} className="rounded-lg min-h-[80px] bg-background/50 text-xs" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { description: (e.target as HTMLTextAreaElement).value })} />
                         </div>
                       </CardContent>
                     </Card>
