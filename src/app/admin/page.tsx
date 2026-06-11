@@ -18,7 +18,7 @@ import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
-  Settings, ShoppingBag, ExternalLink as ExternalLinkIcon, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, Type, Grid3X3, UploadCloud, Link as LinkIcon, ShoppingCart, Search, Map as MapIcon, Palette
+  Settings, ShoppingBag, ExternalLink as ExternalLinkIcon, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, Type, Grid3X3, UploadCloud, Link as LinkIcon, ShoppingCart, Search, Map as MapIcon, Palette, Sparkles
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -27,7 +27,7 @@ import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { PRIVACY_POLICY_DEFAULT, BUSINESS_NAME_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT, MAIN_BUSINESS_ID, THEMES } from '@/lib/constants';
 
-type AdminSection = 'bookings' | 'services' | 'portfolio' | 'links' | 'branding' | 'hero' | 'about' | 'contact' | 'social' | 'privacy';
+type AdminSection = 'bookings' | 'services' | 'portfolio' | 'links' | 'branding' | 'hero' | 'about' | 'ai' | 'contact' | 'social' | 'privacy';
 
 const ETHNIC_FONTS = [
   { name: 'Cinzel', label: 'Cinzel (Etnik Nusantara)' },
@@ -108,6 +108,8 @@ export default function AdminDashboard() {
     servicesSectionBadge: 'Premium Solutions',
     servicesSectionTitle: 'Layanan Unggulan',
     servicesSectionSubtitle: 'Solusi kreatif dan teknologi modern untuk mempercepat pertumbuhan bisnis Anda.',
+    aiTitle: 'Bingung Pilih Layanan?',
+    aiSubtitle: 'Ceritakan masalah teknis Anda, dan asisten AI kami akan merekomendasikan paket layanan yang paling tepat.',
     privacyPolicy: PRIVACY_POLICY_DEFAULT,
     socialInstagram: '',
     socialFacebook: '',
@@ -318,6 +320,7 @@ export default function AdminDashboard() {
     { id: 'branding', label: 'Logo & Tema', icon: Layout },
     { id: 'hero', label: 'Banner Utama', icon: Globe },
     { id: 'about', label: 'Tentang Kami', icon: Info },
+    { id: 'ai', label: 'Asisten AI', icon: Sparkles },
     { id: 'contact', label: 'Alamat & Kontak', icon: MapPin },
     { id: 'social', label: 'Media Sosial', icon: Instagram },
     { id: 'privacy', label: 'Privasi', icon: Shield },
@@ -609,6 +612,16 @@ export default function AdminDashboard() {
               <CardContent className="p-8 space-y-6">
                 <div className="space-y-2"><Label className="text-xs font-bold uppercase">Judul Tentang Kami</Label><Input value={businessInfo.aboutTitle} onChange={(e) => setBusinessInfo({...businessInfo, aboutTitle: e.target.value})} className="rounded-xl h-12 bg-background border-border font-bold" /></div>
                 <div className="space-y-2"><Label className="text-xs font-bold uppercase">Konten Tentang Kami</Label><Textarea value={businessInfo.aboutContent} onChange={(e) => setBusinessInfo({...businessInfo, aboutContent: e.target.value})} className="rounded-xl min-h-[250px] bg-background border-border leading-relaxed" /></div>
+              </CardContent>
+            </Card>
+          )}
+
+          {activeSection === 'ai' && (
+            <Card className="rounded-3xl border-border bg-card shadow-xl">
+              <CardHeader><CardTitle className="flex items-center gap-2"><Sparkles size={20} className="text-primary" /> Pengaturan Asisten AI</CardTitle></CardHeader>
+              <CardContent className="p-8 space-y-6">
+                <div className="space-y-2"><Label className="text-xs font-bold uppercase">Judul Seksi AI</Label><Input value={businessInfo.aiTitle} onChange={(e) => setBusinessInfo({...businessInfo, aiTitle: e.target.value})} className="rounded-xl h-12 bg-background border-border font-bold" placeholder="Contoh: Bingung Pilih Layanan?" /></div>
+                <div className="space-y-2"><Label className="text-xs font-bold uppercase">Deskripsi Seksi AI</Label><Textarea value={businessInfo.aiSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, aiSubtitle: e.target.value})} className="rounded-xl min-h-[120px] bg-background border-border" placeholder="Contoh: Ceritakan masalah teknis Anda..." /></div>
               </CardContent>
             </Card>
           )}

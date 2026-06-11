@@ -8,8 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Sparkles, Loader2, MessageSquare, AlertCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection } from 'firebase/firestore';
+import { useFirestore, useCollection, useDoc, useMemoFirebase } from '@/firebase';
+import { collection, doc } from 'firebase/firestore';
 
 interface AIAssistantProps {
   businessId: string;
@@ -27,6 +27,15 @@ export function AIAssistant({ businessId }: AIAssistantProps) {
     [firestore, businessId]
   );
   const { data: services } = useCollection(servicesQuery);
+
+  const settingsRef = useMemoFirebase(() => 
+    firestore ? doc(firestore, 'businesses', businessId, 'settings', 'profile') : null, 
+    [firestore, businessId]
+  );
+  const { data: settings } = useDoc(settingsRef);
+
+  const aiTitle = settings?.aiTitle || 'Bingung Pilih Layanan?';
+  const aiSubtitle = settings?.aiSubtitle || 'Ceritakan masalah teknis Anda, dan asisten AI kami akan merekomendasikan paket layanan yang paling tepat.';
 
   const handleDiagnose = async () => {
     if (!description.trim() || !services) return;
@@ -63,9 +72,9 @@ export function AIAssistant({ businessId }: AIAssistantProps) {
       
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-2xl md:text-4xl font-bold font-headline mb-4">Bingung Pilih Layanan?</h2>
+          <h2 className="text-2xl md:text-4xl font-bold font-headline mb-4">{aiTitle}</h2>
           <p className="text-muted-foreground text-sm md:text-lg max-w-2xl mx-auto px-2">
-            Ceritakan masalah teknis Anda, dan asisten AI kami akan merekomendasikan paket layanan yang paling tepat.
+            {aiSubtitle}
           </p>
         </div>
 
