@@ -18,7 +18,7 @@ import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
-  Settings, ShoppingBag, ExternalLink as ExternalLinkIcon, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, Type, Grid3X3, UploadCloud, Link as LinkIcon, ShoppingCart, Search, Map as MapIcon, Palette, Sparkles, Menu
+  Settings, ShoppingBag, ExternalLink as ExternalLinkIcon, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, Type, Grid3X3, UploadCloud, Link as LinkIcon, ShoppingCart, Search, Map as MapIcon, Palette, Sparkles, Menu, Image as ImageIcon
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -606,18 +606,28 @@ export default function AdminDashboard() {
                 <div className="grid md:grid-cols-2 gap-6">
                   {services?.map((s: any) => (
                     <Card key={s.id} className="bg-card rounded-3xl border-border overflow-hidden shadow-lg group">
-                      <div className="h-44 bg-background/50 relative">
-                        {s.imageUrl ? <Image src={s.imageUrl} alt={s.name} fill className="object-cover" unoptimized /> : <div className="flex items-center justify-center h-full opacity-10 uppercase text-xs">No Image</div>}
-                        <div className="absolute top-4 right-4 flex gap-2">
+                      <div className="h-56 bg-muted/20 relative overflow-hidden flex items-center justify-center">
+                        {s.imageUrl ? (
+                          <Image src={s.imageUrl} alt={s.name} fill className="object-cover transition-transform group-hover:scale-105" unoptimized />
+                        ) : (
+                          <div className="flex flex-col items-center gap-2 text-muted-foreground/30">
+                            <ImageIcon size={48} />
+                            <span className="uppercase text-[10px] font-black tracking-widest">Belum Ada Gambar</span>
+                          </div>
+                        )}
+                        <div className="absolute top-4 right-4 flex gap-2 z-10">
                           <input type="file" className="hidden" id={`s-${s.id}`} accept="image/*" onChange={(e) => handleImageUpload(e, s.id)} />
-                          <Button variant="secondary" size="sm" asChild className="opacity-0 group-hover:opacity-100 transition-opacity"><label htmlFor={`s-${s.id}`}>Ubah</label></Button>
-                          <Button variant="destructive" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id))}><Trash2 size={14} /></Button>
+                          <Button variant="secondary" size="sm" asChild className="opacity-0 group-hover:opacity-100 transition-opacity shadow-lg rounded-full px-4"><label htmlFor={`s-${s.id}`}>Ubah Gambar</label></Button>
+                          <Button variant="destructive" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity shadow-lg h-9 w-9 rounded-full" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id))}><Trash2 size={16} /></Button>
                         </div>
                       </div>
                       <CardContent className="p-6 space-y-4">
-                        <Input defaultValue={s.name} className="rounded-xl h-12 bg-background border-border font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { name: e.target.value })} />
-                        <Input defaultValue={s.price} className="rounded-xl h-12 bg-background border-border font-bold text-primary" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { price: e.target.value })} />
-                        <Textarea defaultValue={s.description} className="rounded-xl min-h-[100px] bg-background border-border text-sm" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { description: e.target.value })} />
+                        <div className="space-y-1"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40">Nama Layanan</Label><Input defaultValue={s.name} className="rounded-xl h-12 bg-background border-border font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { name: e.target.value })} /></div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-1"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40">Harga / Biaya</Label><Input defaultValue={s.price} className="rounded-xl h-12 bg-background border-border font-bold text-primary" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { price: e.target.value })} /></div>
+                          <div className="space-y-1"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40">Ikon (Lucide)</Label><Input defaultValue={s.iconName} className="rounded-xl h-12 bg-background border-border font-mono text-xs" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { iconName: e.target.value })} /></div>
+                        </div>
+                        <div className="space-y-1"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40">Deskripsi Singkat</Label><Textarea defaultValue={s.description} className="rounded-xl min-h-[100px] bg-background border-border text-sm leading-relaxed" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { description: e.target.value })} /></div>
                       </CardContent>
                     </Card>
                   ))}
