@@ -68,15 +68,14 @@ export function Footer({ businessId }: FooterProps) {
           <Link href="/" className="flex items-center gap-2">
             {logoUrl ? (
               <div 
-                className="relative shrink-0 transition-all duration-300"
-                style={{ height: `${logoH}px`, width: `${logoH}px` }}
+                className="relative shrink-0 transition-all duration-300 flex items-center"
+                style={{ height: `${logoH}px` }}
               >
-                <Image 
+                <img 
                   src={logoUrl} 
                   alt="Logo" 
-                  fill 
-                  className="object-contain"
-                  unoptimized
+                  style={{ height: '100%', width: 'auto', objectFit: 'contain' }}
+                  className="block"
                 />
               </div>
             ) : (
@@ -136,7 +135,7 @@ export function Footer({ businessId }: FooterProps) {
         <div>
           <h4 className="font-bold text-base mb-6 uppercase tracking-wider text-white/90">Navigasi</h4>
           <ul className="space-y-4 text-white/40 text-sm">
-            <li><Link href="#" className="hover:text-primary transition-colors">Beranda</Link></li>
+            <li><Link href="/" className="hover:text-primary transition-colors">Beranda</Link></li>
             <li><Link href="#layanan" className="hover:text-primary transition-colors">Layanan</Link></li>
             <li><Link href="#tentang" className="hover:text-primary transition-colors">Tentang Kami</Link></li>
             <li><Link href="#kontak" className="hover:text-primary transition-colors">Hubungi Kami</Link></li>

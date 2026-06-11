@@ -322,11 +322,19 @@ export default function AdminDashboard() {
                 <div className="space-y-4 pt-4 border-t border-white/5">
                   <Label className="text-white uppercase font-bold text-xs">Logo Bisnis</Label>
                   <div className="flex items-center gap-6 p-6 border-2 border-dashed border-white/10 rounded-3xl bg-background/20">
-                    <div className="relative h-24 w-24 bg-[#0B1120] rounded-xl overflow-hidden border border-white/5">
-                      {businessInfo.logoUrl ? <Image src={businessInfo.logoUrl} alt="Logo" fill className="object-contain p-2" unoptimized /> : <Cpu className="w-full h-full p-6 opacity-20" />}
+                    <div className="relative min-h-[6rem] min-w-[6rem] max-w-[15rem] bg-[#0B1120] rounded-xl overflow-hidden border border-white/5 flex items-center justify-center p-4">
+                      {businessInfo.logoUrl ? (
+                        <img 
+                          src={businessInfo.logoUrl} 
+                          alt="Logo" 
+                          className="max-h-full w-auto object-contain"
+                        />
+                      ) : (
+                        <Cpu className="w-12 h-12 opacity-20" />
+                      )}
                     </div>
                     <div className="flex-1 space-y-3">
-                      <p className="text-sm text-muted-foreground">Upload PNG/JPG max 1MB.</p>
+                      <p className="text-sm text-muted-foreground">Upload logo fleksibel (mendukung horizontal/vertikal). Max 1MB.</p>
                       <input type="file" className="hidden" id="logo-up" accept="image/*" onChange={(e) => handleImageUpload(e, 'logo')} />
                       <Button asChild variant="secondary" className="cursor-pointer h-10 px-6 rounded-xl font-bold"><label htmlFor="logo-up">{isUploading === 'logo' ? '...' : 'Pilih File'}</label></Button>
                     </div>

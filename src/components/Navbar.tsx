@@ -54,16 +54,14 @@ export function Navbar({ businessId }: NavbarProps) {
         <Link href="/" className="flex items-center gap-3 group">
           {logoUrl ? (
             <div 
-              className="relative shrink-0 transition-all duration-300"
-              style={{ height: `${logoH}px`, width: `${logoH}px` }}
+              className="relative shrink-0 transition-all duration-300 flex items-center"
+              style={{ height: `${logoH}px` }}
             >
-              <Image 
+              <img 
                 src={logoUrl} 
                 alt="Logo" 
-                fill 
-                className="object-contain"
-                priority
-                unoptimized
+                style={{ height: '100%', width: 'auto', objectFit: 'contain' }}
+                className="block"
               />
             </div>
           ) : (
