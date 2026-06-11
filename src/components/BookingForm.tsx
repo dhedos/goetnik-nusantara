@@ -64,10 +64,15 @@ export function BookingForm({ businessId }: BookingFormProps) {
     if (!firestore) return;
     setIsSubmitting(true);
     
+    // Cari nama layanan berdasarkan ID yang dipilih
+    const selectedService = services?.find(s => s.id === values.service);
+    const serviceName = selectedService?.name || values.service;
+
     try {
       const bookingsColRef = collection(firestore, 'businesses', businessId, 'bookings');
       await addDoc(bookingsColRef, {
         ...values,
+        service: serviceName, // Simpan nama layanan ke DB agar mudah dibaca admin
         businessId,
         status: 'Pending',
         createdAt: serverTimestamp(),
@@ -78,7 +83,7 @@ export function BookingForm({ businessId }: BookingFormProps) {
 👤 *Pelanggan:* ${values.fullName}
 📱 *WhatsApp:* ${values.whatsapp}
 📍 *Alamat:* ${values.address}
-🛠️ *Layanan:* ${values.service}
+🛠️ *Layanan:* ${serviceName}
 📝 *Catatan:* ${values.notes || '-'}
 ━━━━━━━━━━━━━━━━━━
 _Dikirim melalui Sistem Pemesanan Website_`;
@@ -153,7 +158,7 @@ _Dikirim melalui Sistem Pemesanan Website_`;
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Pilih Layanan</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Klik untuk memilih" />
@@ -161,7 +166,7 @@ _Dikirim melalui Sistem Pemesanan Website_`;
                         </FormControl>
                         <SelectContent>
                           {services?.map((s: any) => (
-                            <SelectItem key={s.id} value={s.name}>{s.name}</SelectItem>
+                            <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
