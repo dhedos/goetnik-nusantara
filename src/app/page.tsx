@@ -17,19 +17,40 @@ import { DynamicTitle } from '@/components/DynamicTitle';
 import { useFirestore, useCollection, useDoc, useMemoFirebase } from '@/firebase';
 import { collection, doc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { ArrowRight, Loader2, Cpu } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ICON_MAP, BUSINESS_NAME_DEFAULT, MAIN_BUSINESS_ID } from '@/lib/constants';
 
-function LoadingScreen() {
+function LoadingScreen({ logoUrl }: { logoUrl?: string }) {
+  const [cachedLogo, setCachedLogo] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Mencoba mengambil logo dari cache agar muncul instan saat reload
+    try {
+      const cache = JSON.parse(localStorage.getItem('goetnik-theme-cache') || '{}');
+      if (cache.logoUrl) setCachedLogo(cache.logoUrl);
+    } catch (e) {}
+  }, []);
+
+  const displayLogo = logoUrl || cachedLogo;
+
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background text-center p-4">
       <div className="relative z-10 flex flex-col items-center">
-        {/* Pulsing Icon Brand (Kedap-Kedip) */}
-        <div className="w-20 h-20 rounded-2xl bg-primary/20 flex items-center justify-center text-primary animate-pulse shadow-2xl shadow-primary/20">
-          <Cpu size={48} />
+        {/* Kontainer Ikon dengan Animasi Pulse */}
+        <div className="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center animate-pulse">
+          {displayLogo ? (
+            <img 
+              src={displayLogo} 
+              alt="Loading Logo" 
+              className="max-w-full max-h-full object-contain filter grayscale brightness-125"
+            />
+          ) : (
+            <div className="w-20 h-20 rounded-2xl bg-primary/20 flex items-center justify-center text-primary shadow-2xl shadow-primary/20">
+              <Cpu size={48} />
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -67,7 +88,7 @@ function HomeContent() {
   }, [settings]);
 
   if (!isReady && settingsLoading && !settings) {
-    return <LoadingScreen />;
+    return <LoadingScreen logoUrl={settings?.logoUrl} />;
   }
 
   const heroPlaceholder = PlaceHolderImages.find(img => img.id === 'hero-tech');

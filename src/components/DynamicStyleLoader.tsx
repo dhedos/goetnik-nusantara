@@ -83,7 +83,8 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
         foreground,
         card,
         border,
-        fontFamily: fontValue
+        fontFamily: fontValue,
+        logoUrl: settings.logoUrl || ''
       }));
     } catch (e) {}
 
