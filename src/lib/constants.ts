@@ -85,5 +85,33 @@ export const THEMES = [
     primary: '45 80% 35%', // Emas Tua
     accent: '0 80% 15%',   // Marun Gelap
     background: '40 50% 94%' // Cream Kertas Kuno
+  },
+  {
+    id: 'deep-sea',
+    label: 'Deep Sea (Modern)',
+    primary: '217 91% 60%',
+    accent: '189 94% 43%',
+    background: '222 47% 11%'
+  },
+  {
+    id: 'earthy-forest',
+    label: 'Earthy Forest (Alam)',
+    primary: '142 70% 45%',
+    accent: '142 20% 95%',
+    background: '142 50% 5%'
+  },
+  {
+    id: 'royal-elite',
+    label: 'Royal Elite (Ungu)',
+    primary: '270 90% 60%',
+    accent: '270 20% 95%',
+    background: '270 50% 5%'
+  },
+  {
+    id: 'terracotta',
+    label: 'Terracotta (Bata)',
+    primary: '20 80% 50%',
+    accent: '20 20% 95%',
+    background: '20 50% 5%'
   }
 ];
