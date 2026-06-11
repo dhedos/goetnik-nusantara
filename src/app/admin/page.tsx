@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
@@ -15,7 +16,7 @@ import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
-  Settings, ShoppingBag, ExternalLink, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, MoveVertical
+  Settings, ShoppingBag, ExternalLink, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, MoveVertical, Maximize
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -68,6 +69,7 @@ export default function AdminDashboard() {
     logoText: 'Go Etnik',
     logoAccentText: 'NUSANTARA',
     logoUrl: '',
+    logoHeight: '36',
     heroBadge: 'Solusi Digital Terpercaya',
     heroTitle: BUSINESS_NAME_DEFAULT,
     heroSubtitle: 'Kami melayani kebutuhan teknologi, desain grafis, dan pembuatan aplikasi secara profesional.',
@@ -100,7 +102,8 @@ export default function AdminDashboard() {
       setBusinessInfo(prev => ({
         ...prev,
         ...settings,
-        heroImagePosition: settings.heroImagePosition || '50%'
+        heroImagePosition: settings.heroImagePosition || '50%',
+        logoHeight: settings.logoHeight || '36'
       }));
       hasLoadedSettings.current = true;
     }
@@ -135,7 +138,6 @@ export default function AdminDashboard() {
           description: "Semua perubahan telah diterapkan ke website secara otomatis." 
         });
         setIsSaving(false);
-        hasLoadedSettings.current = false;
       })
       .catch((e) => {
         setIsSaving(false);
@@ -215,12 +217,13 @@ export default function AdminDashboard() {
   ];
 
   const posValue = parseInt(businessInfo.heroImagePosition) || 50;
+  const logoHValue = parseInt(businessInfo.logoHeight) || 36;
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#0B1120] text-foreground">
       <aside className="w-64 bg-card border-r border-white/5 flex flex-col shrink-0">
         <div className="p-6 border-b border-white/5">
-          <h2 className="text-xl font-black text-primary tracking-tighter uppercase italic">PANEL ADMIN</h2>
+          <h2 className="text-xl font-bold text-primary tracking-tighter uppercase">PANEL ADMIN</h2>
         </div>
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {navItems.map((item) => (
@@ -245,14 +248,14 @@ export default function AdminDashboard() {
       <main className="flex-1 overflow-y-auto p-8 bg-[#0B1120]">
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="flex justify-between items-start">
-            <h1 className="text-3xl font-black italic uppercase text-white">{activeSection}</h1>
+            <h1 className="text-3xl font-bold uppercase text-white">{activeSection}</h1>
             <div className="flex flex-col items-end gap-2">
               <Button onClick={handleSaveBusinessInfo} size="lg" className="rounded-xl px-8 h-12 font-bold shadow-xl" disabled={isSaving}>
                 {isSaving ? <Loader2 className="animate-spin mr-2" /> : <Save className="mr-2" size={20} />}
                 Simpan Semua
               </Button>
               {lastSaved && (
-                <div className="flex items-center gap-1.5 text-[10px] text-primary font-black uppercase tracking-widest animate-in fade-in slide-in-from-right-2">
+                <div className="flex items-center gap-1.5 text-[10px] text-primary font-bold uppercase tracking-widest animate-in fade-in slide-in-from-right-2">
                   <CheckCircle2 size={12} />
                   Tersimpan: {lastSaved.toLocaleTimeString('id-ID')}
                 </div>
@@ -292,6 +295,24 @@ export default function AdminDashboard() {
                       <input type="file" className="hidden" id="logo-up" accept="image/*" onChange={(e) => handleImageUpload(e, 'logo')} />
                       <Button asChild variant="secondary" className="cursor-pointer h-10 px-6 rounded-xl font-bold"><label htmlFor="logo-up">{isUploading === 'logo' ? '...' : 'Pilih File'}</label></Button>
                     </div>
+                  </div>
+
+                  <div className="space-y-6 p-6 bg-background/30 rounded-2xl border border-white/5 mt-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <Label className="text-xs font-bold uppercase flex items-center gap-2">
+                        <Maximize size={14} className="text-primary" /> Ukuran Logo (Tinggi)
+                      </Label>
+                      <Badge variant="outline" className="text-[10px] font-bold">{businessInfo.logoHeight}px</Badge>
+                    </div>
+                    <Slider 
+                      value={[logoHValue]} 
+                      min={20}
+                      max={80} 
+                      step={1} 
+                      onValueChange={(val) => setBusinessInfo({...businessInfo, logoHeight: `${val[0]}`})} 
+                      className="py-4"
+                    />
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest text-center">Sesuaikan ukuran logo agar pas dengan menu navigasi</p>
                   </div>
                 </div>
                 <div className="grid md:grid-cols-2 gap-6">
@@ -336,7 +357,7 @@ export default function AdminDashboard() {
                     <Label className="text-xs font-bold uppercase flex items-center gap-2">
                       <MoveVertical size={14} className="text-primary" /> Atur Posisi Gambar (Slide Vertikal)
                     </Label>
-                    <Badge variant="outline" className="text-[10px] font-black">{businessInfo.heroImagePosition}</Badge>
+                    <Badge variant="outline" className="text-[10px] font-bold">{businessInfo.heroImagePosition}</Badge>
                   </div>
                   <Slider 
                     value={[posValue]} 

@@ -35,6 +35,7 @@ export function Navbar({ businessId }: NavbarProps) {
   const logoText = settings?.logoText || 'Go Etnik';
   const logoAccentText = settings?.logoAccentText || 'NUSANTARA';
   const logoUrl = settings?.logoUrl || '';
+  const logoH = parseInt(settings?.logoHeight) || 36;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -50,9 +51,12 @@ export function Navbar({ businessId }: NavbarProps) {
       scrolled ? "bg-background/90 backdrop-blur-xl border-b border-white/5 py-3 shadow-xl" : "bg-transparent"
     )}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 md:gap-3 group">
+        <Link href="/" className="flex items-center gap-3 group">
           {logoUrl ? (
-            <div className="relative h-8 w-8 md:h-9 md:w-9 shrink-0">
+            <div 
+              className="relative shrink-0 transition-all duration-300"
+              style={{ height: `${logoH}px`, width: `${logoH}px` }}
+            >
               <Image 
                 src={logoUrl} 
                 alt="Logo" 
@@ -63,8 +67,11 @@ export function Navbar({ businessId }: NavbarProps) {
               />
             </div>
           ) : (
-            <div className="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-lg group-hover:scale-105 transition-transform shrink-0">
-              <Cpu size={18} />
+            <div 
+              className="rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-lg group-hover:scale-105 transition-all shrink-0"
+              style={{ height: `${logoH}px`, width: `${logoH}px` }}
+            >
+              <Cpu size={logoH * 0.5} />
             </div>
           )}
           <div className="flex flex-col sm:flex-row sm:items-center text-lg md:text-xl font-bold leading-none gap-0 sm:gap-1.5">

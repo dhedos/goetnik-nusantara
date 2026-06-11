@@ -42,6 +42,7 @@ export function Footer({ businessId }: FooterProps) {
   const businessName = settings?.name || 'Go Etnik NUSANTARA';
   const aboutSubtitle = settings?.heroSubtitle || 'Kami menyediakan layanan service laptop profesional, desain grafis estetik, dan pembuatan aplikasi modern.';
   const privacyPolicyContent = settings?.privacyPolicy || 'Kebijakan privasi belum diatur oleh admin.';
+  const logoH = parseInt(settings?.logoHeight) || 32;
 
   const socialLinks = {
     instagram: settings?.socialInstagram || '',
@@ -66,7 +67,10 @@ export function Footer({ businessId }: FooterProps) {
         <div className="md:col-span-2 space-y-6">
           <Link href="/" className="flex items-center gap-2">
             {logoUrl ? (
-              <div className="relative h-8 w-8 shrink-0">
+              <div 
+                className="relative shrink-0 transition-all duration-300"
+                style={{ height: `${logoH}px`, width: `${logoH}px` }}
+              >
                 <Image 
                   src={logoUrl} 
                   alt="Logo" 
@@ -76,8 +80,11 @@ export function Footer({ businessId }: FooterProps) {
                 />
               </div>
             ) : (
-              <div className="w-7 h-7 rounded bg-primary flex items-center justify-center text-primary-foreground shrink-0">
-                <Cpu size={16} />
+              <div 
+                className="rounded bg-primary flex items-center justify-center text-primary-foreground transition-all shrink-0"
+                style={{ height: `${logoH}px`, width: `${logoH}px` }}
+              >
+                <Cpu size={logoH * 0.5} />
               </div>
             )}
             <div className="flex items-center text-lg md:text-xl font-bold gap-2">
