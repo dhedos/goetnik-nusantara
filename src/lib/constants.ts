@@ -59,31 +59,31 @@ export const ADVANTAGES = [
 
 export const THEMES = [
   {
-    id: 'deep-sea',
-    label: 'Deep Sea (Modern)',
-    primary: '217 91% 60%',
-    accent: '189 94% 43%',
-    background: '222 47% 11%'
+    id: 'heritage-red',
+    label: 'Heritage Red (Utama)',
+    primary: '40 45% 55%',
+    accent: '40 40% 90%',
+    background: '0 80% 20%'
   },
   {
-    id: 'royal-gold',
-    label: 'Royal Gold (Mewah)',
-    primary: '45 100% 51%',
-    accent: '43 100% 70%',
-    background: '20 20% 8%'
+    id: 'midnight-gold',
+    label: 'Midnight Gold (Gelap)',
+    primary: '40 45% 55%',
+    accent: '0 80% 25%',
+    background: '0 0% 10%'
   },
   {
-    id: 'earthy-forest',
-    label: 'Earthy Forest (Alam)',
-    primary: '142 71% 45%',
-    accent: '158 64% 52%',
-    background: '160 30% 8%'
+    id: 'golden-java',
+    label: 'Golden Java (Emas)',
+    primary: '0 80% 20%',
+    accent: '0 0% 10%',
+    background: '40 45% 55%'
   },
   {
-    id: 'terracotta',
-    label: 'Terracotta (Etnik)',
-    primary: '20 80% 50%',
-    accent: '30 100% 70%',
-    background: '15 40% 8%'
+    id: 'vintage-cream',
+    label: 'Vintage Cream (Terang)',
+    primary: '40 45% 55%',
+    accent: '0 80% 20%',
+    background: '40 40% 90%'
   }
 ];
