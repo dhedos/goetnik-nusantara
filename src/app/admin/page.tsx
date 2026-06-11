@@ -17,7 +17,7 @@ import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
-  Settings, ShoppingBag, ExternalLink, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, MoveVertical, Maximize, Type, Image as ImageIcon, Palette
+  Settings, ShoppingBag, ExternalLink, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, MoveVertical, Maximize, Type, Image as ImageIcon, Palette, Map as MapIcon
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -303,7 +303,6 @@ export default function AdminDashboard() {
 
           {activeSection === 'branding' && (
             <div className="space-y-8">
-              {/* Theme Section */}
               <Card className="rounded-3xl border-white/5 bg-card/50">
                 <CardHeader><CardTitle className="flex items-center gap-2"><Palette size={20} className="text-primary" /> Pilih Tema Website</CardTitle></CardHeader>
                 <CardContent className="p-8">
@@ -332,7 +331,6 @@ export default function AdminDashboard() {
 
               <Card className="rounded-3xl border-white/5 bg-card/50">
                 <CardContent className="p-8 space-y-8">
-                  {/* Font Selection */}
                   <div className="space-y-4 p-6 bg-primary/5 rounded-2xl border border-primary/10">
                     <Label className="text-white uppercase font-bold text-xs flex items-center gap-2">
                       <Type size={14} className="text-primary" /> Gaya Huruf (Font Etnik)
@@ -403,7 +401,6 @@ export default function AdminDashboard() {
           {activeSection === 'hero' && (
             <Card className="rounded-3xl border-white/5 bg-card/50">
               <CardContent className="p-8 space-y-8">
-                {/* Hero Title Image Section */}
                 <div className="space-y-4 p-6 bg-primary/5 rounded-2xl border border-primary/10">
                   <Label className="text-white uppercase font-bold text-xs flex items-center gap-2">
                     <ImageIcon size={14} className="text-primary" /> Gambar Judul Utama (Branding Hero)
@@ -520,9 +517,40 @@ export default function AdminDashboard() {
                   <div className="space-y-2"><Label className="text-xs font-bold uppercase">Email Bisnis</Label><Input value={businessInfo.email} onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" /></div>
                   <div className="space-y-2"><Label className="text-xs font-bold uppercase">Alamat Lengkap</Label><Input value={businessInfo.address} onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" /></div>
                 </div>
-                <div className="space-y-4 pt-4 border-t border-white/5">
-                  <div className="space-y-2"><Label className="text-xs font-bold uppercase flex items-center gap-2"><MapPin size={14} /> Link Embed Google Maps (Src Iframe)</Label><Input placeholder="https://www.google.com/maps/embed?pb=..." value={businessInfo.mapEmbedUrl} onChange={(e) => setBusinessInfo({...businessInfo, mapEmbedUrl: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" /></div>
-                  <div className="space-y-2"><Label className="text-xs font-bold uppercase flex items-center gap-2"><Globe size={14} /> Link Google Maps Langsung</Label><Input placeholder="https://maps.app.goo.gl/..." value={businessInfo.mapDirectUrl} onChange={(e) => setBusinessInfo({...businessInfo, mapDirectUrl: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" /></div>
+                <div className="space-y-4 pt-6 border-t border-white/5">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label className="text-xs font-bold uppercase flex items-center gap-2"><MapPin size={14} /> Link Embed Google Maps (Src Iframe)</Label>
+                      <Input placeholder="https://www.google.com/maps/embed?pb=..." value={businessInfo.mapEmbedUrl} onChange={(e) => setBusinessInfo({...businessInfo, mapEmbedUrl: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" />
+                      <p className="text-[10px] text-muted-foreground mt-1">Buka Google Maps &gt; Bagikan &gt; Sematkan Peta &gt; Ambil link di atribut <code>src="..."</code></p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs font-bold uppercase flex items-center gap-2"><Globe size={14} /> Link Google Maps Langsung</Label>
+                      <Input placeholder="https://maps.app.goo.gl/..." value={businessInfo.mapDirectUrl} onChange={(e) => setBusinessInfo({...businessInfo, mapDirectUrl: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" />
+                    </div>
+                  </div>
+
+                  {/* Peta Pratinjau Admin */}
+                  <div className="mt-4">
+                    <Label className="text-xs font-bold uppercase flex items-center gap-2 mb-3"><MapIcon size={14} className="text-primary" /> Pratinjau Lokasi Peta</Label>
+                    <div className="rounded-2xl overflow-hidden border border-white/10 h-[300px] bg-background/20 relative flex items-center justify-center">
+                      {businessInfo.mapEmbedUrl ? (
+                        <iframe 
+                          src={businessInfo.mapEmbedUrl}
+                          width="100%" 
+                          height="100%" 
+                          style={{ border: 0 }} 
+                          allowFullScreen={true} 
+                          loading="lazy" 
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center gap-2 opacity-20">
+                          <MapIcon size={48} />
+                          <span className="text-xs font-bold uppercase tracking-widest">Peta Belum Diatur</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
