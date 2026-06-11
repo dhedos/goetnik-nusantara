@@ -59,7 +59,6 @@ function LoadingScreen({ text }: { text: string }) {
 }
 
 function HomeContent() {
-  // Selalu gunakan ID 'main' agar terhubung otomatis dengan Admin
   const businessId = MAIN_BUSINESS_ID;
   const firestore = useFirestore();
   const [isTimeout, setIsTimeout] = useState(false);
@@ -79,11 +78,10 @@ function HomeContent() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsTimeout(true);
-    }, 3000); // 3 detik loading screen untuk kesan premium
+    }, 3000); 
     return () => clearTimeout(timer);
   }, []);
 
-  // Tampilkan loading screen jika sedang mengambil data awal atau belum timeout
   if (!isTimeout && (settingsLoading || !settings)) {
     return <LoadingScreen text="Menghubungkan ke Pusat Layanan..." />;
   }
@@ -97,102 +95,105 @@ function HomeContent() {
   const heroSubtitle = settings?.heroSubtitle || 'Kami melayani kebutuhan teknologi, desain grafis, dan pembuatan aplikasi secara profesional.';
 
   return (
-    <div className="flex flex-col min-h-screen animate-fade-in">
-      <DynamicTitle businessId={businessId} />
-      <Navbar businessId={businessId} />
-      <main>
-        {/* Hero Section */}
-        <section className="relative min-h-screen flex items-center pt-20 px-4 overflow-hidden">
-          <div className="absolute inset-0 -z-20">
-            {heroDisplayImage && (
-              <Image 
-                src={heroDisplayImage} 
-                alt="Hero" 
-                fill 
-                className="object-cover opacity-20 animate-[subtle-zoom_30s_infinite_alternate]" 
-                unoptimized={!!settings?.heroImageUrl} 
-                priority
-              />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/80 to-background" />
-          </div>
-          
-          <div className="max-w-7xl mx-auto w-full relative z-10">
-            <div className="space-y-10 max-w-4xl">
-              <Badge variant="outline" className="animate-fade-in border-primary/40 text-primary px-8 py-2.5 bg-primary/10 backdrop-blur-xl rounded-full tracking-[0.2em] uppercase text-[10px] font-black">
-                {heroBadge}
-              </Badge>
-              <h1 className="text-6xl md:text-9xl font-black animate-fade-in tracking-tighter leading-[0.85] text-white">
-                {heroTitle.split(' ').map((word: string, i: number) => (
-                  <span key={i} className={i === 1 ? "text-primary block" : "block"}>{word} </span>
-                ))}
-              </h1>
-              <p className="text-xl md:text-2xl text-muted-foreground/80 animate-fade-in leading-relaxed max-w-2xl delay-100 font-medium">
-                {heroSubtitle}
-              </p>
-              <div className="flex flex-wrap gap-6 animate-fade-in pt-8 delay-200">
-                <Link href="#pesan">
-                  <Button size="lg" className="rounded-[1.5rem] px-12 shadow-2xl shadow-primary/40 h-20 text-xl font-black uppercase italic tracking-tighter hover:scale-105 transition-all">
-                    Mulai Pemesanan <ArrowRight className="ml-2 h-6 w-6" />
-                  </Button>
-                </Link>
-                <Link href="#layanan">
-                  <Button variant="outline" size="lg" className="rounded-[1.5rem] px-12 h-20 text-xl font-bold border-white/10 bg-white/5 backdrop-blur-2xl hover:bg-white/10 transition-all">
-                    Daftar Layanan
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <AIAssistant businessId={businessId} />
-        
-        {/* Services Section */}
-        <section id="layanan" className="py-40 px-4 bg-secondary/5 relative">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-28 space-y-8">
-              <Badge variant="outline" className="uppercase tracking-[0.4em] px-8 py-2 border-primary/20 text-primary bg-primary/5 font-black text-[10px]">Premium Solutions</Badge>
-              <h2 className="text-5xl md:text-8xl font-black tracking-tight leading-none italic uppercase">Katalog Layanan</h2>
-              <p className="text-muted-foreground/60 max-w-3xl mx-auto text-xl font-medium">Hadirkan efisiensi dan kreativitas dalam setiap aspek kebutuhan teknologi Anda.</p>
+    <>
+      <div className="flex flex-col min-h-screen animate-fade-in">
+        <DynamicTitle businessId={businessId} />
+        <Navbar businessId={businessId} />
+        <main>
+          {/* Hero Section */}
+          <section className="relative min-h-screen flex items-center pt-20 px-4 overflow-hidden">
+            <div className="absolute inset-0 -z-20">
+              {heroDisplayImage && (
+                <Image 
+                  src={heroDisplayImage} 
+                  alt="Hero" 
+                  fill 
+                  className="object-cover opacity-20 animate-[subtle-zoom_30s_infinite_alternate]" 
+                  unoptimized={!!settings?.heroImageUrl} 
+                  priority
+                />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/80 to-background" />
             </div>
             
-            {servicesLoading ? (
-              <div className="flex flex-col items-center justify-center py-40 gap-8">
-                <div className="h-16 w-16 rounded-3xl border-2 border-primary/20 border-t-primary animate-spin" />
-                <p className="text-muted-foreground animate-pulse tracking-[0.5em] text-xs uppercase font-black">Menyiapkan Katalog...</p>
-              </div>
-            ) : services && services.length > 0 ? (
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
-                {services.map((s: any, i: number) => (
-                  <div key={s.id} className="animate-fade-in" style={{ animationDelay: `${i * 150}ms` }}>
-                    <ServiceCard 
-                      {...s} 
-                      icon={ICON_MAP[s.iconName] || ICON_MAP.Monitor} 
-                      imageId={serviceImageIds[i % 4]} 
-                    />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <Card className="max-w-3xl mx-auto p-24 text-center bg-card/10 border-dashed border-white/5 backdrop-blur-2xl rounded-[3rem]">
-                <div className="w-24 h-24 bg-muted/10 rounded-full flex items-center justify-center mx-auto mb-8">
-                  <Loader2 className="h-12 w-12 text-muted-foreground opacity-10" />
+            <div className="max-w-7xl mx-auto w-full relative z-10">
+              <div className="space-y-10 max-w-4xl">
+                <Badge variant="outline" className="animate-fade-in border-primary/40 text-primary px-8 py-2.5 bg-primary/10 backdrop-blur-xl rounded-full tracking-[0.2em] uppercase text-[10px] font-black">
+                  {heroBadge}
+                </Badge>
+                <h1 className="text-6xl md:text-9xl font-black animate-fade-in tracking-tighter leading-[0.85] text-white">
+                  {heroTitle.split(' ').map((word: string, i: number) => (
+                    <span key={i} className={i === 1 ? "text-primary block" : "block"}>{word} </span>
+                  ))}
+                </h1>
+                <p className="text-xl md:text-2xl text-muted-foreground/80 animate-fade-in leading-relaxed max-w-2xl delay-100 font-medium">
+                  {heroSubtitle}
+                </p>
+                <div className="flex flex-wrap gap-6 animate-fade-in pt-8 delay-200">
+                  <Link href="#pesan">
+                    <Button size="lg" className="rounded-[1.5rem] px-12 shadow-2xl shadow-primary/40 h-20 text-xl font-black uppercase italic tracking-tighter hover:scale-105 transition-all">
+                      Mulai Pemesanan <ArrowRight className="ml-2 h-6 w-6" />
+                    </Button>
+                  </Link>
+                  <Link href="#layanan">
+                    <Button variant="outline" size="lg" className="rounded-[1.5rem] px-12 h-20 text-xl font-bold border-white/10 bg-white/5 backdrop-blur-2xl hover:bg-white/10 transition-all">
+                      Daftar Layanan
+                    </Button>
+                  </Link>
                 </div>
-                <h3 className="text-3xl font-black mb-4 text-white/40 uppercase italic">Layanan Belum Tersedia</h3>
-                <p className="text-muted-foreground/60 mb-10 text-lg">Admin sedang menyiapkan paket-paket terbaik untuk Anda. Silakan cek kembali nanti.</p>
-              </Card>
-            )}
-          </div>
-        </section>
+              </div>
+            </div>
+          </section>
 
-        <AboutUs businessId={businessId} />
-        <BookingForm businessId={businessId} />
-        <Contact businessId={businessId} />
-      </main>
-      <Footer businessId={businessId} />
+          <AIAssistant businessId={businessId} />
+          
+          {/* Services Section */}
+          <section id="layanan" className="py-40 px-4 bg-secondary/5 relative">
+            <div className="max-w-7xl mx-auto">
+              <div className="text-center mb-28 space-y-8">
+                <Badge variant="outline" className="uppercase tracking-[0.4em] px-8 py-2 border-primary/20 text-primary bg-primary/5 font-black text-[10px]">Premium Solutions</Badge>
+                <h2 className="text-5xl md:text-8xl font-black tracking-tight leading-none italic uppercase">Katalog Layanan</h2>
+                <p className="text-muted-foreground/60 max-w-3xl mx-auto text-xl font-medium">Hadirkan efisiensi dan kreativitas dalam setiap aspek kebutuhan teknologi Anda.</p>
+              </div>
+              
+              {servicesLoading ? (
+                <div className="flex flex-col items-center justify-center py-40 gap-8">
+                  <div className="h-16 w-16 rounded-3xl border-2 border-primary/20 border-t-primary animate-spin" />
+                  <p className="text-muted-foreground animate-pulse tracking-[0.5em] text-xs uppercase font-black">Menyiapkan Katalog...</p>
+                </div>
+              ) : services && services.length > 0 ? (
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
+                  {services.map((s: any, i: number) => (
+                    <div key={s.id} className="animate-fade-in" style={{ animationDelay: `${i * 150}ms` }}>
+                      <ServiceCard 
+                        {...s} 
+                        icon={ICON_MAP[s.iconName] || ICON_MAP.Monitor} 
+                        imageId={serviceImageIds[i % 4]} 
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <Card className="max-w-3xl mx-auto p-24 text-center bg-card/10 border-dashed border-white/5 backdrop-blur-2xl rounded-[3rem]">
+                  <div className="w-24 h-24 bg-muted/10 rounded-full flex items-center justify-center mx-auto mb-8">
+                    <Loader2 className="h-12 w-12 text-muted-foreground opacity-10" />
+                  </div>
+                  <h3 className="text-3xl font-black mb-4 text-white/40 uppercase italic">Layanan Belum Tersedia</h3>
+                  <p className="text-muted-foreground/60 mb-10 text-lg">Admin sedang menyiapkan paket-paket terbaik untuk Anda. Silakan cek kembali nanti.</p>
+                </Card>
+              )}
+            </div>
+          </section>
+
+          <AboutUs businessId={businessId} />
+          <BookingForm businessId={businessId} />
+          <Contact businessId={businessId} />
+        </main>
+        <Footer businessId={businessId} />
+      </div>
+      {/* WhatsAppPopup diletakkan di luar kontainer animasi agar benar-benar fixed terhadap layar */}
       <WhatsAppPopup businessId={businessId} />
-    </div>
+    </>
   );
 }
 
