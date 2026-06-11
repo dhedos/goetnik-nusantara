@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect } from 'react';
@@ -42,7 +43,6 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
     const lValue = parseInt(bgParts[2]);
     const isLight = lValue > 60;
     
-    // Logic for Light vs Dark Text/Borders
     let foreground: string;
     let mutedForeground: string;
     let border: string;
@@ -77,9 +77,6 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
     if (settings.logoUrl) {
       root.style.setProperty('--loading-logo', `url(${settings.logoUrl})`);
       root.classList.add('has-loading-logo');
-    } else {
-      root.style.removeProperty('--loading-logo');
-      root.classList.remove('has-loading-logo');
     }
 
     // Save to Cache for instant reload
@@ -94,9 +91,7 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
         fontFamily: fontValue,
         logoUrl: settings.logoUrl || ''
       }));
-    } catch (e) {
-      console.warn("Gagal menyimpan preferensi tema ke localStorage.");
-    }
+    } catch (e) {}
 
   }, [settings]);
 

@@ -11,7 +11,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
@@ -102,18 +101,18 @@ export default function AdminDashboard() {
     logoHeight: '36',
     fontFamily: 'Inter',
     themeId: 'heritage-red',
-    heroBadge: 'Solusi Digital Terpercaya',
+    heroBadge: '',
     heroTitle: BUSINESS_NAME_DEFAULT,
     heroSubtitle: 'Kami melayani kebutuhan teknologi, desain grafis, dan pembuatan aplikasi secara profesional.',
     heroImageUrl: '',
     heroImagePosition: '50%',
     aboutTitle: 'Tentang Bisnis Kami',
     aboutContent: '',
-    servicesSectionBadge: 'Premium Solutions',
+    servicesSectionBadge: '',
     servicesSectionTitle: 'Layanan Unggulan',
     servicesSectionSubtitle: 'Solusi kreatif dan teknologi modern untuk mempercepat pertumbuhan bisnis Anda.',
     aiTitle: 'Bingung Pilih Layanan?',
-    aiSubtitle: 'Ceritakan masalah teknis Anda, dan asisten AI kami akan merekomendasikan paket layanan yang paling tepat.',
+    aiSubtitle: 'Ceritakan masalah Anda, dan asisten AI kami akan merekomendasikan paket layanan yang paling tepat.',
     privacyPolicy: PRIVACY_POLICY_DEFAULT,
     socialInstagram: '',
     socialFacebook: '',
@@ -232,10 +231,6 @@ export default function AdminDashboard() {
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: string) => {
     const file = e.target.files?.[0];
     if (!file || !user || !firestore) return;
-    if (file.size > 1024 * 1024 * 2) { 
-      toast({ variant: "destructive", title: "File Terlalu Besar", description: "Maksimal 2MB sebelum kompresi." });
-      return;
-    }
     setIsUploading(target);
     try {
       const compressedBase64 = await resizeAndCompressImage(file);
@@ -247,7 +242,7 @@ export default function AdminDashboard() {
         const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'services', target);
         updateDoc(docRef, { imageUrl: compressedBase64 });
       }
-      toast({ title: "Gambar Berhasil Dimuat", description: "Klik simpan untuk menerapkan." });
+      toast({ title: "Gambar Berhasil Dimuat", description: "Klik simpan untuk menerapkan secara permanen." });
     } catch (err) {
       toast({ variant: "destructive", title: "Gagal", description: "Gagal memproses gambar." });
     } finally {
@@ -262,10 +257,6 @@ export default function AdminDashboard() {
     let count = 0;
     try {
       for (const file of files) {
-        if (file.size > 1024 * 1024 * 3) {
-          toast({ variant: "destructive", title: "File Terlalu Besar", description: `${file.name} melebihi 3MB.` });
-          continue;
-        }
         const compressedBase64 = await resizeAndCompressImage(file, 1000, 0.6);
         const colRef = collection(firestore, 'businesses', MAIN_BUSINESS_ID, 'portfolio');
         await addDoc(colRef, {
@@ -277,7 +268,6 @@ export default function AdminDashboard() {
       }
       toast({ title: "Berhasil", description: `${count} foto portofolio telah diunggah.` });
     } catch (err) {
-      console.error(err);
       toast({ variant: "destructive", title: "Gagal", description: "Gagal mengunggah foto." });
     } finally {
       setIsUploading(null);
@@ -365,7 +355,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-background text-foreground transition-colors duration-500" style={{ fontFamily: 'var(--selected-font)' }}>
-      {/* Mobile Header */}
       <div className="md:hidden flex items-center justify-between p-4 border-b border-border bg-card">
         <h2 className="text-lg font-black text-primary tracking-tighter uppercase">ADMIN</h2>
         <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
@@ -379,7 +368,6 @@ export default function AdminDashboard() {
         </Sheet>
       </div>
 
-      {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 bg-card border-r border-border flex-col shrink-0">
         <SidebarContent />
       </aside>
@@ -426,7 +414,7 @@ export default function AdminDashboard() {
           {activeSection === 'portfolio' && (
             <Card className="rounded-3xl border-border bg-card shadow-xl overflow-hidden">
               <CardHeader className="p-8 border-b border-border">
-                <CardTitle className="flex items-center gap-2"><Grid3X3 size={20} className="text-primary" /> Galeri Portofolio (Hasil Karya)</CardTitle>
+                <CardTitle className="flex items-center gap-2"><Grid3X3 size={20} className="text-primary" /> Galeri Portofolio</CardTitle>
               </CardHeader>
               <CardContent className="p-8 space-y-8">
                 <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-border rounded-3xl bg-primary/5 group hover:bg-primary/10 transition-all">
@@ -437,7 +425,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="text-center">
                       <p className="font-bold text-lg">Klik untuk Unggah Foto Karya</p>
-                      <p className="text-sm text-muted-foreground uppercase tracking-widest mt-1">Bisa pilih banyak foto sekaligus (Auto-Compress)</p>
+                      <p className="text-sm text-muted-foreground uppercase tracking-widest mt-1">Bisa pilih banyak foto sekaligus</p>
                     </div>
                   </label>
                 </div>
@@ -467,7 +455,7 @@ export default function AdminDashboard() {
                   <div className="space-y-2"><Label className="text-xs font-bold uppercase">WhatsApp</Label><Input value={businessInfo.whatsapp} onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})} className="rounded-xl h-12 bg-background border-border font-bold" /></div>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <Label className="text-xs font-bold uppercase">No Telp (Opsional)</Label>
+                      <Label className="text-xs font-bold uppercase">No Telp</Label>
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-bold uppercase text-muted-foreground">{businessInfo.showPhoneNumber ? 'Aktif' : 'Nonaktif'}</span>
                         <Switch checked={businessInfo.showPhoneNumber} onCheckedChange={(val) => setBusinessInfo({...businessInfo, showPhoneNumber: val})} />
@@ -481,7 +469,7 @@ export default function AdminDashboard() {
                   <div className="space-y-2"><Label className="text-xs font-bold uppercase">Alamat Lengkap</Label><Textarea value={businessInfo.address} onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})} className="rounded-xl h-24 bg-background border-border" /></div>
                   
                   <div className="space-y-4 p-6 bg-primary/5 rounded-2xl border border-primary/10">
-                    <Label className="text-xs font-black uppercase flex items-center gap-2 text-primary"><Search size={14} /> Cari Lokasi & Update Alamat</Label>
+                    <Label className="text-xs font-black uppercase flex items-center gap-2 text-primary"><Search size={14} /> Cari Lokasi Peta</Label>
                     <div className="flex gap-2">
                       <Input placeholder="Nama tempat atau alamat..." value={searchLocation} onChange={(e) => setSearchLocation(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAutoSearchMap()} className="rounded-xl h-12 bg-background border-border" />
                       <Button onClick={handleAutoSearchMap} className="h-12 w-12 rounded-xl" variant="secondary"><Search size={18} /></Button>
@@ -593,9 +581,8 @@ export default function AdminDashboard() {
                   <Slider value={[parseInt(businessInfo.heroImagePosition) || 50]} max={100} onValueChange={(v) => setBusinessInfo({...businessInfo, heroImagePosition: `${v[0]}%`})} />
                 </div>
                 <div className="space-y-6 pt-4 border-t border-border">
-                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Badge Atas (Small Text)</Label><Input value={businessInfo.heroBadge} onChange={(e) => setBusinessInfo({...businessInfo, heroBadge: e.target.value})} className="rounded-xl h-12 bg-background border-border" /></div>
                   <div className="space-y-2"><Label className="text-xs font-bold uppercase">Judul Utama (Besar)</Label><Input value={businessInfo.heroTitle} onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})} className="rounded-xl h-12 bg-background border-border font-bold" /></div>
-                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Deskripsi Hero (Sub-judul)</Label><Textarea value={businessInfo.heroSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, heroSubtitle: e.target.value})} className="rounded-xl min-h-[120px] bg-background border-border" /></div>
+                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Deskripsi Hero</Label><Textarea value={businessInfo.heroSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, heroSubtitle: e.target.value})} className="rounded-xl min-h-[120px] bg-background border-border" /></div>
                 </div>
               </CardContent>
             </Card>
@@ -604,16 +591,15 @@ export default function AdminDashboard() {
           {activeSection === 'services' && (
              <div className="space-y-8">
                 <Card className="rounded-3xl border-border bg-card shadow-xl">
-                  <CardHeader><CardTitle className="text-lg">Pengaturan Judul Seksi Layanan</CardTitle></CardHeader>
+                  <CardHeader><CardTitle className="text-lg">Pengaturan Seksi Layanan</CardTitle></CardHeader>
                   <CardContent className="p-6 space-y-4">
-                    <div className="space-y-2"><Label className="text-xs font-bold uppercase">Badge Seksi</Label><Input value={businessInfo.servicesSectionBadge} onChange={(e) => setBusinessInfo({...businessInfo, servicesSectionBadge: e.target.value})} className="rounded-xl h-12" placeholder="Contoh: Premium Solutions" /></div>
-                    <div className="space-y-2"><Label className="text-xs font-bold uppercase">Judul Seksi</Label><Input value={businessInfo.servicesSectionTitle} onChange={(e) => setBusinessInfo({...businessInfo, servicesSectionTitle: e.target.value})} className="rounded-xl h-12 font-bold" placeholder="Contoh: Layanan Unggulan" /></div>
-                    <div className="space-y-2"><Label className="text-xs font-bold uppercase">Deskripsi Seksi (Sub-judul)</Label><Textarea value={businessInfo.servicesSectionSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, servicesSectionSubtitle: e.target.value})} className="rounded-xl h-24" placeholder="Contoh: Solusi kreatif dan teknologi modern..." /></div>
+                    <div className="space-y-2"><Label className="text-xs font-bold uppercase">Judul Seksi</Label><Input value={businessInfo.servicesSectionTitle} onChange={(e) => setBusinessInfo({...businessInfo, servicesSectionTitle: e.target.value})} className="rounded-xl h-12 font-bold" /></div>
+                    <div className="space-y-2"><Label className="text-xs font-bold uppercase">Deskripsi Seksi</Label><Textarea value={businessInfo.servicesSectionSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, servicesSectionSubtitle: e.target.value})} className="rounded-xl h-24" /></div>
                   </CardContent>
                 </Card>
 
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                  <h3 className="text-xl font-bold uppercase tracking-tight">Daftar Layanan Individu</h3>
+                  <h3 className="text-xl font-bold uppercase tracking-tight">Daftar Layanan</h3>
                   <Button onClick={handleAddService} size="lg" className="w-full sm:w-auto rounded-2xl px-8 h-12 font-black uppercase bg-primary text-primary-foreground shadow-lg"><Plus className="mr-2" size={18} /> Tambah Layanan</Button>
                 </div>
 
@@ -652,8 +638,8 @@ export default function AdminDashboard() {
             <Card className="rounded-3xl border-border bg-card shadow-xl">
               <CardHeader><CardTitle className="flex items-center gap-2"><Sparkles size={20} className="text-primary" /> Pengaturan Asisten AI</CardTitle></CardHeader>
               <CardContent className="p-8 space-y-6">
-                <div className="space-y-2"><Label className="text-xs font-bold uppercase">Judul Seksi AI</Label><Input value={businessInfo.aiTitle} onChange={(e) => setBusinessInfo({...businessInfo, aiTitle: e.target.value})} className="rounded-xl h-12 bg-background border-border font-bold" placeholder="Contoh: Bingung Pilih Layanan?" /></div>
-                <div className="space-y-2"><Label className="text-xs font-bold uppercase">Deskripsi Seksi AI</Label><Textarea value={businessInfo.aiSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, aiSubtitle: e.target.value})} className="rounded-xl min-h-[120px] bg-background border-border" placeholder="Contoh: Ceritakan masalah teknis Anda..." /></div>
+                <div className="space-y-2"><Label className="text-xs font-bold uppercase">Judul Seksi AI</Label><Input value={businessInfo.aiTitle} onChange={(e) => setBusinessInfo({...businessInfo, aiTitle: e.target.value})} className="rounded-xl h-12 bg-background border-border font-bold" /></div>
+                <div className="space-y-2"><Label className="text-xs font-bold uppercase">Deskripsi Seksi AI</Label><Textarea value={businessInfo.aiSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, aiSubtitle: e.target.value})} className="rounded-xl min-h-[120px] bg-background border-border" /></div>
               </CardContent>
             </Card>
           )}

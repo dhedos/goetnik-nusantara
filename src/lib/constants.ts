@@ -13,18 +13,13 @@ export const PRIVACY_POLICY_DEFAULT = `Kebijakan Privasi
 Kami mengumpulkan informasi yang Anda berikan langsung kepada kami saat melakukan pemesanan layanan, seperti nama, nomor WhatsApp, dan alamat.
 
 2. Penggunaan Informasi
-Informasi yang kami kumpulkan digunakan untuk:
-- Memproses dan mengelola pesanan Anda.
-- Menghubungi Anda terkait layanan yang dipesan.
-- Meningkatkan kualitas layanan kami.
+Informasi yang kami kumpulkan digunakan untuk memproses pesanan dan menghubungi Anda.
 
 3. Perlindungan Informasi
-Kami mengimplementasikan langkah-langkah keamanan untuk menjaga keselamatan informasi pribadi Anda. Kami tidak menjual, memperdagangkan, atau memberikan informasi pribadi Anda kepada pihak ketiga tanpa izin Anda.
+Kami tidak menjual informasi pribadi Anda kepada pihak ketiga tanpa izin.
 
 4. Persetujuan
-Dengan menggunakan layanan kami, Anda menyetujui kebijakan privasi kami.
-
-Jika Anda memiliki pertanyaan mengenai kebijakan privasi ini, Anda dapat menghubungi kami melalui informasi kontak yang tersedia di website ini.`;
+Dengan menggunakan layanan kami, Anda menyetujui kebijakan privasi ini.`;
 
 export const ICON_MAP: Record<string, any> = {
   Monitor,
@@ -61,30 +56,30 @@ export const THEMES = [
   {
     id: 'heritage-red',
     label: 'Heritage Red (Utama)',
-    primary: '45 90% 45%', // Emas Cerah
-    accent: '45 40% 95%',  // Cream sangat terang
-    background: '0 80% 12%' // Marun Gelap yang elegan
+    primary: '45 90% 45%', 
+    accent: '45 40% 95%',  
+    background: '0 80% 12%' 
   },
   {
     id: 'midnight-gold',
     label: 'Midnight Gold (Gelap)',
-    primary: '45 90% 45%', // Emas Cerah
-    accent: '0 0% 100%',   // Putih Bersih
-    background: '220 30% 4%' // Hampir Hitam (Deep Navy)
+    primary: '45 90% 45%', 
+    accent: '0 0% 100%',   
+    background: '220 30% 4%' 
   },
   {
     id: 'golden-java',
     label: 'Golden Java (Emas)',
-    primary: '0 80% 20%',  // Marun untuk tombol
-    accent: '30 20% 10%',  // Coklat Gelap
-    background: '45 70% 50%' // Emas Jawa yang hangat
+    primary: '0 80% 20%',  
+    accent: '30 20% 10%',  
+    background: '45 70% 50%' 
   },
   {
     id: 'vintage-cream',
     label: 'Vintage Cream (Terang)',
-    primary: '35 50% 30%', // Coklat Perunggu Hangat
-    accent: '0 70% 20%',   // Marun Gelap Aksen
-    background: '40 40% 94%' // Warm Cream (Kertas Kuno Lembut)
+    primary: '35 50% 30%', 
+    accent: '0 70% 20%',   
+    background: '40 40% 94%' 
   },
   {
     id: 'deep-sea',

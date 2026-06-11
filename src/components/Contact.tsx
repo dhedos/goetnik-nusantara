@@ -47,7 +47,7 @@ export function Contact({ businessId }: ContactProps) {
             <div>
               <h2 className="text-4xl font-bold font-headline mb-4">Hubungi Kami</h2>
               <p className="text-muted-foreground text-lg">
-                Punya pertanyaan lebih lanjut atau ingin konsultasi gratis? Silakan hubungi kami melalui saluran berikut.
+                Punya pertanyaan lebih lanjut? Silakan hubungi kami melalui saluran berikut.
               </p>
             </div>
 
@@ -118,15 +118,7 @@ export function Contact({ businessId }: ContactProps) {
                     style={{ border: 0 }} 
                     allowFullScreen={true} 
                     loading="lazy" 
-                    referrerPolicy="no-referrer-when-downgrade"
                   />
-                  <div className="absolute top-4 left-4">
-                    <Button asChild size="sm" className="shadow-lg h-9 bg-white text-primary hover:bg-white/90 font-semibold">
-                      <a href={directMapUrl} target="_blank">
-                        Open in Maps <ExternalLink size={14} className="ml-2" />
-                      </a>
-                    </Button>
-                  </div>
                 </>
               ) : (
                 <div className="flex flex-col items-center gap-4 p-8 text-center max-w-sm">

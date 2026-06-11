@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -82,8 +83,7 @@ export function BookingForm({ businessId }: BookingFormProps) {
 ━━━━━━━━━━━━━━━━━━
 _Dikirim melalui Sistem Pemesanan Website_`;
 
-      const encodedMessage = encodeURIComponent(message);
-      const whatsappUrl = `https://wa.me/${ownerWhatsapp}?text=${encodedMessage}`;
+      const whatsappUrl = `https://wa.me/${ownerWhatsapp}?text=${encodeURIComponent(message)}`;
       
       toast({ title: "Berhasil", description: "Pesanan disimpan. Mengalihkan ke WhatsApp..." });
       
@@ -94,8 +94,7 @@ _Dikirim melalui Sistem Pemesanan Website_`;
       }, 1000);
 
     } catch (e) {
-      console.error(e);
-      toast({ variant: "destructive", title: "Gagal", description: "Terjadi kesalahan teknis. Silakan coba lagi." });
+      toast({ variant: "destructive", title: "Gagal", description: "Terjadi kesalahan teknis." });
       setIsSubmitting(false);
     }
   }
@@ -106,7 +105,7 @@ _Dikirim melalui Sistem Pemesanan Website_`;
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold font-headline mb-4">Form Pemesanan</h2>
           <p className="text-muted-foreground text-sm md:text-lg">
-            Isi data di bawah ini untuk memesan layanan. Kami akan segera menghubungi Anda melalui WhatsApp.
+            Isi data di bawah ini untuk memesan layanan melalui WhatsApp.
           </p>
         </div>
 
@@ -114,7 +113,7 @@ _Dikirim melalui Sistem Pemesanan Website_`;
           <div className="h-2 bg-gradient-to-r from-primary to-accent w-full" />
           <CardHeader className="px-5 md:px-8">
             <CardTitle>Rincian Pesanan</CardTitle>
-            <CardDescription>Setelah klik kirim, Anda akan diarahkan otomatis ke WhatsApp kami.</CardDescription>
+            <CardDescription>Anda akan diarahkan otomatis ke WhatsApp kami.</CardDescription>
           </CardHeader>
           <CardContent className="px-5 md:px-8 pb-8">
             <Form {...form}>
@@ -164,9 +163,6 @@ _Dikirim melalui Sistem Pemesanan Website_`;
                           {services?.map((s: any) => (
                             <SelectItem key={s.id} value={s.name}>{s.name}</SelectItem>
                           ))}
-                          {services?.length === 0 && (
-                            <SelectItem value="Umum" disabled>Belum ada layanan aktif</SelectItem>
-                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -181,7 +177,7 @@ _Dikirim melalui Sistem Pemesanan Website_`;
                     <FormItem>
                       <FormLabel>Alamat Lengkap</FormLabel>
                       <FormControl>
-                        <Input placeholder="Jl. Merdeka No. 123, Kelurahan..." {...field} />
+                        <Input placeholder="Jl. Merdeka No. 123..." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -196,7 +192,7 @@ _Dikirim melalui Sistem Pemesanan Website_`;
                       <FormLabel>Detail Masalah / Catatan (Opsional)</FormLabel>
                       <FormControl>
                         <Textarea 
-                          placeholder="Jelaskan kendala Anda agar kami bisa memberikan estimasi harga..." 
+                          placeholder="Jelaskan kendala Anda..." 
                           className="min-h-[100px]"
                           {...field} 
                         />
@@ -211,17 +207,8 @@ _Dikirim melalui Sistem Pemesanan Website_`;
                   className="w-full py-6 md:py-8 text-sm sm:text-lg rounded-xl font-bold flex items-center justify-center gap-2 md:gap-3 shadow-xl shadow-primary/20 hover:scale-[1.01] transition-all px-4"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? (
-                    <>Sedang Memproses...</>
-                  ) : (
-                    <>
-                      <Send className="h-4 w-4 md:h-5 md:w-5" /> Kirim & Hubungi via WhatsApp
-                    </>
-                  )}
+                  {isSubmitting ? "Sedang Memproses..." : "Kirim & Hubungi via WhatsApp"}
                 </Button>
-                <p className="text-center text-[10px] md:text-xs text-muted-foreground mt-2">
-                  *Dengan menekan tombol, pesanan akan tersimpan di sistem kami.
-                </p>
               </form>
             </Form>
           </CardContent>

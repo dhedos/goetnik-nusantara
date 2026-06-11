@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from 'next/image';
@@ -21,16 +22,10 @@ import { ArrowRight, Loader2, Cpu } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ICON_MAP, BUSINESS_NAME_DEFAULT, MAIN_BUSINESS_ID } from '@/lib/constants';
 
-/**
- * Layar Pemuatan yang dioptimalkan untuk identitas brand.
- * Menggunakan CSS variables yang disuntikkan di layout.tsx agar logo muncul instan tanpa flicker.
- */
 function LoadingScreen({ logoUrl }: { logoUrl?: string }) {
-  // Kita menggunakan state untuk memastikan re-render saat logoUrl dari database akhirnya sampai
   const [hasLogo, setHasLogo] = useState(false);
 
   useEffect(() => {
-    // Mengecek apakah CSS variable logo sudah tersedia di root
     const root = document.documentElement;
     const hasCssLogo = root.style.getPropertyValue('--loading-logo') !== '';
     if (hasCssLogo || logoUrl) {
@@ -41,9 +36,7 @@ function LoadingScreen({ logoUrl }: { logoUrl?: string }) {
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background text-center p-4">
       <div className="relative z-10 flex flex-col items-center">
-        {/* Kontainer Logo dengan Efek Pulse (Kedap-kedip) */}
         <div className="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center animate-pulse transition-all duration-700">
-          {/* Prioritas: logoUrl dari prop, lalu CSS variable loading-logo */}
           {logoUrl ? (
             <img 
               src={logoUrl} 
@@ -52,12 +45,10 @@ function LoadingScreen({ logoUrl }: { logoUrl?: string }) {
             />
           ) : (
             <div className="relative w-full h-full flex items-center justify-center">
-              {/* Div ini akan menampilkan logo melalui background-image CSS jika variabel tersedia */}
               <div 
                 className="absolute inset-0 bg-contain bg-center bg-no-repeat opacity-0 [.has-loading-logo_&]:opacity-100 transition-opacity duration-300 brightness-110 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
                 style={{ backgroundImage: 'var(--loading-logo)' }}
               />
-              {/* Ikon Fallback hanya tampil jika kelas 'has-loading-logo' tidak ada di root */}
               <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-2xl shadow-primary/20 [.has-loading-logo_&]:hidden">
                 <Cpu size={48} />
               </div>
@@ -87,7 +78,6 @@ function HomeContent() {
   const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
 
   useEffect(() => {
-    // Safety timeout: website akan tampil dalam maksimal 2 detik apapun kondisinya
     const safetyTimer = setTimeout(() => {
       setIsReady(true);
     }, 2000);
@@ -121,7 +111,6 @@ function HomeContent() {
       
       <div className="flex flex-col min-h-screen overflow-x-hidden">
         <main className="animate-fade-in">
-          {/* Hero Section */}
           <section className="relative min-h-[85vh] md:min-h-screen flex items-center pt-24 md:pt-28 pb-20 px-4 md:px-8 overflow-hidden">
             <div className="absolute inset-0 -z-20">
               {heroDisplayImage && (
@@ -166,7 +155,6 @@ function HomeContent() {
 
           <AIAssistant businessId={businessId} />
           
-          {/* Services Section */}
           <section id="layanan" className="py-20 md:py-32 px-4 md:px-8 bg-secondary/5 relative">
             <div className="max-w-7xl mx-auto">
               <div className="text-center mb-12 md:mb-20 space-y-4">
