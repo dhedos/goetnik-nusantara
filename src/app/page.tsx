@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from 'next/image';
@@ -22,38 +21,46 @@ import { ArrowRight, Loader2, Cpu } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ICON_MAP, BUSINESS_NAME_DEFAULT, MAIN_BUSINESS_ID } from '@/lib/constants';
 
+/**
+ * Layar Pemuatan yang dioptimalkan untuk identitas brand.
+ * Menggunakan CSS variables yang disuntikkan di layout.tsx agar logo muncul instan tanpa flicker.
+ */
 function LoadingScreen({ logoUrl }: { logoUrl?: string }) {
-  const [cachedLogo, setCachedLogo] = useState<string | null>(null);
+  // Kita menggunakan state untuk memastikan re-render saat logoUrl dari database akhirnya sampai
+  const [hasLogo, setHasLogo] = useState(false);
 
   useEffect(() => {
-    // Mencoba mengambil logo dari cache agar muncul instan saat reload halaman
-    try {
-      const cacheData = localStorage.getItem('goetnik-theme-cache');
-      if (cacheData) {
-        const cache = JSON.parse(cacheData);
-        if (cache.logoUrl) setCachedLogo(cache.logoUrl);
-      }
-    } catch (e) {
-      console.warn("Gagal memuat logo dari cache.");
+    // Mengecek apakah CSS variable logo sudah tersedia di root
+    const root = document.documentElement;
+    const hasCssLogo = root.style.getPropertyValue('--loading-logo') !== '';
+    if (hasCssLogo || logoUrl) {
+      setHasLogo(true);
     }
-  }, []);
-
-  const displayLogo = logoUrl || cachedLogo;
+  }, [logoUrl]);
 
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background text-center p-4">
       <div className="relative z-10 flex flex-col items-center">
         {/* Kontainer Logo dengan Efek Pulse (Kedap-kedip) */}
         <div className="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center animate-pulse transition-all duration-700">
-          {displayLogo ? (
+          {/* Prioritas: logoUrl dari prop, lalu CSS variable loading-logo */}
+          {logoUrl ? (
             <img 
-              src={displayLogo} 
+              src={logoUrl} 
               alt="Loading Logo" 
               className="max-w-full max-h-full object-contain brightness-110 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
             />
           ) : (
-            <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-2xl shadow-primary/20">
-              <Cpu size={48} />
+            <div className="relative w-full h-full flex items-center justify-center">
+              {/* Div ini akan menampilkan logo melalui background-image CSS jika variabel tersedia */}
+              <div 
+                className="absolute inset-0 bg-contain bg-center bg-no-repeat opacity-0 [.has-loading-logo_&]:opacity-100 transition-opacity duration-300 brightness-110 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+                style={{ backgroundImage: 'var(--loading-logo)' }}
+              />
+              {/* Ikon Fallback hanya tampil jika kelas 'has-loading-logo' tidak ada di root */}
+              <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-2xl shadow-primary/20 [.has-loading-logo_&]:hidden">
+                <Cpu size={48} />
+              </div>
             </div>
           )}
         </div>

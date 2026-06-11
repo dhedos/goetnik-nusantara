@@ -1,4 +1,3 @@
-
 import type {Metadata} from 'next';
 import './globals.css';
 import { FirebaseClientProvider } from '@/firebase';
@@ -37,6 +36,10 @@ export default function RootLayout({
                     if (theme.card) root.style.setProperty('--card', theme.card);
                     if (theme.border) root.style.setProperty('--border', theme.border);
                     if (theme.fontFamily) root.style.setProperty('--selected-font', theme.fontFamily);
+                    if (theme.logoUrl) {
+                      root.style.setProperty('--loading-logo', 'url(' + theme.logoUrl + ')');
+                      root.classList.add('has-loading-logo');
+                    }
                   }
                 } catch (e) {}
               })();

@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect } from 'react';
@@ -21,21 +20,23 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
   useEffect(() => {
     if (!settings) return;
 
+    const root = document.documentElement;
+
     // 1. Handle Font
     const font = settings.fontFamily || 'Inter';
     const fontValue = `'${font}', sans-serif`;
-    document.documentElement.style.setProperty('--selected-font', fontValue);
+    root.style.setProperty('--selected-font', fontValue);
     
     const isEthnic = ['Cinzel', 'Almendra', 'Playfair Display', 'Marcellus', 'Lora'].includes(font);
-    document.documentElement.style.setProperty('--font-weight-display', isEthnic ? '700' : '800');
+    root.style.setProperty('--font-weight-display', isEthnic ? '700' : '800');
 
     // 2. Handle Theme
     const themeId = settings.themeId || 'heritage-red';
     const selectedTheme = THEMES.find(t => t.id === themeId) || THEMES[0];
 
-    document.documentElement.style.setProperty('--primary', selectedTheme.primary);
-    document.documentElement.style.setProperty('--accent', selectedTheme.accent);
-    document.documentElement.style.setProperty('--background', selectedTheme.background);
+    root.style.setProperty('--primary', selectedTheme.primary);
+    root.style.setProperty('--accent', selectedTheme.accent);
+    root.style.setProperty('--background', selectedTheme.background);
     
     const bgParts = selectedTheme.background.split(' ');
     const lValue = parseInt(bgParts[2]);
@@ -52,29 +53,36 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
     const s = bgParts[1];
 
     if (isLight) {
-      // Light theme adjustments (Vintage Cream etc)
-      foreground = '20 20% 12%'; // Warm dark charcoal/espresso
-      mutedForeground = '20 10% 40%'; // Soft brown-gray
-      border = '30 20% 85%'; // Subtle warm border
+      foreground = '20 20% 12%'; 
+      mutedForeground = '20 10% 40%'; 
+      border = '30 20% 85%'; 
       input = '30 20% 85% / 0.5';
-      card = `${h} ${s} ${Math.max(0, lValue - 3)}%`; // Slightly darker than BG
+      card = `${h} ${s} ${Math.max(0, lValue - 3)}%`; 
     } else {
-      // Dark theme adjustments
       foreground = '210 40% 98%';
       mutedForeground = '215 20% 65%';
       border = '217 19% 27% / 0.15';
       input = '217 19% 27% / 0.1';
-      card = `${h} ${s} ${Math.min(100, lValue + 3)}%`; // Slightly lighter than BG
+      card = `${h} ${s} ${Math.min(100, lValue + 3)}%`; 
     }
 
-    document.documentElement.style.setProperty('--foreground', foreground);
-    document.documentElement.style.setProperty('--card-foreground', foreground);
-    document.documentElement.style.setProperty('--muted-foreground', mutedForeground);
-    document.documentElement.style.setProperty('--border', border);
-    document.documentElement.style.setProperty('--input', input);
-    document.documentElement.style.setProperty('--card', card);
+    root.style.setProperty('--foreground', foreground);
+    root.style.setProperty('--card-foreground', foreground);
+    root.style.setProperty('--muted-foreground', mutedForeground);
+    root.style.setProperty('--border', border);
+    root.style.setProperty('--input', input);
+    root.style.setProperty('--card', card);
 
-    // Save to Cache for instant reload (Termasuk logoUrl)
+    // 3. Handle Logo for Loading Screen
+    if (settings.logoUrl) {
+      root.style.setProperty('--loading-logo', `url(${settings.logoUrl})`);
+      root.classList.add('has-loading-logo');
+    } else {
+      root.style.removeProperty('--loading-logo');
+      root.classList.remove('has-loading-logo');
+    }
+
+    // Save to Cache for instant reload
     try {
       localStorage.setItem('goetnik-theme-cache', JSON.stringify({
         primary: selectedTheme.primary,
