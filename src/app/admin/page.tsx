@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useUser, useFirestore, useCollection, useDoc, useAuth, useMemoFirebase } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,6 +34,7 @@ export default function AdminDashboard() {
   const [isSaving, setIsSaving] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const hasLoadedSettings = useRef(false);
   
   const canFetchData = !!(firestore && user);
 
@@ -92,11 +93,13 @@ export default function AdminDashboard() {
   }, [user, authLoading, router]);
 
   useEffect(() => {
-    if (settings) {
+    // Hanya set state dari Firestore jika belum pernah dimuat (mencegah reset saat edit)
+    if (settings && !hasLoadedSettings.current) {
       setBusinessInfo(prev => ({
         ...prev,
         ...settings,
       }));
+      hasLoadedSettings.current = true;
     }
   }, [settings]);
 
@@ -129,6 +132,8 @@ export default function AdminDashboard() {
           description: "Semua perubahan telah diterapkan ke website secara otomatis." 
         });
         setIsSaving(false);
+        // Izinkan sinkronisasi ulang setelah simpan manual
+        hasLoadedSettings.current = false;
       })
       .catch((e) => {
         setIsSaving(false);
@@ -280,7 +285,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="flex-1 space-y-3">
                       <p className="text-sm text-muted-foreground">Upload PNG/JPG max 1MB.</p>
-                      <input type="file" className="hidden" id="logo-up" onChange={(e) => handleImageUpload(e, 'logo')} />
+                      <input type="file" className="hidden" id="logo-up" accept="image/*" onChange={(e) => handleImageUpload(e, 'logo')} />
                       <Button asChild variant="secondary" className="cursor-pointer h-10 px-6 rounded-xl font-bold"><label htmlFor="logo-up">{isUploading === 'logo' ? '...' : 'Pilih File'}</label></Button>
                     </div>
                   </div>
@@ -301,8 +306,12 @@ export default function AdminDashboard() {
                   <div className="relative h-48 w-full bg-[#0B1120] rounded-2xl overflow-hidden border border-white/5">
                     {businessInfo.heroImageUrl ? <Image src={businessInfo.heroImageUrl} alt="Hero" fill className="object-cover opacity-50" unoptimized /> : <Globe className="w-full h-full p-20 opacity-10" />}
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <input type="file" className="hidden" id="hero-up" onChange={(e) => handleImageUpload(e, 'hero')} />
-                      <Button asChild variant="secondary" className="cursor-pointer shadow-2xl rounded-xl"><label htmlFor="hero-up">{isUploading === 'hero' ? '...' : 'Ganti Banner'}</label></Button>
+                      <input type="file" className="hidden" id="hero-up" accept="image/*" onChange={(e) => handleImageUpload(e, 'hero')} />
+                      <Button asChild variant="secondary" className="cursor-pointer shadow-2xl rounded-xl z-20">
+                        <label htmlFor="hero-up" className="cursor-pointer px-6 py-2">
+                          {isUploading === 'hero' ? 'Sedang Memuat...' : 'Ganti Banner'}
+                        </label>
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -372,7 +381,7 @@ export default function AdminDashboard() {
                       <div className="h-40 bg-muted/20 relative">
                         {s.imageUrl ? <Image src={s.imageUrl} alt={s.name} fill className="object-cover" unoptimized /> : <div className="w-full h-full flex items-center justify-center text-xs opacity-10">NO IMAGE</div>}
                         <div className="absolute top-4 right-4 flex gap-2">
-                          <input type="file" className="hidden" id={`s-${s.id}`} onChange={(e) => handleImageUpload(e, s.id)} />
+                          <input type="file" className="hidden" id={`s-${s.id}`} accept="image/*" onChange={(e) => handleImageUpload(e, s.id)} />
                           <Button variant="secondary" size="sm" asChild className="rounded-full h-8"><label htmlFor={`s-${s.id}`} className="cursor-pointer">{isUploading === s.id ? '...' : 'Ganti Gambar'}</label></Button>
                           <Button variant="destructive" size="icon" className="rounded-full h-8 w-8" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id))}><Trash2 size={14} /></Button>
                         </div>

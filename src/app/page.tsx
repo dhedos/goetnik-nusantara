@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from 'next/image';
@@ -97,7 +96,7 @@ function HomeContent() {
                   alt="Hero" 
                   fill 
                   className="object-cover opacity-15 md:opacity-20 animate-[subtle-zoom_40s_infinite_alternate]" 
-                  unoptimized={!!settings?.heroImageUrl} 
+                  unoptimized={heroDisplayImage.startsWith('data:')} 
                   priority
                 />
               )}
@@ -110,12 +109,8 @@ function HomeContent() {
                   {heroBadge}
                 </Badge>
                 
-                <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black animate-fade-in tracking-tighter leading-[0.9] md:leading-[0.85] text-white">
-                  {heroTitle.split(' ').map((word: string, i: number) => (
-                    <span key={i} className={i === 1 ? "text-primary block sm:inline-block sm:mr-4" : "block sm:inline-block sm:mr-4"}>
-                      {word}{' '}
-                    </span>
-                  ))}
+                <h1 className="text-4xl sm:text-7xl md:text-8xl lg:text-9xl font-black animate-fade-in tracking-tighter leading-[0.9] md:leading-[0.85] text-white break-words">
+                  {heroTitle}
                 </h1>
 
                 <p className="text-lg md:text-2xl text-muted-foreground/70 animate-fade-in leading-relaxed max-w-2xl delay-100 font-medium">
