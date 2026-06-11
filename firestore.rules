@@ -1,43 +1,29 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Aturan untuk bisnis utama 'main'
-    match /businesses/main {
-      // Akses publik untuk membaca profil dasar
+    // Aturan utama untuk koleksi bisnis
+    match /businesses/{businessId} {
+      // Akses publik untuk membaca profil bisnis
       allow read: if true;
-      // Akses admin untuk menulis profil dasar
+      // Akses admin untuk menulis/mengubah data bisnis utama
       allow write: if request.auth != null;
 
-      // Aturan spesifik untuk sub-koleksi agar lebih presisi
-      
-      // 1. Pengaturan Bisnis (Logo, Hero, Konten)
-      match /settings/profile {
-        allow read: if true;
-        allow write: if request.auth != null;
-      }
-
-      // 2. Katalog Layanan
-      match /services/{serviceId} {
-        allow read: if true;
-        allow write: if request.auth != null;
-      }
-
-      // 3. Pesanan (Bookings)
-      match /bookings/{bookingId} {
-        // Publik hanya bisa membuat (create) pesanan
-        allow create: if true;
-        // Admin bisa mengelola (read, update, delete) pesanan
-        allow read, update, delete: if request.auth != null;
-      }
-
-      // Catch-all untuk sub-jalur lain di bawah main demi fleksibilitas masa depan
+      // Aturan untuk semua sub-koleksi di bawah bisnis (settings, services, dll)
       match /{allPaths=**} {
         allow read: if true;
         allow write: if request.auth != null;
       }
+
+      // Aturan khusus untuk Pesanan (Bookings)
+      // Pengunjung publik diperbolehkan membuat pesanan baru
+      match /bookings/{bookingId} {
+        allow create: if true;
+        // Hanya admin yang bisa membaca, memperbarui, atau menghapus pesanan
+        allow read, update, delete: if request.auth != null;
+      }
     }
     
-    // Default deny untuk jalur lain demi keamanan
+    // Default deny untuk semua jalur lain demi keamanan
     match /{document=**} {
       allow read, write: if false;
     }
