@@ -1,7 +1,9 @@
+
 "use client";
 
+import * as React from 'react';
 import Image from 'next/image';
-import { LucideIcon, Check, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LucideIcon, Check, ArrowRight } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -12,7 +14,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { useState } from 'react';
+import Autoplay from "embla-carousel-autoplay";
 
 interface ServiceCardProps {
   name: string;
@@ -33,12 +35,20 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
   const allImages = mainImage ? [mainImage, ...galleryUrls] : galleryUrls;
   const hasGallery = allImages.length > 1;
 
+  // Konfigurasi Autoplay
+  const plugin = React.useRef(
+    Autoplay({ delay: 3000, stopOnInteraction: true, stopOnMouseEnter: true })
+  );
+
   return (
     <Card className="flex flex-col h-full bg-card/40 border-white/5 hover:border-primary/30 transition-all duration-500 group overflow-hidden rounded-[2rem] shadow-2xl relative">
       {/* Container Gambar / Carousel */}
       <div className="relative h-64 overflow-hidden bg-muted/10">
         {hasGallery ? (
-          <Carousel className="w-full h-full">
+          <Carousel 
+            className="w-full h-full"
+            plugins={[plugin.current]}
+          >
             <CarouselContent className="h-full">
               {allImages.map((img, index) => (
                 <CarouselItem key={index} className="h-64">
