@@ -23,45 +23,14 @@ import { ArrowRight, Loader2 } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ICON_MAP, BUSINESS_NAME_DEFAULT, MAIN_BUSINESS_ID } from '@/lib/constants';
 
-const EthnicOrnament = ({ className }: { className?: string }) => (
-  <svg 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="1.5" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
-    className={className}
-  >
-    <path d="M12 2L14.5 9L22 9L16 14L18.5 21L12 17L5.5 21L8 14L2 9L9.5 9L12 2Z" />
-    <circle cx="12" cy="12" r="3" />
-    <path d="M12 7V5M12 19V17M7 12H5M19 12H17M8.5 8.5L7 7M17 17L15.5 15.5M15.5 8.5L17 7M7 17L8.5 15.5" />
-  </svg>
-);
-
 function LoadingScreen({ text }: { text: string }) {
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background text-center p-4 overflow-hidden">
-      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[140px] animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[140px] animate-pulse delay-700" />
-      
+    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background text-center p-4">
       <div className="relative z-10 flex flex-col items-center">
-        <div className="relative h-16 w-16 md:h-20 md:w-20 mb-8">
-          <div className="absolute inset-0 rounded-2xl border-2 border-primary/10 rotate-45 animate-[spin_6s_linear_infinite]" />
-          <div className="absolute inset-0 rounded-2xl border-2 border-t-primary/80 border-r-transparent border-b-transparent border-l-transparent rotate-45 animate-[spin_2s_linear_infinite] shadow-[0_0_30px_rgba(var(--primary),0.2)]" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <EthnicOrnament className="h-8 w-8 md:h-10 md:w-10 text-primary animate-pulse" />
-          </div>
-        </div>
-
-        <h2 className="text-foreground text-base md:text-2xl font-bold tracking-[0.1em] mb-8 animate-pulse px-4">
+        <Loader2 className="h-10 w-10 animate-spin text-primary mb-6" />
+        <h2 className="text-foreground text-sm font-bold tracking-widest uppercase animate-pulse">
           {text}
         </h2>
-
-        <div className="w-48 md:w-64 h-1 bg-foreground/5 rounded-full overflow-hidden border border-foreground/5 relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent animate-[loading-progress_1.5s_infinite]" />
-          <div className="h-full bg-primary animate-[loading-progress_2.5s_ease-in-out_infinite]" />
-        </div>
       </div>
     </div>
   );
@@ -96,19 +65,17 @@ function HomeContent() {
   }, [settings]);
 
   if (!isReady && settingsLoading && !settings) {
-    return <LoadingScreen text="Menyiapkan Pengalaman Digital..." />;
+    return <LoadingScreen text="Menyiapkan..." />;
   }
 
   const heroPlaceholder = PlaceHolderImages.find(img => img.id === 'hero-tech');
   const heroDisplayImage = settings?.heroImageUrl || heroPlaceholder?.imageUrl;
   const serviceImageIds = ['service-os', 'service-repair', 'service-design', 'service-web'];
 
-  const heroBadge = settings?.heroBadge || 'Solusi Digital Terpercaya';
   const heroTitle = settings?.heroTitle || BUSINESS_NAME_DEFAULT;
   const heroSubtitle = settings?.heroSubtitle || 'Kami melayani kebutuhan teknologi, desain grafis, dan pembuatan aplikasi secara profesional.';
   const heroImagePos = settings?.heroImagePosition || '50%';
 
-  const servicesBadge = settings?.servicesSectionBadge || 'Premium Solutions';
   const servicesTitle = settings?.servicesSectionTitle || 'Layanan Unggulan';
   const servicesSubtitle = settings?.servicesSectionSubtitle || 'Solusi kreatif dan teknologi modern untuk mempercepat pertumbuhan bisnis Anda.';
 
@@ -127,7 +94,7 @@ function HomeContent() {
                   src={heroDisplayImage} 
                   alt="Hero Background" 
                   fill 
-                  className="object-cover opacity-20 animate-[subtle-zoom_30s_infinite_alternate]" 
+                  className="object-cover opacity-20" 
                   style={{ objectPosition: `center ${heroImagePos}` }}
                   unoptimized={heroDisplayImage.startsWith('data:')} 
                   priority
@@ -173,9 +140,9 @@ function HomeContent() {
               </div>
               
               {servicesLoading && !services ? (
-                <div className="flex flex-col items-center justify-center py-20 gap-6">
-                  <div className="h-10 w-10 rounded-xl border-2 border-primary/20 border-t-primary animate-spin" />
-                  <p className="text-muted-foreground animate-pulse tracking-widest text-[10px] uppercase font-bold">Menyiapkan Katalog...</p>
+                <div className="flex flex-col items-center justify-center py-20 gap-4">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-widest">Menyiapkan Katalog...</p>
                 </div>
               ) : services && services.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
