@@ -29,6 +29,19 @@
       },
       "required": ["imageUrl", "ownerId"]
     },
+    "ExternalLink": {
+      "title": "ExternalLink",
+      "description": "An external link to a marketplace or another website.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "url": { "type": "string" },
+        "platform": { "type": "string", "enum": ["Shopee", "Tokopedia", "Lazada", "Website", "Lainnya"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "ownerId": { "type": "string" }
+      },
+      "required": ["title", "url", "platform", "ownerId"]
+    },
     "Booking": {
       "title": "Booking",
       "description": "A service request from a customer.",
@@ -62,10 +75,9 @@
         "logoUrl": { "type": "string" },
         "logoHeight": { "type": "string" },
         "fontFamily": { "type": "string", "description": "Selected Google Font name." },
+        "themeId": { "type": "string" },
         "heroBadge": { "type": "string" },
         "heroTitle": { "type": "string" },
-        "heroTitleImageUrl": { "type": "string", "description": "Image to replace the hero title text." },
-        "heroTitleImageHeight": { "type": "string" },
         "heroSubtitle": { "type": "string" },
         "heroImageUrl": { "type": "string" },
         "heroImagePosition": { "type": "string" },
@@ -93,6 +105,10 @@
     "/businesses/{businessId}/portfolio/{itemId}": {
       "schema": "PortfolioItem",
       "description": "Collection of portfolio images for a specific business."
+    },
+    "/businesses/{businessId}/external-links/{linkId}": {
+      "schema": "ExternalLink",
+      "description": "External links like marketplaces or partner sites."
     },
     "/businesses/{businessId}/bookings/{bookingId}": {
       "schema": "Booking",

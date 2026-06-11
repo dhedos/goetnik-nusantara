@@ -1,11 +1,11 @@
 
 "use client";
 
-import { Cpu, Facebook, Instagram, Youtube, Fingerprint } from 'lucide-react';
+import { Cpu, Facebook, Instagram, Youtube, Fingerprint, ShoppingBag, Globe, Link as LinkIcon, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
-import { doc } from 'firebase/firestore';
+import { useFirestore, useDoc, useMemoFirebase, useCollection } from '@/firebase';
+import { doc, collection, query, orderBy } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
@@ -15,6 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { MAIN_BUSINESS_ID } from '@/lib/constants';
 
 const TikTokIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className} xmlns="http://www.w3.org/2000/svg">
@@ -30,11 +31,18 @@ export function Footer({ businessId }: FooterProps) {
   const { toast } = useToast();
   const currentYear = new Date().getFullYear();
   const firestore = useFirestore();
+  
   const settingsRef = useMemoFirebase(() => 
     firestore ? doc(firestore, 'businesses', businessId, 'settings', 'profile') : null, 
     [firestore, businessId]
   );
   const { data: settings } = useDoc(settingsRef);
+
+  const linksQuery = useMemoFirebase(() => 
+    firestore ? query(collection(firestore, 'businesses', businessId, 'external-links'), orderBy('createdAt', 'desc')) : null, 
+    [firestore, businessId]
+  );
+  const { data: externalLinks } = useCollection(linksQuery);
   
   const logoText = settings?.logoText || 'Go Etnik';
   const logoAccentText = settings?.logoAccentText || 'NUSANTARA';
@@ -48,6 +56,19 @@ export function Footer({ businessId }: FooterProps) {
     if (!url) return '#';
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
     return `https://${url}`;
+  };
+
+  const getPlatformIcon = (platform: string) => {
+    switch (platform) {
+      case 'Shopee':
+      case 'Tokopedia':
+      case 'Lazada':
+        return <ShoppingCart size={14} className="mr-2" />;
+      case 'Website':
+        return <Globe size={14} className="mr-2" />;
+      default:
+        return <LinkIcon size={14} className="mr-2" />;
+    }
   };
 
   const socialLinks = {
@@ -70,7 +91,7 @@ export function Footer({ businessId }: FooterProps) {
   return (
     <footer className="bg-card/30 border-t border-border pt-16 pb-8 px-4">
       <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 mb-12">
-        <div className="md:col-span-2 space-y-6">
+        <div className="md:col-span-1 space-y-6">
           <Link href="/" className="flex items-center gap-2">
             {logoUrl ? (
               <div 
@@ -98,7 +119,7 @@ export function Footer({ businessId }: FooterProps) {
             </div>
           </Link>
           
-          <p className="text-muted-foreground max-w-sm text-sm leading-relaxed">
+          <p className="text-muted-foreground max-w-sm text-xs leading-relaxed">
             {aboutSubtitle}
           </p>
 
@@ -145,6 +166,28 @@ export function Footer({ businessId }: FooterProps) {
             <li><Link href="#layanan" className="hover:text-primary transition-colors">Layanan</Link></li>
             <li><Link href="#tentang" className="hover:text-primary transition-colors">Tentang Kami</Link></li>
             <li><Link href="#kontak" className="hover:text-primary transition-colors">Hubungi Kami</Link></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 className="font-bold text-base mb-6 uppercase tracking-wider text-foreground">Marketplace & Partner</h4>
+          <ul className="space-y-4 text-muted-foreground text-sm font-medium">
+             {externalLinks && externalLinks.length > 0 ? (
+               externalLinks.map((link: any) => (
+                 <li key={link.id}>
+                    <a 
+                      href={formatSocialUrl(link.url)} 
+                      target="_blank" 
+                      className="hover:text-primary transition-colors flex items-center"
+                    >
+                      {getPlatformIcon(link.platform)}
+                      {link.title}
+                    </a>
+                 </li>
+               ))
+             ) : (
+               <li><span className="opacity-30 italic text-xs">Belum ada tautan partner</span></li>
+             )}
           </ul>
         </div>
 

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
@@ -16,7 +17,7 @@ import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
-  Settings, ShoppingBag, ExternalLink, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, MoveVertical, Maximize, Type, Image as ImageIcon, Palette, Map as MapIcon, Search, Grid3X3, UploadCloud
+  Settings, ShoppingBag, ExternalLink as ExternalLinkIcon, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, MoveVertical, Maximize, Type, Image as ImageIcon, Palette, Map as MapIcon, Search, Grid3X3, UploadCloud, Link as LinkIcon, ShoppingCart
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -25,7 +26,7 @@ import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { PRIVACY_POLICY_DEFAULT, BUSINESS_NAME_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT, MAIN_BUSINESS_ID, THEMES } from '@/lib/constants';
 
-type AdminSection = 'bookings' | 'services' | 'portfolio' | 'branding' | 'hero' | 'about' | 'contact' | 'social' | 'privacy';
+type AdminSection = 'bookings' | 'services' | 'portfolio' | 'links' | 'branding' | 'hero' | 'about' | 'contact' | 'social' | 'privacy';
 
 const ETHNIC_FONTS = [
   { name: 'Cinzel', label: 'Cinzel (Etnik Nusantara)' },
@@ -62,6 +63,12 @@ export default function AdminDashboard() {
     [canFetchData, firestore]
   );
   const { data: portfolio } = useCollection(portfolioQuery);
+
+  const linksQuery = useMemoFirebase(() => 
+    canFetchData ? query(collection(firestore!, 'businesses', MAIN_BUSINESS_ID, 'external-links'), orderBy('createdAt', 'desc')) : null, 
+    [canFetchData, firestore]
+  );
+  const { data: externalLinks } = useCollection(linksQuery);
 
   const bookingsQuery = useMemoFirebase(() => 
     canFetchData ? collection(firestore!, 'businesses', MAIN_BUSINESS_ID, 'bookings') : null, 
@@ -224,7 +231,6 @@ export default function AdminDashboard() {
     const file = e.target.files?.[0];
     if (!file || !user || !firestore) return;
 
-    // Batasan awal 1MB sebelum kompresi untuk keamanan
     if (file.size > 1024 * 1024 * 2) { 
       toast({ variant: "destructive", title: "File Terlalu Besar", description: "Maksimal 2MB sebelum kompresi." });
       return;
@@ -259,7 +265,6 @@ export default function AdminDashboard() {
 
     try {
       for (const file of files) {
-        // Lewati file yang sangat besar sebelum kompresi
         if (file.size > 1024 * 1024 * 3) {
           toast({ variant: "destructive", title: "File Terlalu Besar", description: `${file.name} melebihi 3MB.` });
           continue;
@@ -299,6 +304,18 @@ export default function AdminDashboard() {
     });
   };
 
+  const handleAddExternalLink = () => {
+    if (!firestore || !user) return;
+    const colRef = collection(firestore, 'businesses', MAIN_BUSINESS_ID, 'external-links');
+    addDoc(colRef, {
+      title: 'Tautan Baru',
+      url: 'https://',
+      platform: 'Website',
+      ownerId: user.uid,
+      createdAt: serverTimestamp()
+    });
+  };
+
   const handleAutoSearchMap = () => {
     if (!searchLocation.trim()) return;
     const embedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(searchLocation)}&output=embed`;
@@ -314,6 +331,7 @@ export default function AdminDashboard() {
     { id: 'bookings', label: 'Pesanan', icon: ShoppingBag },
     { id: 'services', label: 'Layanan', icon: Settings },
     { id: 'portfolio', label: 'Portofolio', icon: Grid3X3 },
+    { id: 'links', label: 'Tautan Eksternal', icon: LinkIcon },
     { id: 'branding', label: 'Logo & Tema', icon: Layout },
     { id: 'hero', label: 'Banner Utama', icon: Globe },
     { id: 'about', label: 'Tentang Kami', icon: Info },
@@ -344,7 +362,7 @@ export default function AdminDashboard() {
           ))}
         </nav>
         <div className="p-4 border-t border-border space-y-2">
-          <Button variant="outline" className="w-full gap-2 rounded-xl text-xs font-bold border-border" onClick={() => window.open(window.location.origin, '_blank')}><ExternalLink size={14} /> Lihat Website</Button>
+          <Button variant="outline" className="w-full gap-2 rounded-xl text-xs font-bold border-border" onClick={() => window.open(window.location.origin, '_blank')}><ExternalLinkIcon size={14} /> Lihat Website</Button>
           <Button variant="destructive" className="w-full gap-2 rounded-xl text-xs font-bold" onClick={handleLogout}><LogOut size={14} /> Keluar</Button>
         </div>
       </aside>
@@ -384,6 +402,52 @@ export default function AdminDashboard() {
                 {bookings?.length === 0 && <p className="text-center text-muted-foreground py-16 font-medium">Belum ada pesanan terbaru.</p>}
               </CardContent>
             </Card>
+          )}
+
+          {activeSection === 'links' && (
+             <div className="space-y-6">
+                <Button onClick={handleAddExternalLink} size="lg" className="rounded-2xl px-12 h-16 font-black uppercase tracking-widest bg-primary text-primary-foreground hover:scale-105 transition-all shadow-2xl"><Plus className="mr-2" size={24} /> Tambah Tautan</Button>
+                <div className="grid md:grid-cols-1 gap-6">
+                  {externalLinks?.map((link: any) => (
+                    <Card key={link.id} className="bg-card rounded-3xl border-border overflow-hidden shadow-lg p-6">
+                      <div className="grid md:grid-cols-3 gap-4 items-end">
+                        <div className="space-y-2">
+                          <Label className="text-xs font-bold uppercase">Judul Link</Label>
+                          <Input defaultValue={link.title} className="rounded-xl h-12 bg-background border-border font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'external-links', link.id), { title: e.target.value })} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-xs font-bold uppercase">Platform</Label>
+                          <Select 
+                            defaultValue={link.platform} 
+                            onValueChange={(val) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'external-links', link.id), { platform: val })}
+                          >
+                            <SelectTrigger className="rounded-xl h-12 bg-background border-border">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Shopee">Shopee</SelectItem>
+                              <SelectItem value="Tokopedia">Tokopedia</SelectItem>
+                              <SelectItem value="Lazada">Lazada</SelectItem>
+                              <SelectItem value="Website">Website Partner</SelectItem>
+                              <SelectItem value="Lainnya">Lainnya</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="flex gap-2">
+                          <div className="flex-1 space-y-2">
+                            <Label className="text-xs font-bold uppercase">URL / Link</Label>
+                            <Input defaultValue={link.url} className="rounded-xl h-12 bg-background border-border" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'external-links', link.id), { url: e.target.value })} />
+                          </div>
+                          <Button variant="destructive" size="icon" className="rounded-xl h-12 w-12 shrink-0" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'external-links', link.id))}><Trash2 size={18} /></Button>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                  {externalLinks?.length === 0 && (
+                    <div className="py-20 text-center opacity-20 uppercase font-black tracking-widest text-xs">Belum ada tautan eksternal (Marketplace/Web Partner)</div>
+                  )}
+                </div>
+             </div>
           )}
 
           {activeSection === 'portfolio' && (
