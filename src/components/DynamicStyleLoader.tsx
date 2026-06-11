@@ -72,23 +72,22 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
     root.style.setProperty('--input', input);
     root.style.setProperty('--card', card);
 
-    // 3. Handle Logo and Dynamic Favicon
+    // 3. Handle Logo, Dynamic Favicon & Home Screen Icons
     if (settings.logoUrl) {
       root.style.setProperty('--loading-logo', `url(${settings.logoUrl})`);
       root.classList.add('has-loading-logo');
       
-      // Update all favicon tags
-      const fav = document.getElementById('dynamic-favicon') as HTMLLinkElement;
-      const favShort = document.getElementById('dynamic-shortcut-icon') as HTMLLinkElement;
-      
-      if (fav) fav.href = settings.logoUrl;
-      if (favShort) favShort.href = settings.logoUrl;
+      const updateIcon = (id: string, url: string) => {
+        const el = document.getElementById(id) as HTMLLinkElement;
+        if (el) el.href = url;
+      };
 
-      // Force refresh for some browsers by appending a timestamp if needed, 
-      // but base64 usually doesn't need it.
+      updateIcon('dynamic-favicon', settings.logoUrl);
+      updateIcon('dynamic-shortcut-icon', settings.logoUrl);
+      updateIcon('dynamic-apple-icon', settings.logoUrl);
     }
 
-    // Save to Cache for instant reload
+    // Save to Cache for instant reload on next visit
     try {
       localStorage.setItem('goetnik-theme-cache', JSON.stringify({
         primary: selectedTheme.primary,
