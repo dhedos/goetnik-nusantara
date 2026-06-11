@@ -1,10 +1,8 @@
-
 "use client";
 
 import Image from 'next/image';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
-import { MAIN_BUSINESS_ID } from '@/lib/constants';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Maximize2 } from 'lucide-react';
 
@@ -42,24 +40,24 @@ export function Portfolio({ businessId }: PortfolioProps) {
           {portfolio.map((item: any, i: number) => (
             <div 
               key={item.id} 
-              className="relative group rounded-3xl overflow-hidden border border-border/10 shadow-xl bg-card transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 animate-fade-in"
+              className="relative group rounded-3xl overflow-hidden border border-border/10 shadow-xl bg-card transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 animate-fade-in break-inside-avoid"
               style={{ animationDelay: `${i * 100}ms` }}
             >
-              <div className="relative aspect-auto">
+              <div className="relative">
                 <Image 
                   src={item.imageUrl} 
                   alt="Hasil Karya" 
-                  width={600}
-                  height={800}
+                  width={800}
+                  height={1200}
                   className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-110" 
                   unoptimized 
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-8">
+                <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-8">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
+                    <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground shadow-lg">
                       <Maximize2 size={18} />
                     </div>
-                    <span className="text-xs font-bold uppercase tracking-widest text-white">Lihat Detail</span>
+                    <span className="text-xs font-bold uppercase tracking-widest text-white drop-shadow-md">Lihat Hasil Karya</span>
                   </div>
                 </div>
               </div>

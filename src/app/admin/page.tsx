@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
@@ -193,6 +192,15 @@ export default function AdminDashboard() {
       });
   };
 
+  const readFileAsDataURL = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: string) => {
     const file = e.target.files?.[0];
     if (!file || !user || !firestore) return;
@@ -203,9 +211,8 @@ export default function AdminDashboard() {
     }
 
     setIsUploading(target);
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64String = reader.result as string;
+    try {
+      const base64String = await readFileAsDataURL(file);
       if (target === 'logo') {
         setBusinessInfo(prev => ({ ...prev, logoUrl: base64String }));
       } else if (target === 'hero') {
@@ -216,10 +223,12 @@ export default function AdminDashboard() {
         const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'services', target);
         updateDoc(docRef, { imageUrl: base64String });
       }
-      setIsUploading(null);
       toast({ title: "Gambar Berhasil Dimuat", description: "Klik simpan untuk menerapkan." });
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      toast({ variant: "destructive", title: "Gagal", description: "Gagal memproses gambar." });
+    } finally {
+      setIsUploading(null);
+    }
   };
 
   const handleMultiplePortfolioUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -227,30 +236,32 @@ export default function AdminDashboard() {
     if (files.length === 0 || !user || !firestore) return;
 
     setIsUploading('portfolio');
-    let uploadedCount = 0;
+    let count = 0;
 
-    for (const file of files) {
-      if (file.size > 1024 * 1024) {
-        toast({ variant: "destructive", title: "File Terlalu Besar", description: `${file.name} melebihi 1MB.` });
-        continue;
-      }
+    try {
+      for (const file of files) {
+        if (file.size > 1024 * 1024) {
+          toast({ variant: "destructive", title: "File Terlalu Besar", description: `${file.name} melebihi 1MB.` });
+          continue;
+        }
 
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64String = reader.result as string;
+        const base64String = await readFileAsDataURL(file);
         const colRef = collection(firestore, 'businesses', MAIN_BUSINESS_ID, 'portfolio');
         await addDoc(colRef, {
           imageUrl: base64String,
           createdAt: serverTimestamp(),
           ownerId: user.uid
         });
-        uploadedCount++;
-        if (uploadedCount === files.length) {
-          setIsUploading(null);
-          toast({ title: "Berhasil", description: `${uploadedCount} foto portofolio telah diunggah.` });
-        }
-      };
-      reader.readAsDataURL(file);
+        count++;
+      }
+      toast({ title: "Berhasil", description: `${count} foto portofolio telah diunggah.` });
+    } catch (err) {
+      console.error(err);
+      toast({ variant: "destructive", title: "Gagal", description: "Beberapa gambar gagal diunggah." });
+    } finally {
+      setIsUploading(null);
+      // Reset input agar bisa pilih file yang sama jika perlu
+      e.target.value = '';
     }
   };
 
@@ -360,7 +371,7 @@ export default function AdminDashboard() {
             <div className="space-y-6">
               <Card className="rounded-3xl border-border bg-card shadow-xl overflow-hidden">
                 <CardHeader className="p-8 border-b border-border">
-                  <CardTitle className="flex items-center gap-2"><Grid3X3 size={20} className="text-primary" /> Galeri Portofolio</CardTitle>
+                  <CardTitle className="flex items-center gap-2"><Grid3X3 size={20} className="text-primary" /> Galeri Portofolio (Hasil Karya)</CardTitle>
                 </CardHeader>
                 <CardContent className="p-8 space-y-8">
                   <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-border rounded-3xl bg-primary/5 group hover:bg-primary/10 transition-all">
@@ -395,7 +406,7 @@ export default function AdminDashboard() {
                       </div>
                     ))}
                     {portfolio?.length === 0 && (
-                      <div className="col-span-full py-20 text-center opacity-20 uppercase font-black tracking-widest text-xs">Belum ada foto hasil karya</div>
+                      <div className="col-span-full py-20 text-center opacity-20 uppercase font-black tracking-widest text-xs">Belum ada foto hasil karya yang diunggah</div>
                     )}
                   </div>
                 </CardContent>
