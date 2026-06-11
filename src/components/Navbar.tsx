@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from 'next/link';
@@ -68,8 +67,8 @@ export function Navbar({ businessId }: NavbarProps) {
             </div>
           )}
           <div className="flex flex-col sm:flex-row sm:items-center text-lg md:text-2xl font-black font-headline tracking-tighter leading-none gap-0 sm:gap-2">
-            <span className="text-white uppercase italic">{logoText}</span>
-            <span className="text-primary uppercase italic">{logoAccentText}</span>
+            <span className="text-white">{logoText}</span>
+            <span className="text-primary">{logoAccentText}</span>
           </div>
         </Link>
 

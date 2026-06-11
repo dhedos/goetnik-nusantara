@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Cpu, Facebook, Instagram, Youtube, Fingerprint } from 'lucide-react';
