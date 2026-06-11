@@ -9,7 +9,6 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import { googleAI } from '@genkit-ai/google-genai';
 
 const ServiceSchema = z.object({
   name: z.string(),
@@ -37,7 +36,7 @@ export async function recommendService(input: AIServiceRecommendationInput): Pro
 
 const prompt = ai.definePrompt({
   name: 'aiServiceRecommendationPrompt',
-  model: googleAI.model('gemini-1.5-flash'),
+  model: 'googleai/gemini-1.5-flash',
   input: { schema: AIServiceRecommendationInputSchema },
   output: { schema: AIServiceRecommendationOutputSchema },
   prompt: `Anda adalah pakar teknologi dan konsultan layanan digital senior. Tugas Anda adalah membantu pelanggan memilih layanan terbaik dari daftar yang tersedia.
