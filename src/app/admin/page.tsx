@@ -18,7 +18,7 @@ import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
-  Settings, ShoppingBag, ExternalLink as ExternalLinkIcon, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, Type, Grid3X3, UploadCloud, Link as LinkIcon, ShoppingCart, Search, Map as MapIcon
+  Settings, ShoppingBag, ExternalLink as ExternalLinkIcon, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, Type, Grid3X3, UploadCloud, Link as LinkIcon, ShoppingCart, Search, Map as MapIcon, Palette
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -426,7 +426,7 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6 pt-4 border-t border-border">
-                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">WhatsApp (Utama)</Label><Input value={businessInfo.whatsapp} onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})} className="rounded-xl h-12 bg-background border-border font-bold" /></div>
+                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">WhatsApp</Label><Input value={businessInfo.whatsapp} onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})} className="rounded-xl h-12 bg-background border-border font-bold" /></div>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <Label className="text-xs font-bold uppercase">No Telp (Opsional)</Label>
@@ -465,7 +465,6 @@ export default function AdminDashboard() {
             </Card>
           )}
 
-          {/* ... bagian lainnya tetap sama ... */}
           {activeSection === 'links' && (
              <div className="space-y-6">
                 <Button onClick={handleAddExternalLink} size="lg" className="rounded-2xl px-12 h-16 font-black uppercase tracking-widest bg-primary text-primary-foreground hover:scale-105 transition-all shadow-2xl"><Plus className="mr-2" size={24} /> Tambah Tautan</Button>
