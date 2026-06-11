@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
@@ -13,12 +12,12 @@ import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
+import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc, serverTimestamp, query, orderBy, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
-  Settings, ShoppingBag, ExternalLink as ExternalLinkIcon, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, Type, Grid3X3, UploadCloud, Link as LinkIcon, ShoppingCart, Search, Map as MapIcon, Palette, Sparkles, Menu, Image as ImageIcon
+  Settings, ShoppingBag, ExternalLink as ExternalLinkIcon, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, Type, Grid3X3, UploadCloud, Link as LinkIcon, ShoppingCart, Search, Map as MapIcon, Palette, Sparkles, Menu, Image as ImageIcon, X
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -250,6 +249,40 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleServiceGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>, serviceId: string) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0 || !user || !firestore) return;
+    setIsUploading(`gallery-${serviceId}`);
+    try {
+      for (const file of files) {
+        const compressedBase64 = await resizeAndCompressImage(file, 1000, 0.6);
+        const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'services', serviceId);
+        await updateDoc(docRef, {
+          galleryUrls: arrayUnion(compressedBase64)
+        });
+      }
+      toast({ title: "Berhasil", description: "Foto galeri telah ditambahkan." });
+    } catch (err) {
+      toast({ variant: "destructive", title: "Gagal", description: "Gagal mengunggah foto galeri." });
+    } finally {
+      setIsUploading(null);
+      e.target.value = '';
+    }
+  };
+
+  const handleRemoveGalleryImage = async (serviceId: string, imageUrl: string) => {
+    if (!firestore) return;
+    try {
+      const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'services', serviceId);
+      await updateDoc(docRef, {
+        galleryUrls: arrayRemove(imageUrl)
+      });
+      toast({ title: "Berhasil", description: "Foto galeri dihapus." });
+    } catch (e) {
+      toast({ variant: "destructive", title: "Gagal", description: "Gagal menghapus foto." });
+    }
+  };
+
   const handleMultiplePortfolioUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0 || !user || !firestore) return;
@@ -284,6 +317,7 @@ export default function AdminDashboard() {
       description: 'Deskripsi layanan...',
       iconName: 'Monitor',
       imageUrl: '',
+      galleryUrls: [],
       features: ['Fitur Layanan'],
       ownerId: user.uid,
       createdAt: serverTimestamp()
@@ -362,7 +396,6 @@ export default function AdminDashboard() {
             <Button variant="ghost" size="icon"><Menu /></Button>
           </SheetTrigger>
           <SheetContent side="left" className="p-0 w-72 bg-card border-r border-border">
-            <SheetHeader className="sr-only"><SheetTitle>Menu Admin</SheetTitle></SheetHeader>
             <SidebarContent />
           </SheetContent>
         </Sheet>
@@ -605,29 +638,61 @@ export default function AdminDashboard() {
 
                 <div className="grid md:grid-cols-2 gap-6">
                   {services?.map((s: any) => (
-                    <Card key={s.id} className="bg-card rounded-3xl border-border overflow-hidden shadow-lg group">
+                    <Card key={s.id} className="bg-card rounded-3xl border-border overflow-hidden shadow-lg group flex flex-col">
                       <div className="h-56 bg-muted/20 relative overflow-hidden flex items-center justify-center">
                         {s.imageUrl ? (
                           <Image src={s.imageUrl} alt={s.name} fill className="object-cover transition-transform group-hover:scale-105" unoptimized />
                         ) : (
                           <div className="flex flex-col items-center gap-2 text-muted-foreground/30">
                             <ImageIcon size={48} />
-                            <span className="uppercase text-[10px] font-black tracking-widest">Belum Ada Gambar</span>
+                            <span className="uppercase text-[10px] font-black tracking-widest">Utama Belum Ada</span>
                           </div>
                         )}
                         <div className="absolute top-4 right-4 flex gap-2 z-10">
-                          <input type="file" className="hidden" id={`s-${s.id}`} accept="image/*" onChange={(e) => handleImageUpload(e, s.id)} />
-                          <Button variant="secondary" size="sm" asChild className="opacity-0 group-hover:opacity-100 transition-opacity shadow-lg rounded-full px-4"><label htmlFor={`s-${s.id}`}>Ubah Gambar</label></Button>
+                          <input type="file" className="hidden" id={`s-main-${s.id}`} accept="image/*" onChange={(e) => handleImageUpload(e, s.id)} />
+                          <Button variant="secondary" size="sm" asChild className="opacity-0 group-hover:opacity-100 transition-opacity shadow-lg rounded-full px-4"><label htmlFor={`s-main-${s.id}`}>Ganti Utama</label></Button>
                           <Button variant="destructive" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity shadow-lg h-9 w-9 rounded-full" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id))}><Trash2 size={16} /></Button>
                         </div>
                       </div>
-                      <CardContent className="p-6 space-y-4">
-                        <div className="space-y-1"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40">Nama Layanan</Label><Input defaultValue={s.name} className="rounded-xl h-12 bg-background border-border font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { name: e.target.value })} /></div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-1"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40">Harga / Biaya</Label><Input defaultValue={s.price} className="rounded-xl h-12 bg-background border-border font-bold text-primary" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { price: e.target.value })} /></div>
-                          <div className="space-y-1"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40">Ikon (Lucide)</Label><Input defaultValue={s.iconName} className="rounded-xl h-12 bg-background border-border font-mono text-xs" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { iconName: e.target.value })} /></div>
+                      
+                      <CardContent className="p-6 space-y-6 flex-1">
+                        <div className="space-y-4">
+                           <div className="flex items-center justify-between">
+                             <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Galeri Contoh Gambar</Label>
+                             <div className="relative">
+                                <input type="file" className="hidden" id={`s-gallery-${s.id}`} multiple accept="image/*" onChange={(e) => handleServiceGalleryUpload(e, s.id)} />
+                                <Button variant="outline" size="xs" asChild className="h-7 text-[10px] rounded-lg px-2"><label htmlFor={`s-gallery-${s.id}`}>{isUploading === `gallery-${s.id}` ? 'Loading...' : '+ Tambah Foto'}</label></Button>
+                             </div>
+                           </div>
+                           <div className="grid grid-cols-4 gap-2">
+                              {s.galleryUrls?.map((img: string, idx: number) => (
+                                <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-border group/gal">
+                                   <Image src={img} alt="Gallery" fill className="object-cover" unoptimized />
+                                   <button 
+                                      onClick={() => handleRemoveGalleryImage(s.id, img)}
+                                      className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover/gal:opacity-100 transition-opacity"
+                                   >
+                                      <X size={10} />
+                                   </button>
+                                </div>
+                              ))}
+                              {(!s.galleryUrls || s.galleryUrls.length === 0) && (
+                                <div className="col-span-4 border border-dashed border-border rounded-lg py-4 flex flex-col items-center justify-center opacity-30">
+                                   <ImageIcon size={16} />
+                                   <span className="text-[8px] uppercase mt-1">Galeri Kosong</span>
+                                </div>
+                              )}
+                           </div>
                         </div>
-                        <div className="space-y-1"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40">Deskripsi Singkat</Label><Textarea defaultValue={s.description} className="rounded-xl min-h-[100px] bg-background border-border text-sm leading-relaxed" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { description: e.target.value })} /></div>
+
+                        <div className="space-y-4 pt-4 border-t border-border">
+                          <div className="space-y-1"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40">Nama Layanan</Label><Input defaultValue={s.name} className="rounded-xl h-12 bg-background border-border font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { name: e.target.value })} /></div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40">Harga / Biaya</Label><Input defaultValue={s.price} className="rounded-xl h-12 bg-background border-border font-bold text-primary" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { price: e.target.value })} /></div>
+                            <div className="space-y-1"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40">Ikon (Lucide)</Label><Input defaultValue={s.iconName} className="rounded-xl h-12 bg-background border-border font-mono text-xs" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { iconName: e.target.value })} /></div>
+                          </div>
+                          <div className="space-y-1"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40">Deskripsi Singkat</Label><Textarea defaultValue={s.description} className="rounded-xl min-h-[100px] bg-background border-border text-sm leading-relaxed" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { description: e.target.value })} /></div>
+                        </div>
                       </CardContent>
                     </Card>
                   ))}

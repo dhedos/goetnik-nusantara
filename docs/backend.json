@@ -1,4 +1,3 @@
-
 {
   "entities": {
     "Service": {
@@ -10,7 +9,12 @@
         "price": { "type": "string" },
         "description": { "type": "string" },
         "iconName": { "type": "string" },
-        "imageUrl": { "type": "string", "description": "Base64 or URL of the service image." },
+        "imageUrl": { "type": "string", "description": "Main cover image." },
+        "galleryUrls": { 
+          "type": "array", 
+          "items": { "type": "string" },
+          "description": "Array of additional images for the service gallery."
+        },
         "features": { "type": "array", "items": { "type": "string" } },
         "createdAt": { "type": "string", "format": "date-time" },
         "ownerId": { "type": "string" }
