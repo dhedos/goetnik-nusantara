@@ -81,10 +81,11 @@ function HomeContent() {
 
   return (
     <>
-      <div className="flex flex-col min-h-screen animate-fade-in overflow-x-hidden">
-        <DynamicTitle businessId={businessId} />
-        <Navbar businessId={businessId} />
-        <main>
+      <DynamicTitle businessId={businessId} />
+      <Navbar businessId={businessId} />
+      
+      <div className="flex flex-col min-h-screen overflow-x-hidden">
+        <main className="animate-fade-in">
           {/* Hero Section */}
           <section className="relative min-h-[85vh] md:min-h-screen flex items-center pt-28 pb-20 px-4 md:px-8 overflow-hidden">
             <div className="absolute inset-0 -z-20">
@@ -104,19 +105,19 @@ function HomeContent() {
             
             <div className="max-w-7xl mx-auto w-full relative z-10">
               <div className="space-y-6 md:space-y-8 max-w-4xl">
-                <Badge variant="outline" className="animate-fade-in border-primary/20 text-primary px-5 py-2 bg-primary/5 backdrop-blur-xl rounded-full tracking-wider uppercase text-[10px] font-bold w-fit">
+                <Badge variant="outline" className="border-primary/20 text-primary px-5 py-2 bg-primary/5 backdrop-blur-xl rounded-full tracking-wider uppercase text-[10px] font-bold w-fit">
                   {heroBadge}
                 </Badge>
                 
-                <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold animate-fade-in leading-[1.1] md:leading-[1] text-foreground break-words">
+                <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[1.1] md:leading-[1] text-foreground break-words">
                   {heroTitle}
                 </h1>
 
-                <p className="text-base md:text-xl text-foreground/60 animate-fade-in leading-relaxed max-w-2xl delay-100">
+                <p className="text-base md:text-xl text-foreground/60 leading-relaxed max-w-2xl">
                   {heroSubtitle}
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-4 animate-fade-in pt-8 delay-200">
+                <div className="flex flex-col sm:flex-row gap-4 pt-8">
                   <Link href="#pesan">
                     <Button size="lg" className="rounded-xl w-full sm:w-auto px-10 shadow-xl shadow-primary/20 h-14 md:h-16 text-base font-bold uppercase tracking-wide hover:scale-105 transition-all">
                       Pesan Sekarang <ArrowRight className="ml-2 h-5 w-5" />
@@ -151,7 +152,7 @@ function HomeContent() {
               ) : services && services.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
                   {services.map((s: any, i: number) => (
-                    <div key={s.id} className="animate-fade-in" style={{ animationDelay: `${i * 100}ms` }}>
+                    <div key={s.id}>
                       <ServiceCard 
                         {...s} 
                         icon={ICON_MAP[s.iconName] || ICON_MAP.Monitor} 
