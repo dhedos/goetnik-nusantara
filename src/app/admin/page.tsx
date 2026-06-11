@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
@@ -8,12 +9,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
 import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
-  Settings, ShoppingBag, ExternalLink, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2
+  Settings, ShoppingBag, ExternalLink, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, MoveVertical
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -70,6 +72,7 @@ export default function AdminDashboard() {
     heroTitle: BUSINESS_NAME_DEFAULT,
     heroSubtitle: 'Kami melayani kebutuhan teknologi, desain grafis, dan pembuatan aplikasi secara profesional.',
     heroImageUrl: '',
+    heroImagePosition: '50%',
     aboutTitle: 'Tentang Bisnis Kami',
     aboutContent: '',
     servicesSectionBadge: 'Katalog Layanan',
@@ -93,11 +96,11 @@ export default function AdminDashboard() {
   }, [user, authLoading, router]);
 
   useEffect(() => {
-    // Hanya set state dari Firestore jika belum pernah dimuat (mencegah reset saat edit)
     if (settings && !hasLoadedSettings.current) {
       setBusinessInfo(prev => ({
         ...prev,
         ...settings,
+        heroImagePosition: settings.heroImagePosition || '50%'
       }));
       hasLoadedSettings.current = true;
     }
@@ -132,7 +135,6 @@ export default function AdminDashboard() {
           description: "Semua perubahan telah diterapkan ke website secara otomatis." 
         });
         setIsSaving(false);
-        // Izinkan sinkronisasi ulang setelah simpan manual
         hasLoadedSettings.current = false;
       })
       .catch((e) => {
@@ -211,6 +213,8 @@ export default function AdminDashboard() {
     { id: 'social', label: 'Media Sosial', icon: Instagram },
     { id: 'privacy', label: 'Privasi', icon: Shield },
   ];
+
+  const posValue = parseInt(businessInfo.heroImagePosition) || 50;
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#0B1120] text-foreground">
@@ -300,21 +304,50 @@ export default function AdminDashboard() {
 
           {activeSection === 'hero' && (
             <Card className="rounded-3xl border-white/5 bg-card/50">
-              <CardContent className="p-8 space-y-6">
+              <CardContent className="p-8 space-y-8">
                 <div className="space-y-4">
                   <Label className="text-xs font-bold uppercase">Gambar Banner (Hero)</Label>
-                  <div className="relative h-48 w-full bg-[#0B1120] rounded-2xl overflow-hidden border border-white/5">
-                    {businessInfo.heroImageUrl ? <Image src={businessInfo.heroImageUrl} alt="Hero" fill className="object-cover opacity-50" unoptimized /> : <Globe className="w-full h-full p-20 opacity-10" />}
-                    <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative h-64 w-full bg-[#0B1120] rounded-2xl overflow-hidden border border-white/5 group">
+                    {businessInfo.heroImageUrl ? (
+                      <Image 
+                        src={businessInfo.heroImageUrl} 
+                        alt="Hero" 
+                        fill 
+                        className="object-cover opacity-60 transition-all" 
+                        style={{ objectPosition: `center ${businessInfo.heroImagePosition}` }}
+                        unoptimized 
+                      />
+                    ) : (
+                      <Globe className="w-full h-full p-20 opacity-10" />
+                    )}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
                       <input type="file" className="hidden" id="hero-up" accept="image/*" onChange={(e) => handleImageUpload(e, 'hero')} />
-                      <Button asChild variant="secondary" className="cursor-pointer shadow-2xl rounded-xl z-20">
+                      <Button asChild variant="secondary" className="cursor-pointer shadow-2xl rounded-xl">
                         <label htmlFor="hero-up" className="cursor-pointer px-6 py-2">
-                          {isUploading === 'hero' ? 'Sedang Memuat...' : 'Ganti Banner'}
+                          {isUploading === 'hero' ? '...' : 'Ganti Banner'}
                         </label>
                       </Button>
                     </div>
                   </div>
                 </div>
+
+                <div className="space-y-6 p-6 bg-background/30 rounded-2xl border border-white/5">
+                  <div className="flex items-center justify-between mb-2">
+                    <Label className="text-xs font-bold uppercase flex items-center gap-2">
+                      <MoveVertical size={14} className="text-primary" /> Atur Posisi Gambar (Slide Vertikal)
+                    </Label>
+                    <Badge variant="outline" className="text-[10px] font-black">{businessInfo.heroImagePosition}</Badge>
+                  </div>
+                  <Slider 
+                    value={[posValue]} 
+                    max={100} 
+                    step={1} 
+                    onValueChange={(val) => setBusinessInfo({...businessInfo, heroImagePosition: `${val[0]}%`})} 
+                    className="py-4"
+                  />
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest text-center">Geser slider di atas untuk menyesuaikan fokus gambar banner</p>
+                </div>
+
                 <div className="space-y-4">
                   <div className="space-y-2"><Label className="text-xs font-bold uppercase">Badge Hero</Label><Input value={businessInfo.heroBadge} onChange={(e) => setBusinessInfo({...businessInfo, heroBadge: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" /></div>
                   <div className="space-y-2"><Label className="text-xs font-bold uppercase">Judul Hero</Label><Input value={businessInfo.heroTitle} onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" /></div>

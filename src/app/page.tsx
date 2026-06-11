@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from 'next/image';
@@ -80,6 +81,7 @@ function HomeContent() {
   const heroBadge = settings?.heroBadge || 'Solusi Digital Terpercaya';
   const heroTitle = settings?.heroTitle || BUSINESS_NAME_DEFAULT;
   const heroSubtitle = settings?.heroSubtitle || 'Kami melayani kebutuhan teknologi, desain grafis, dan pembuatan aplikasi secara profesional.';
+  const heroImagePos = settings?.heroImagePosition || '50%';
 
   return (
     <>
@@ -96,6 +98,7 @@ function HomeContent() {
                   alt="Hero" 
                   fill 
                   className="object-cover opacity-15 md:opacity-20 animate-[subtle-zoom_40s_infinite_alternate]" 
+                  style={{ objectPosition: `center ${heroImagePos}` }}
                   unoptimized={heroDisplayImage.startsWith('data:')} 
                   priority
                 />
