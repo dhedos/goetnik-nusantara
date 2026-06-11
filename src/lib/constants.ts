@@ -82,9 +82,9 @@ export const THEMES = [
   {
     id: 'vintage-cream',
     label: 'Vintage Cream (Terang)',
-    primary: '45 80% 35%', // Emas Tua
-    accent: '0 80% 15%',   // Marun Gelap
-    background: '40 50% 94%' // Cream Kertas Kuno
+    primary: '35 50% 30%', // Coklat Perunggu Hangat
+    accent: '0 70% 20%',   // Marun Gelap Aksen
+    background: '40 40% 94%' // Warm Cream (Kertas Kuno Lembut)
   },
   {
     id: 'deep-sea',

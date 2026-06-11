@@ -41,15 +41,31 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
     const lValue = parseInt(bgParts[2]);
     const isLight = lValue > 60;
     
-    let foreground = isLight ? '222 47% 11%' : '210 40% 98%';
-    let mutedForeground = isLight ? '215 16% 47%' : '215 20% 65%';
-    let border = isLight ? '214 32% 91%' : '217 19% 27% / 0.15';
-    let input = isLight ? '214 32% 91%' : '217 19% 27% / 0.1';
-    
+    // Logic for Light vs Dark Text/Borders
+    let foreground: string;
+    let mutedForeground: string;
+    let border: string;
+    let input: string;
+    let card: string;
+
     const h = bgParts[0];
     const s = bgParts[1];
-    const lCard = isLight ? lValue - 4 : lValue + 3;
-    let card = `${h} ${s} ${lCard}%`;
+
+    if (isLight) {
+      // Light theme adjustments (Vintage Cream etc)
+      foreground = '20 20% 12%'; // Warm dark charcoal/espresso
+      mutedForeground = '20 10% 40%'; // Soft brown-gray
+      border = '30 20% 85%'; // Subtle warm border
+      input = '30 20% 85% / 0.5';
+      card = `${h} ${s} ${Math.max(0, lValue - 3)}%`; // Slightly darker than BG
+    } else {
+      // Dark theme adjustments
+      foreground = '210 40% 98%';
+      mutedForeground = '215 20% 65%';
+      border = '217 19% 27% / 0.15';
+      input = '217 19% 27% / 0.1';
+      card = `${h} ${s} ${Math.min(100, lValue + 3)}%`; // Slightly lighter than BG
+    }
 
     document.documentElement.style.setProperty('--foreground', foreground);
     document.documentElement.style.setProperty('--card-foreground', foreground);
