@@ -83,7 +83,7 @@ export function Contact({ businessId }: ContactProps) {
                     <Mail size={20} />
                   </div>
                   <div>
-                    <h4 className="font-bold mb-1">Email Dukungan</h4>
+                    <h4 className="font-bold mb-1">Email</h4>
                     <p className="text-muted-foreground text-sm">{email}</p>
                   </div>
                 </CardContent>
