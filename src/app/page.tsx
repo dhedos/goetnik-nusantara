@@ -18,9 +18,25 @@ import { collection, doc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { ArrowRight, Loader2, Sparkles } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ICON_MAP, BUSINESS_NAME_DEFAULT, MAIN_BUSINESS_ID } from '@/lib/constants';
+
+const EthnicOrnament = ({ className }: { className?: string }) => (
+  <svg 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="1.5" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <path d="M12 2L14.5 9L22 9L16 14L18.5 21L12 17L5.5 21L8 14L2 9L9.5 9L12 2Z" />
+    <circle cx="12" cy="12" r="3" />
+    <path d="M12 7V5M12 19V17M7 12H5M19 12H17M8.5 8.5L7 7M17 17L15.5 15.5M15.5 8.5L17 7M7 17L8.5 15.5" />
+  </svg>
+);
 
 function LoadingScreen({ text }: { text: string }) {
   return (
@@ -33,7 +49,7 @@ function LoadingScreen({ text }: { text: string }) {
           <div className="absolute inset-0 rounded-2xl border-2 border-primary/10 rotate-45 animate-[spin_6s_linear_infinite]" />
           <div className="absolute inset-0 rounded-2xl border-2 border-t-primary/80 border-r-transparent border-b-transparent border-l-transparent rotate-45 animate-[spin_2s_linear_infinite] shadow-[0_0_30px_rgba(var(--primary),0.2)]" />
           <div className="absolute inset-0 flex items-center justify-center">
-            <Sparkles className="h-6 w-6 md:h-8 md:h-8 text-primary animate-pulse" />
+            <EthnicOrnament className="h-8 w-8 md:h-10 md:w-10 text-primary animate-pulse" />
           </div>
         </div>
 
