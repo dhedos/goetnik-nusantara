@@ -21,7 +21,11 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Cinzel:wght@400;700;900&family=Marcellus&family=Almendra:wght@400;700&family=Lora:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-        <link id="dynamic-favicon" rel="icon" href="/favicon.ico" />
+        
+        {/* Favicon Placeholder - Akan diganti secara dinamis */}
+        <link id="dynamic-favicon" rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>" />
+        <link id="dynamic-shortcut-icon" rel="shortcut icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>" />
+
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -40,8 +44,12 @@ export default function RootLayout({
                     if (theme.logoUrl) {
                       root.style.setProperty('--loading-logo', 'url(' + theme.logoUrl + ')');
                       root.classList.add('has-loading-logo');
-                      const favicon = document.getElementById('dynamic-favicon');
-                      if (favicon) favicon.href = theme.logoUrl;
+                      
+                      // Update Favicon Segera dari Cache
+                      const fav = document.getElementById('dynamic-favicon');
+                      const favShort = document.getElementById('dynamic-shortcut-icon');
+                      if (fav) fav.href = theme.logoUrl;
+                      if (favShort) favShort.href = theme.logoUrl;
                     }
                   }
                 } catch (e) {}

@@ -77,10 +77,15 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
       root.style.setProperty('--loading-logo', `url(${settings.logoUrl})`);
       root.classList.add('has-loading-logo');
       
-      const favicon = document.getElementById('dynamic-favicon') as HTMLLinkElement;
-      if (favicon) {
-        favicon.href = settings.logoUrl;
-      }
+      // Update all favicon tags
+      const fav = document.getElementById('dynamic-favicon') as HTMLLinkElement;
+      const favShort = document.getElementById('dynamic-shortcut-icon') as HTMLLinkElement;
+      
+      if (fav) fav.href = settings.logoUrl;
+      if (favShort) favShort.href = settings.logoUrl;
+
+      // Force refresh for some browsers by appending a timestamp if needed, 
+      // but base64 usually doesn't need it.
     }
 
     // Save to Cache for instant reload
