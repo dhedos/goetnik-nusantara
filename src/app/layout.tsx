@@ -1,4 +1,4 @@
-import type {Metadata} from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { FirebaseClientProvider } from '@/firebase';
 import { Toaster } from '@/components/ui/toaster';
@@ -8,7 +8,12 @@ import { DynamicStyleLoader } from '@/components/DynamicStyleLoader';
 export const metadata: Metadata = {
   title: 'Pusat Layanan Digital & Service',
   description: 'Solusi profesional untuk kebutuhan teknologi, desain, dan aplikasi Anda.',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({
@@ -23,10 +28,10 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Cinzel:wght@400;700;900&family=Marcellus&family=Almendra:wght@400;700&family=Lora:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
         
-        {/* Dynamic Metadata Tags for Branding & Home Screen */}
-        <link id="dynamic-favicon" rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>" />
-        <link id="dynamic-shortcut-icon" rel="shortcut icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>" />
-        <link id="dynamic-apple-icon" rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>" />
+        {/* Transparent initial placeholders to avoid Firebase/Vercel default icon flash */}
+        <link id="dynamic-favicon" rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1 1%22></svg>" />
+        <link id="dynamic-shortcut-icon" rel="shortcut icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1 1%22></svg>" />
+        <link id="dynamic-apple-icon" rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1 1%22></svg>" />
 
         <script
           dangerouslySetInnerHTML={{
@@ -45,7 +50,7 @@ export default function RootLayout({
                       root.style.setProperty('--loading-logo', 'url(' + theme.logoUrl + ')');
                       root.classList.add('has-loading-logo');
                       
-                      // Update Icons from Cache immediately to prevent Firebase default favicon flash
+                      // Immediate Icon Update from Cache
                       const fav = document.getElementById('dynamic-favicon');
                       const favShort = document.getElementById('dynamic-shortcut-icon');
                       const appleIcon = document.getElementById('dynamic-apple-icon');
