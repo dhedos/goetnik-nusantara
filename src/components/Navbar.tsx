@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from 'next/link';
@@ -51,11 +50,11 @@ export function Navbar({ businessId }: NavbarProps) {
       scrolled ? "bg-background/90 backdrop-blur-xl border-b border-white/5 py-3 shadow-xl" : "bg-transparent"
     )}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3 group">
+        <Link href="/" className="flex items-center gap-2 md:gap-3 group max-w-[70%] sm:max-w-none">
           {logoUrl ? (
             <div 
               className="relative shrink-0 transition-all duration-300 flex items-center"
-              style={{ height: `${logoH}px` }}
+              style={{ height: scrolled ? `${Math.max(24, logoH * 0.7)}px` : `${logoH}px` }}
             >
               <img 
                 src={logoUrl} 
@@ -67,14 +66,17 @@ export function Navbar({ businessId }: NavbarProps) {
           ) : (
             <div 
               className="rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-lg group-hover:scale-105 transition-all shrink-0"
-              style={{ height: `${logoH}px`, width: `${logoH}px` }}
+              style={{ 
+                height: scrolled ? `${Math.max(24, logoH * 0.7)}px` : `${logoH}px`, 
+                width: scrolled ? `${Math.max(24, logoH * 0.7)}px` : `${logoH}px` 
+              }}
             >
-              <Cpu size={logoH * 0.5} />
+              <Cpu size={scrolled ? Math.max(12, logoH * 0.35) : logoH * 0.5} />
             </div>
           )}
-          <div className="flex flex-col sm:flex-row sm:items-center text-lg md:text-xl font-bold leading-none gap-0 sm:gap-1.5">
-            <span className="text-white">{logoText}</span>
-            <span className="text-primary">{logoAccentText}</span>
+          <div className="flex flex-col sm:flex-row sm:items-center text-sm sm:text-base md:text-xl font-bold leading-none gap-0 sm:gap-1.5 truncate">
+            <span className="text-white truncate">{logoText}</span>
+            <span className="text-primary truncate">{logoAccentText}</span>
           </div>
         </Link>
 
@@ -96,21 +98,21 @@ export function Navbar({ businessId }: NavbarProps) {
 
         {/* Mobile Toggle */}
         <button 
-          className="md:hidden text-white p-2"
+          className="md:hidden text-white p-2 shrink-0"
           onClick={() => setIsOpen(!isOpen)}
         >
-          {isOpen ? <X size={28} /> : <Menu size={28} />}
+          {isOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden fixed inset-x-0 top-[64px] bg-background/98 backdrop-blur-2xl border-b border-white/5 p-8 flex flex-col gap-2 animate-in slide-in-from-top-4 duration-300 z-[99]">
+        <div className="md:hidden fixed inset-x-0 top-[60px] md:top-[64px] bg-background/98 backdrop-blur-2xl border-b border-white/5 p-8 flex flex-col gap-2 animate-in slide-in-from-top-4 duration-300 z-[99] h-[calc(100vh-60px)] overflow-y-auto">
           {NAV_LINKS.map((link) => (
             <Link 
               key={link.name} 
               href={link.href}
-              className="text-xl font-bold uppercase tracking-wide py-5 border-b border-white/5 text-white/90"
+              className="text-lg font-bold uppercase tracking-wide py-5 border-b border-white/5 text-white/90"
               onClick={() => setIsOpen(false)}
             >
               {link.name}

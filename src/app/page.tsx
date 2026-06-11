@@ -53,7 +53,7 @@ function LoadingScreen({ text }: { text: string }) {
           </div>
         </div>
 
-        <h2 className="text-foreground text-lg md:text-2xl font-bold tracking-[0.1em] mb-8 animate-pulse px-4">
+        <h2 className="text-foreground text-base md:text-2xl font-bold tracking-[0.1em] mb-8 animate-pulse px-4">
           {text}
         </h2>
 
@@ -103,7 +103,7 @@ function HomeContent() {
       <div className="flex flex-col min-h-screen overflow-x-hidden">
         <main className="animate-fade-in">
           {/* Hero Section */}
-          <section className="relative min-h-[85vh] md:min-h-screen flex items-center pt-28 pb-20 px-4 md:px-8 overflow-hidden">
+          <section className="relative min-h-[85vh] md:min-h-screen flex items-center pt-24 md:pt-28 pb-20 px-4 md:px-8 overflow-hidden">
             <div className="absolute inset-0 -z-20">
               {heroDisplayImage && (
                 <Image 
@@ -121,26 +121,26 @@ function HomeContent() {
             
             <div className="max-w-7xl mx-auto w-full relative z-10">
               <div className="space-y-6 md:space-y-8 max-w-4xl">
-                <Badge variant="outline" className="border-primary/20 text-primary px-5 py-2 bg-primary/5 backdrop-blur-xl rounded-full tracking-wider uppercase text-[10px] font-bold w-fit">
+                <Badge variant="outline" className="border-primary/20 text-primary px-4 md:px-5 py-1.5 md:py-2 bg-primary/5 backdrop-blur-xl rounded-full tracking-wider uppercase text-[9px] md:text-[10px] font-bold w-fit">
                   {heroBadge}
                 </Badge>
                 
-                <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[1.1] md:leading-[1] text-foreground break-words">
+                <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.2] md:leading-[1] text-foreground break-words">
                   {heroTitle}
                 </h1>
 
-                <p className="text-base md:text-xl text-foreground/60 leading-relaxed max-w-2xl">
+                <p className="text-sm md:text-xl text-foreground/60 leading-relaxed max-w-2xl px-1">
                   {heroSubtitle}
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-4 pt-8">
-                  <Link href="#pesan">
-                    <Button size="lg" className="rounded-xl w-full sm:w-auto px-10 shadow-xl shadow-primary/20 h-14 md:h-16 text-base font-bold uppercase tracking-wide hover:scale-105 transition-all">
-                      Pesan Sekarang <ArrowRight className="ml-2 h-5 w-5" />
+                <div className="flex flex-col sm:flex-row gap-4 pt-6 md:pt-8">
+                  <Link href="#pesan" className="w-full sm:w-auto">
+                    <Button size="lg" className="rounded-xl w-full px-8 md:px-10 shadow-xl shadow-primary/20 h-14 md:h-16 text-sm md:text-base font-bold uppercase tracking-wide hover:scale-105 transition-all">
+                      Pesan Sekarang <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5" />
                     </Button>
                   </Link>
-                  <Link href="#layanan">
-                    <Button variant="outline" size="lg" className="rounded-xl w-full sm:w-auto px-10 h-14 md:h-16 text-base font-bold border-border/10 bg-foreground/5 backdrop-blur-2xl hover:bg-foreground/10 transition-all">
+                  <Link href="#layanan" className="w-full sm:w-auto">
+                    <Button variant="outline" size="lg" className="rounded-xl w-full px-8 md:px-10 h-14 md:h-16 text-sm md:text-base font-bold border-border/10 bg-foreground/5 backdrop-blur-2xl hover:bg-foreground/10 transition-all">
                       Lihat Layanan
                     </Button>
                   </Link>
@@ -152,12 +152,12 @@ function HomeContent() {
           <AIAssistant businessId={businessId} />
           
           {/* Services Section */}
-          <section id="layanan" className="py-24 md:py-32 px-4 md:px-8 bg-secondary/5 relative">
+          <section id="layanan" className="py-20 md:py-32 px-4 md:px-8 bg-secondary/5 relative">
             <div className="max-w-7xl mx-auto">
-              <div className="text-center mb-16 md:mb-20 space-y-4">
-                <Badge variant="outline" className="uppercase tracking-widest px-4 py-1 border-primary/20 text-primary bg-primary/5 font-bold text-[10px]">Premium Solutions</Badge>
-                <h2 className="text-3xl md:text-5xl font-bold text-foreground uppercase">Layanan Unggulan</h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto text-sm md:text-base font-medium">Solusi kreatif dan teknologi modern untuk mempercepat pertumbuhan bisnis Anda.</p>
+              <div className="text-center mb-12 md:mb-20 space-y-4">
+                <Badge variant="outline" className="uppercase tracking-widest px-4 py-1 border-primary/20 text-primary bg-primary/5 font-bold text-[9px] md:text-[10px]">Premium Solutions</Badge>
+                <h2 className="text-2xl md:text-5xl font-bold text-foreground uppercase">Layanan Unggulan</h2>
+                <p className="text-muted-foreground max-w-2xl mx-auto text-xs md:text-base font-medium px-4">Solusi kreatif dan teknologi modern untuk mempercepat pertumbuhan bisnis Anda.</p>
               </div>
               
               {servicesLoading ? (

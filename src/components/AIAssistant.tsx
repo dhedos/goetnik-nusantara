@@ -62,77 +62,77 @@ export function AIAssistant({ businessId }: AIAssistantProps) {
       
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <Badge variant="outline" className="mb-4 py-1 px-4 border-primary/50 text-primary uppercase tracking-widest flex w-fit mx-auto gap-2 items-center">
+          <Badge variant="outline" className="mb-4 py-1 px-4 border-primary/50 text-primary uppercase tracking-widest flex w-fit mx-auto gap-2 items-center text-[10px] md:text-xs">
             <Sparkles size={14} /> AI Diagnostic Tool
           </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold font-headline mb-4">Bingung Pilih Layanan?</h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Ceritakan masalah teknis Anda, dan asisten AI kami akan merekomendasikan paket layanan yang paling tepat dari daftar layanan aktif kami.
+          <h2 className="text-2xl md:text-4xl font-bold font-headline mb-4">Bingung Pilih Layanan?</h2>
+          <p className="text-muted-foreground text-sm md:text-lg max-w-2xl mx-auto px-2">
+            Ceritakan masalah teknis Anda, dan asisten AI kami akan merekomendasikan paket layanan yang paling tepat.
           </p>
         </div>
 
         <Card className="glass-card border-primary/20 shadow-2xl overflow-hidden">
-          <CardContent className="p-6 md:p-8 space-y-6">
+          <CardContent className="p-5 md:p-8 space-y-6">
             <div className="space-y-4">
               <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <MessageSquare size={16} /> Deskripsikan Masalah Anda
               </label>
               <Textarea 
-                placeholder="Contoh: Laptop saya lambat sekali saat membuka Chrome dan sering muncul layar biru (BSOD)..."
-                className="min-h-[120px] bg-background/50 text-lg border-white/10 focus:border-primary transition-all"
+                placeholder="Contoh: Laptop saya lambat sekali saat membuka Chrome..."
+                className="min-h-[120px] bg-background/50 text-base md:text-lg border-white/10 focus:border-primary transition-all rounded-xl"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
             </div>
             
             <Button 
-              className="w-full py-6 text-lg rounded-xl font-bold shadow-xl shadow-primary/20 transition-all hover:scale-[1.01]"
+              className="w-full py-6 md:py-7 text-base md:text-lg rounded-xl font-bold shadow-xl shadow-primary/20 transition-all hover:scale-[1.01]"
               onClick={handleDiagnose}
               disabled={loading || !description.trim() || !services}
             >
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Sedang Menganalisis...
+                  Menganalisis...
                 </>
               ) : (
                 <>
                   <Sparkles className="mr-2 h-5 w-5" />
-                  Dapatkan Rekomendasi AI
+                  Rekomendasi AI
                 </>
               )}
             </Button>
 
             {error && (
-              <div className="flex items-center gap-2 text-destructive bg-destructive/10 p-4 rounded-lg">
-                <AlertCircle size={20} />
-                <p className="text-sm">{error}</p>
+              <div className="flex items-start gap-2 text-destructive bg-destructive/10 p-4 rounded-xl">
+                <AlertCircle size={20} className="shrink-0 mt-0.5" />
+                <p className="text-xs md:text-sm">{error}</p>
               </div>
             )}
 
             {result && (
               <div className="mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <div className="p-6 rounded-2xl bg-primary/10 border border-primary/20">
-                  <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
+                <div className="p-5 md:p-6 rounded-2xl bg-primary/10 border border-primary/20">
+                  <div className="flex flex-col md:flex-row md:items-start justify-between gap-3 mb-4">
                     <div>
-                      <h4 className="text-sm font-semibold uppercase tracking-wider text-primary mb-1">Rekomendasi Kami:</h4>
-                      <h3 className="text-2xl font-bold">{result.recommendedService}</h3>
+                      <h4 className="text-[10px] font-semibold uppercase tracking-wider text-primary mb-1">Rekomendasi Kami:</h4>
+                      <h3 className="text-xl md:text-2xl font-bold">{result.recommendedService}</h3>
                     </div>
-                    <Badge className="bg-primary text-primary-foreground py-1 px-4 text-sm">Akurasi Tinggi</Badge>
+                    <Badge className="bg-primary text-primary-foreground py-1 px-3 text-[10px] md:text-xs w-fit">Akurasi Tinggi</Badge>
                   </div>
-                  <p className="text-muted-foreground mb-4 leading-relaxed">
+                  <p className="text-muted-foreground mb-4 text-xs md:text-base leading-relaxed">
                     {result.serviceDescription}
                   </p>
                   <div className="pt-4 border-t border-primary/10">
-                    <p className="text-sm italic text-foreground/80">
+                    <p className="text-[11px] md:text-sm italic text-foreground/80">
                       " {result.reason} "
                     </p>
                   </div>
-                  <div className="mt-6 flex flex-wrap gap-4">
-                    <Button asChild className="flex-1 rounded-xl">
+                  <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                    <Button asChild className="flex-1 rounded-xl h-12">
                       <a href="#pesan">Pesan Sekarang</a>
                     </Button>
-                    <Button variant="outline" className="flex-1 rounded-xl border-primary/30" onClick={() => setResult(null)}>
+                    <Button variant="outline" className="flex-1 rounded-xl h-12 border-primary/30" onClick={() => setResult(null)}>
                       Analisis Lagi
                     </Button>
                   </div>
