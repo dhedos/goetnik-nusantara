@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect } from 'react';
@@ -13,19 +12,18 @@ export function FirebaseErrorListener() {
         const isMainPath = error.context.path.includes('main');
         const isReadOperation = error.context.operation === 'get' || error.context.operation === 'list';
         
-        // Hanya abaikan error JIKA itu adalah operasi pembacaan (get/list) pada jalur utama (saat auth init)
-        // Jika itu operasi penulisan (write/create/update) atau pada jalur lain, tampilkan detailnya.
+        // Hanya abaikan error JIKA itu adalah operasi pembacaan (get/list) pada jalur utama saat auth init
         if (!(isMainPath && isReadOperation)) {
-          console.error('Firestore Access Denied Details:', JSON.stringify({
+          console.error('Firestore Access Denied Details:', {
             path: error.context.path,
             operation: error.context.operation,
             message: error.message
-          }, null, 2));
+          });
 
           toast({
             variant: "destructive",
             title: "Akses Ditolak",
-            description: `Gagal mengakses ${error.context.path}. Pastikan Anda memiliki izin.`,
+            description: `Gagal melakukan ${error.context.operation} pada ${error.context.path}.`,
           });
         }
       }
