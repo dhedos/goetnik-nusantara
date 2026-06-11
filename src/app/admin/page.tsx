@@ -189,12 +189,34 @@ export default function AdminDashboard() {
       });
   };
 
-  const readFileAsDataURL = (file: File): Promise<string> => {
+  const resizeAndCompressImage = (file: File, maxWidth: number = 1200, quality: number = 0.7): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = reject;
       reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new window.Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth) {
+            height = (maxWidth / width) * height;
+            width = maxWidth;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+          resolve(compressedBase64);
+        };
+        img.onerror = reject;
+      };
+      reader.onerror = reject;
     });
   };
 
@@ -202,21 +224,23 @@ export default function AdminDashboard() {
     const file = e.target.files?.[0];
     if (!file || !user || !firestore) return;
 
-    if (file.size > 1024 * 1024) { 
-      toast({ variant: "destructive", title: "File Terlalu Besar", description: "Maksimal 1MB." });
+    // Batasan awal 1MB sebelum kompresi untuk keamanan
+    if (file.size > 1024 * 1024 * 2) { 
+      toast({ variant: "destructive", title: "File Terlalu Besar", description: "Maksimal 2MB sebelum kompresi." });
       return;
     }
 
     setIsUploading(target);
     try {
-      const base64String = await readFileAsDataURL(file);
+      const compressedBase64 = await resizeAndCompressImage(file);
+      
       if (target === 'logo') {
-        setBusinessInfo(prev => ({ ...prev, logoUrl: base64String }));
+        setBusinessInfo(prev => ({ ...prev, logoUrl: compressedBase64 }));
       } else if (target === 'hero') {
-        setBusinessInfo(prev => ({ ...prev, heroImageUrl: base64String }));
+        setBusinessInfo(prev => ({ ...prev, heroImageUrl: compressedBase64 }));
       } else {
         const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'services', target);
-        updateDoc(docRef, { imageUrl: base64String });
+        updateDoc(docRef, { imageUrl: compressedBase64 });
       }
       toast({ title: "Gambar Berhasil Dimuat", description: "Klik simpan untuk menerapkan." });
     } catch (err) {
@@ -235,15 +259,16 @@ export default function AdminDashboard() {
 
     try {
       for (const file of files) {
-        if (file.size > 1024 * 1024) {
-          toast({ variant: "destructive", title: "File Terlalu Besar", description: `${file.name} melebihi 1MB.` });
+        // Lewati file yang sangat besar sebelum kompresi
+        if (file.size > 1024 * 1024 * 3) {
+          toast({ variant: "destructive", title: "File Terlalu Besar", description: `${file.name} melebihi 3MB.` });
           continue;
         }
 
-        const base64String = await readFileAsDataURL(file);
+        const compressedBase64 = await resizeAndCompressImage(file, 1000, 0.6);
         const colRef = collection(firestore, 'businesses', MAIN_BUSINESS_ID, 'portfolio');
         await addDoc(colRef, {
-          imageUrl: base64String,
+          imageUrl: compressedBase64,
           createdAt: serverTimestamp(),
           ownerId: user.uid
         });
@@ -252,7 +277,7 @@ export default function AdminDashboard() {
       toast({ title: "Berhasil", description: `${count} foto portofolio telah diunggah.` });
     } catch (err) {
       console.error(err);
-      toast({ variant: "destructive", title: "Gagal", description: "Beberapa gambar gagal diunggah." });
+      toast({ variant: "destructive", title: "Gagal", description: "Beberapa gambar gagal diunggah karena ukuran dokumen Firestore terbatas (1MB)." });
     } finally {
       setIsUploading(null);
       e.target.value = '';
@@ -383,7 +408,7 @@ export default function AdminDashboard() {
                       </div>
                       <div className="text-center">
                         <p className="font-bold text-lg">Klik untuk Unggah Foto Karya</p>
-                        <p className="text-sm text-muted-foreground uppercase tracking-widest mt-1">Bisa pilih banyak foto sekaligus (Maks 1MB/foto)</p>
+                        <p className="text-sm text-muted-foreground uppercase tracking-widest mt-1">Bisa pilih banyak foto sekaligus (Auto-Compress)</p>
                       </div>
                     </label>
                   </div>
