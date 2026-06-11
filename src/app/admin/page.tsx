@@ -412,7 +412,7 @@ export default function AdminDashboard() {
                     <Card key={link.id} className="bg-card rounded-3xl border-border overflow-hidden shadow-lg p-6">
                       <div className="grid md:grid-cols-3 gap-4 items-end">
                         <div className="space-y-2">
-                          <Label className="text-xs font-bold uppercase">Judul Link</Label>
+                          <Label className="text-xs font-bold uppercase">Judul Link (Contoh: Shopee Store)</Label>
                           <Input defaultValue={link.title} className="rounded-xl h-12 bg-background border-border font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'external-links', link.id), { title: e.target.value })} />
                         </div>
                         <div className="space-y-2">
@@ -435,7 +435,7 @@ export default function AdminDashboard() {
                         </div>
                         <div className="flex gap-2">
                           <div className="flex-1 space-y-2">
-                            <Label className="text-xs font-bold uppercase">URL / Link</Label>
+                            <Label className="text-xs font-bold uppercase">URL / Link Lengkap</Label>
                             <Input defaultValue={link.url} className="rounded-xl h-12 bg-background border-border" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'external-links', link.id), { url: e.target.value })} />
                           </div>
                           <Button variant="destructive" size="icon" className="rounded-xl h-12 w-12 shrink-0" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'external-links', link.id))}><Trash2 size={18} /></Button>
