@@ -22,52 +22,54 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
   const displayImage = imageUrl || placeholder?.imageUrl;
 
   return (
-    <Card className="flex flex-col h-full bg-card/40 border-white/5 hover:border-primary/40 transition-all duration-500 group overflow-hidden rounded-[2rem] shadow-2xl hover:shadow-primary/5">
-      <div className="relative h-56 overflow-hidden">
+    <Card className="flex flex-col h-full bg-card/40 border-white/5 hover:border-primary/30 transition-all duration-500 group overflow-hidden rounded-2xl shadow-xl">
+      <div className="relative h-48 overflow-hidden">
         {displayImage && (
           <Image 
             src={displayImage}
             alt={name}
             fill
-            className="object-cover group-hover:scale-110 transition-transform duration-700"
+            className="object-cover group-hover:scale-105 transition-transform duration-700"
             unoptimized={!!imageUrl}
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
-        <div className="absolute bottom-6 left-6 flex items-center gap-4">
-          <div className="p-3 rounded-2xl bg-primary text-primary-foreground shadow-2xl">
-            <Icon size={24} />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+        <div className="absolute bottom-4 left-6 right-6">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="p-2 rounded-lg bg-primary text-primary-foreground shadow-lg">
+              <Icon size={18} />
+            </div>
+            <CardTitle className="text-lg font-bold text-white">{name}</CardTitle>
           </div>
-          <CardTitle className="text-2xl font-black italic uppercase tracking-tighter text-white drop-shadow-2xl">{name}</CardTitle>
         </div>
       </div>
       
-      <CardHeader className="pt-8 px-8">
-        <div className="flex justify-between items-baseline mb-5">
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Mulai Dari</span>
-          <span className="text-2xl font-black text-accent tracking-tighter italic">{price}</span>
+      <CardHeader className="pt-6 px-6">
+        <div className="flex justify-between items-baseline mb-4">
+          <span className="text-[9px] font-bold uppercase tracking-widest text-primary">Estimasi Biaya</span>
+          <span className="text-xl font-bold text-accent">{price}</span>
         </div>
-        <p className="text-muted-foreground/80 text-sm leading-relaxed font-medium">
+        <p className="text-white/60 text-xs leading-relaxed">
           {description}
         </p>
       </CardHeader>
       
-      <CardContent className="flex-1 px-8 pt-4">
-        <div className="space-y-3">
+      <CardContent className="flex-1 px-6 pt-2">
+        <div className="space-y-2.5">
           {features && features.map((feature, i) => (
-            <div key={i} className="flex items-center gap-3 text-[13px] font-medium">
-              <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                <Check size={12} strokeWidth={3} />
+            <div key={i} className="flex items-center gap-2.5 text-[11px] font-medium">
+              <div className="w-4 h-4 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                <Check size={10} strokeWidth={3} />
               </div>
-              <span className="text-white/70">{feature}</span>
+              <span className="text-white/50">{feature}</span>
             </div>
           ))}
         </div>
       </CardContent>
       
-      <CardFooter className="p-8 pt-6">
-        <Button asChild className="w-full rounded-2xl h-14 font-black uppercase italic tracking-tighter text-sm hover:scale-[1.02] transition-all" variant="outline">
-          <a href="#pesan">Pesan Sekarang</a>
+      <CardFooter className="p-6 pt-4">
+        <Button asChild className="w-full rounded-xl h-11 font-bold uppercase tracking-wider text-[11px] hover:scale-[1.02] transition-all" variant="outline">
+          <a href="#pesan">Pilih Layanan</a>
         </Button>
       </CardFooter>
     </Card>

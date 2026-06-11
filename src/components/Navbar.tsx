@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -46,12 +47,12 @@ export function Navbar({ businessId }: NavbarProps) {
   return (
     <nav className={cn(
       "fixed top-0 left-0 right-0 z-[100] transition-all duration-300 px-4 md:px-8 py-4",
-      scrolled ? "bg-background/90 backdrop-blur-xl border-b border-white/5 py-3 shadow-2xl" : "bg-transparent"
+      scrolled ? "bg-background/90 backdrop-blur-xl border-b border-white/5 py-3 shadow-xl" : "bg-transparent"
     )}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 md:gap-3 group">
           {logoUrl ? (
-            <div className="relative h-8 w-8 md:h-10 md:w-10 shrink-0">
+            <div className="relative h-8 w-8 md:h-9 md:w-9 shrink-0">
               <Image 
                 src={logoUrl} 
                 alt="Logo" 
@@ -62,28 +63,28 @@ export function Navbar({ businessId }: NavbarProps) {
               />
             </div>
           ) : (
-            <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-xl shadow-primary/20 group-hover:scale-110 transition-transform shrink-0">
-              <Cpu size={20} />
+            <div className="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-lg group-hover:scale-105 transition-transform shrink-0">
+              <Cpu size={18} />
             </div>
           )}
-          <div className="flex flex-col sm:flex-row sm:items-center text-lg md:text-2xl font-black font-headline tracking-tighter leading-none gap-0 sm:gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center text-lg md:text-xl font-bold leading-none gap-0 sm:gap-1.5">
             <span className="text-white">{logoText}</span>
             <span className="text-primary">{logoAccentText}</span>
           </div>
         </Link>
 
         {/* Desktop Links */}
-        <div className="hidden md:flex items-center gap-10">
+        <div className="hidden md:flex items-center gap-8">
           {NAV_LINKS.map((link) => (
             <Link 
               key={link.name} 
               href={link.href}
-              className="text-[13px] uppercase tracking-widest font-black text-white/60 hover:text-primary transition-all"
+              className="text-[11px] uppercase tracking-widest font-bold text-white/70 hover:text-primary transition-all"
             >
               {link.name}
             </Link>
           ))}
-          <Button asChild size="lg" className="rounded-full px-8 font-black uppercase italic tracking-tighter text-sm shadow-xl shadow-primary/20">
+          <Button asChild size="sm" className="rounded-full px-6 font-bold uppercase text-[11px] tracking-wider shadow-lg shadow-primary/20">
             <Link href="#pesan">Pesan Sekarang</Link>
           </Button>
         </div>
@@ -93,24 +94,24 @@ export function Navbar({ businessId }: NavbarProps) {
           className="md:hidden text-white p-2"
           onClick={() => setIsOpen(!isOpen)}
         >
-          {isOpen ? <X size={32} /> : <Menu size={32} />}
+          {isOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
       </div>
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden fixed inset-x-0 top-[72px] bg-background/98 backdrop-blur-2xl border-b border-white/5 p-6 flex flex-col gap-4 animate-in slide-in-from-top-4 duration-300 z-[99]">
+        <div className="md:hidden fixed inset-x-0 top-[64px] bg-background/98 backdrop-blur-2xl border-b border-white/5 p-8 flex flex-col gap-2 animate-in slide-in-from-top-4 duration-300 z-[99]">
           {NAV_LINKS.map((link) => (
             <Link 
               key={link.name} 
               href={link.href}
-              className="text-2xl font-black uppercase italic tracking-tighter py-4 border-b border-white/5"
+              className="text-xl font-bold uppercase tracking-wide py-5 border-b border-white/5 text-white/90"
               onClick={() => setIsOpen(false)}
             >
               {link.name}
             </Link>
           ))}
-          <Button asChild className="w-full rounded-2xl py-8 text-xl font-black uppercase italic tracking-tighter mt-4">
+          <Button asChild className="w-full rounded-xl py-7 text-lg font-bold uppercase tracking-wider mt-6">
             <Link href="#pesan" onClick={() => setIsOpen(false)}>Pesan Sekarang</Link>
           </Button>
         </div>
