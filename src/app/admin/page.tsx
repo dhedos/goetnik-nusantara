@@ -661,7 +661,7 @@ export default function AdminDashboard() {
                              <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Galeri Contoh Gambar</Label>
                              <div className="relative">
                                 <input type="file" className="hidden" id={`s-gallery-${s.id}`} multiple accept="image/*" onChange={(e) => handleServiceGalleryUpload(e, s.id)} />
-                                <Button variant="outline" size="xs" asChild className="h-7 text-[10px] rounded-lg px-2"><label htmlFor={`s-gallery-${s.id}`}>{isUploading === `gallery-${s.id}` ? 'Loading...' : '+ Tambah Foto'}</label></Button>
+                                <Button variant="outline" size="sm" asChild className="h-7 text-[10px] rounded-lg px-2"><label htmlFor={`s-gallery-${s.id}`}>{isUploading === `gallery-${s.id}` ? 'Loading...' : '+ Tambah Foto'}</label></Button>
                              </div>
                            </div>
                            <div className="grid grid-cols-4 gap-2">

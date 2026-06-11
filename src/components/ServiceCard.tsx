@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from 'react';
@@ -32,7 +31,13 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
   const mainImage = imageUrl || placeholder?.imageUrl;
   
   // Gabungkan gambar utama dengan galeri
-  const allImages = mainImage ? [mainImage, ...galleryUrls] : galleryUrls;
+  const allImages = React.useMemo(() => {
+    const imgs = [];
+    if (mainImage) imgs.push(mainImage);
+    if (galleryUrls && galleryUrls.length > 0) imgs.push(...galleryUrls);
+    return imgs;
+  }, [mainImage, galleryUrls]);
+
   const hasGallery = allImages.length > 1;
 
   // Konfigurasi Autoplay
@@ -70,7 +75,7 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
             </div>
           </Carousel>
         ) : (
-          allImages[0] && (
+          allImages.length > 0 && (
             <Image 
               src={allImages[0]}
               alt={name}
