@@ -51,7 +51,7 @@ Berikut adalah daftar layanan aktif kami:
 Analisis masalah pelanggan berikut:
 "{{{problemDescription}}}"
 
-Berdasarkan daftar layanan di atas, berikan solusi yang paling relevan. Jika masalah tidak spesifik, pilih layanan yang paling mendekati kategori masalah tersebut (misal: masalah software arahkan ke instalasi/service laptop).
+Berdasarkan daftar layanan di atas, berikan solusi yang paling relevan. Jika masalah tidak spesifik, pilih layanan yang paling mendekati kategori masalah tersebut.
 
 Berikan rekomendasi dalam format yang ditentukan.`,
 });

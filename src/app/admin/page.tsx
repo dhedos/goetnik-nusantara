@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc, serverTimestamp, query, orderBy, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { 
@@ -362,7 +362,7 @@ export default function AdminDashboard() {
   ];
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-card">
       <div className="p-6 border-b border-border">
         <h2 className="text-xl font-bold text-primary tracking-tighter uppercase">PANEL ADMIN</h2>
       </div>
@@ -389,6 +389,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-background text-foreground transition-colors duration-500" style={{ fontFamily: 'var(--selected-font)' }}>
+      {/* Mobile Top Header */}
       <div className="md:hidden flex items-center justify-between p-4 border-b border-border bg-card">
         <h2 className="text-lg font-black text-primary tracking-tighter uppercase">ADMIN</h2>
         <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
@@ -401,10 +402,12 @@ export default function AdminDashboard() {
         </Sheet>
       </div>
 
+      {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 bg-card border-r border-border flex-col shrink-0">
         <SidebarContent />
       </aside>
 
+      {/* Main Area */}
       <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-background/50">
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
@@ -422,6 +425,7 @@ export default function AdminDashboard() {
             </div>
           </div>
 
+          {/* Render Active Section (Contoh: Bookings) */}
           {activeSection === 'bookings' && (
             <Card className="rounded-3xl border-border bg-card shadow-xl overflow-hidden">
               <CardHeader className="p-6 border-b border-border"><CardTitle>Pesanan Masuk</CardTitle></CardHeader>
@@ -444,6 +448,7 @@ export default function AdminDashboard() {
             </Card>
           )}
 
+          {/* Sections lainnya di-render secara dinamis berdasarkan state activeSection... */}
           {activeSection === 'portfolio' && (
             <Card className="rounded-3xl border-border bg-card shadow-xl overflow-hidden">
               <CardHeader className="p-8 border-b border-border">
