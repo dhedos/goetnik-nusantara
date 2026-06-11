@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from 'next/image';
@@ -83,19 +84,14 @@ function HomeContent() {
   );
   const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
 
-  // Efek untuk menangani timeout loading
   useEffect(() => {
-    // Jika data sudah ada, langsung tampilkan
     if (settings) {
       setIsReady(true);
       return;
     }
-
-    // Jika setelah 2 detik data belum datang, paksa tampilkan dengan data default
     const timer = setTimeout(() => {
       setIsReady(true);
     }, 2000);
-
     return () => clearTimeout(timer);
   }, [settings]);
 
@@ -111,6 +107,10 @@ function HomeContent() {
   const heroTitle = settings?.heroTitle || BUSINESS_NAME_DEFAULT;
   const heroSubtitle = settings?.heroSubtitle || 'Kami melayani kebutuhan teknologi, desain grafis, dan pembuatan aplikasi secara profesional.';
   const heroImagePos = settings?.heroImagePosition || '50%';
+
+  const servicesBadge = settings?.servicesSectionBadge || 'Premium Solutions';
+  const servicesTitle = settings?.servicesSectionTitle || 'Layanan Unggulan';
+  const servicesSubtitle = settings?.servicesSectionSubtitle || 'Solusi kreatif dan teknologi modern untuk mempercepat pertumbuhan bisnis Anda.';
 
   return (
     <>
@@ -172,9 +172,9 @@ function HomeContent() {
           <section id="layanan" className="py-20 md:py-32 px-4 md:px-8 bg-secondary/5 relative">
             <div className="max-w-7xl mx-auto">
               <div className="text-center mb-12 md:mb-20 space-y-4">
-                <Badge variant="outline" className="uppercase tracking-widest px-4 py-1 border-primary/20 text-primary bg-primary/5 font-bold text-[9px] md:text-[10px]">Premium Solutions</Badge>
-                <h2 className="text-2xl md:text-5xl font-bold text-foreground uppercase">Layanan Unggulan</h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto text-xs md:text-base font-medium px-4">Solusi kreatif dan teknologi modern untuk mempercepat pertumbuhan bisnis Anda.</p>
+                <Badge variant="outline" className="uppercase tracking-widest px-4 py-1 border-primary/20 text-primary bg-primary/5 font-bold text-[9px] md:text-[10px]">{servicesBadge}</Badge>
+                <h2 className="text-2xl md:text-5xl font-bold text-foreground uppercase">{servicesTitle}</h2>
+                <p className="text-muted-foreground max-w-2xl mx-auto text-xs md:text-base font-medium px-4">{servicesSubtitle}</p>
               </div>
               
               {servicesLoading && !services ? (

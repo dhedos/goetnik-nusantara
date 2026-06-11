@@ -105,9 +105,9 @@ export default function AdminDashboard() {
     heroImagePosition: '50%',
     aboutTitle: 'Tentang Bisnis Kami',
     aboutContent: '',
-    servicesSectionBadge: 'Katalog Layanan',
-    servicesSectionTitle: 'Layanan Digital Premium',
-    servicesSectionSubtitle: '',
+    servicesSectionBadge: 'Premium Solutions',
+    servicesSectionTitle: 'Layanan Unggulan',
+    servicesSectionSubtitle: 'Solusi kreatif dan teknologi modern untuk mempercepat pertumbuhan bisnis Anda.',
     privacyPolicy: PRIVACY_POLICY_DEFAULT,
     socialInstagram: '',
     socialFacebook: '',
@@ -377,7 +377,10 @@ export default function AdminDashboard() {
                       <p className="text-sm text-muted-foreground">{b.service} • {b.whatsapp}</p>
                       <p className="text-xs text-muted-foreground/60 mt-1 italic">{b.notes || 'Tanpa catatan'}</p>
                     </div>
-                    <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'bookings', b.id))}><Trash2 size={18} /></Button>
+                    <div className="flex gap-2">
+                       <Button variant="outline" size="sm" asChild className="rounded-xl h-10 px-4 font-bold"><a href={`https://wa.me/${b.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank">Chat WA</a></Button>
+                       <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 h-10 w-10" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'bookings', b.id))}><Trash2 size={18} /></Button>
+                    </div>
                   </div>
                 ))}
                 {bookings?.length === 0 && <p className="text-center text-muted-foreground py-16 font-medium">Belum ada pesanan terbaru.</p>}
@@ -555,17 +558,30 @@ export default function AdminDashboard() {
                   <Slider value={[parseInt(businessInfo.heroImagePosition) || 50]} max={100} onValueChange={(v) => setBusinessInfo({...businessInfo, heroImagePosition: `${v[0]}%`})} />
                 </div>
                 <div className="space-y-6 pt-4 border-t border-border">
-                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Badge Atas</Label><Input value={businessInfo.heroBadge} onChange={(e) => setBusinessInfo({...businessInfo, heroBadge: e.target.value})} className="rounded-xl h-12 bg-background border-border" /></div>
-                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Judul Utama</Label><Input value={businessInfo.heroTitle} onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})} className="rounded-xl h-12 bg-background border-border font-bold" /></div>
-                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Deskripsi Hero</Label><Textarea value={businessInfo.heroSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, heroSubtitle: e.target.value})} className="rounded-xl min-h-[120px] bg-background border-border" /></div>
+                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Badge Atas (Small Text)</Label><Input value={businessInfo.heroBadge} onChange={(e) => setBusinessInfo({...businessInfo, heroBadge: e.target.value})} className="rounded-xl h-12 bg-background border-border" /></div>
+                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Judul Utama (Besar)</Label><Input value={businessInfo.heroTitle} onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})} className="rounded-xl h-12 bg-background border-border font-bold" /></div>
+                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Deskripsi Hero (Sub-judul)</Label><Textarea value={businessInfo.heroSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, heroSubtitle: e.target.value})} className="rounded-xl min-h-[120px] bg-background border-border" /></div>
                 </div>
               </CardContent>
             </Card>
           )}
 
           {activeSection === 'services' && (
-             <div className="space-y-6">
-                <Button onClick={handleAddService} size="lg" className="rounded-2xl px-12 h-16 font-black uppercase bg-primary text-primary-foreground shadow-2xl"><Plus className="mr-2" size={24} /> Tambah Layanan</Button>
+             <div className="space-y-8">
+                <Card className="rounded-3xl border-border bg-card shadow-xl">
+                  <CardHeader><CardTitle className="text-lg">Pengaturan Judul Seksi Layanan</CardTitle></CardHeader>
+                  <CardContent className="p-6 space-y-4">
+                    <div className="space-y-2"><Label className="text-xs font-bold uppercase">Badge Seksi</Label><Input value={businessInfo.servicesSectionBadge} onChange={(e) => setBusinessInfo({...businessInfo, servicesSectionBadge: e.target.value})} className="rounded-xl h-12" placeholder="Contoh: Premium Solutions" /></div>
+                    <div className="space-y-2"><Label className="text-xs font-bold uppercase">Judul Seksi</Label><Input value={businessInfo.servicesSectionTitle} onChange={(e) => setBusinessInfo({...businessInfo, servicesSectionTitle: e.target.value})} className="rounded-xl h-12 font-bold" placeholder="Contoh: Layanan Unggulan" /></div>
+                    <div className="space-y-2"><Label className="text-xs font-bold uppercase">Deskripsi Seksi (Sub-judul)</Label><Textarea value={businessInfo.servicesSectionSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, servicesSectionSubtitle: e.target.value})} className="rounded-xl h-24" placeholder="Contoh: Solusi kreatif dan teknologi modern..." /></div>
+                  </CardContent>
+                </Card>
+
+                <div className="flex justify-between items-center">
+                  <h3 className="text-xl font-bold uppercase tracking-tight">Daftar Layanan Individu</h3>
+                  <Button onClick={handleAddService} size="lg" className="rounded-2xl px-8 h-12 font-black uppercase bg-primary text-primary-foreground shadow-lg"><Plus className="mr-2" size={18} /> Tambah Layanan</Button>
+                </div>
+
                 <div className="grid md:grid-cols-2 gap-6">
                   {services?.map((s: any) => (
                     <Card key={s.id} className="bg-card rounded-3xl border-border overflow-hidden shadow-lg group">
