@@ -17,14 +17,14 @@ import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
-  Settings, ShoppingBag, ExternalLink, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, MoveVertical, Maximize, Type, Image as ImageIcon
+  Settings, ShoppingBag, ExternalLink, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, MoveVertical, Maximize, Type, Image as ImageIcon, Palette
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
-import { PRIVACY_POLICY_DEFAULT, BUSINESS_NAME_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT, MAIN_BUSINESS_ID } from '@/lib/constants';
+import { PRIVACY_POLICY_DEFAULT, BUSINESS_NAME_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT, MAIN_BUSINESS_ID, THEMES } from '@/lib/constants';
 
 type AdminSection = 'bookings' | 'services' | 'branding' | 'hero' | 'about' | 'contact' | 'social' | 'privacy';
 
@@ -81,6 +81,7 @@ export default function AdminDashboard() {
     logoUrl: '',
     logoHeight: '36',
     fontFamily: 'Inter',
+    themeId: 'deep-sea',
     heroBadge: 'Solusi Digital Terpercaya',
     heroTitle: BUSINESS_NAME_DEFAULT,
     heroTitleImageUrl: '',
@@ -118,7 +119,8 @@ export default function AdminDashboard() {
         heroImagePosition: settings.heroImagePosition || '50%',
         logoHeight: settings.logoHeight || '36',
         heroTitleImageHeight: settings.heroTitleImageHeight || '80',
-        fontFamily: settings.fontFamily || 'Inter'
+        fontFamily: settings.fontFamily || 'Inter',
+        themeId: settings.themeId || 'deep-sea'
       }));
       hasLoadedSettings.current = true;
     }
@@ -225,7 +227,7 @@ export default function AdminDashboard() {
   const navItems = [
     { id: 'bookings', label: 'Pesanan', icon: ShoppingBag },
     { id: 'services', label: 'Layanan', icon: Settings },
-    { id: 'branding', label: 'Logo & Tipografi', icon: Layout },
+    { id: 'branding', label: 'Logo & Tema', icon: Layout },
     { id: 'hero', label: 'Banner Utama', icon: Globe },
     { id: 'about', label: 'Tentang Kami', icon: Info },
     { id: 'contact', label: 'Kontak & Peta', icon: MapPin },
@@ -300,75 +302,102 @@ export default function AdminDashboard() {
           )}
 
           {activeSection === 'branding' && (
-            <Card className="rounded-3xl border-white/5 bg-card/50">
-              <CardContent className="p-8 space-y-8">
-                {/* Font Selection */}
-                <div className="space-y-4 p-6 bg-primary/5 rounded-2xl border border-primary/10">
-                  <Label className="text-white uppercase font-bold text-xs flex items-center gap-2">
-                    <Type size={14} className="text-primary" /> Gaya Huruf (Font Etnik)
-                  </Label>
-                  <Select 
-                    value={businessInfo.fontFamily} 
-                    onValueChange={(val) => setBusinessInfo({...businessInfo, fontFamily: val})}
-                  >
-                    <SelectTrigger className="rounded-xl h-12 bg-background/50 border-white/5 text-sm font-medium">
-                      <SelectValue placeholder="Pilih Font Website" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ETHNIC_FONTS.map((font) => (
-                        <SelectItem key={font.name} value={font.name} className="py-3">
-                          <span style={{ fontFamily: font.name }}>{font.label}</span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest leading-relaxed">Pilih font yang mencerminkan nuansa Nusantara untuk seluruh website Anda.</p>
-                </div>
+            <div className="space-y-8">
+              {/* Theme Section */}
+              <Card className="rounded-3xl border-white/5 bg-card/50">
+                <CardHeader><CardTitle className="flex items-center gap-2"><Palette size={20} className="text-primary" /> Pilih Tema Website</CardTitle></CardHeader>
+                <CardContent className="p-8">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {THEMES.map((theme) => (
+                      <button
+                        key={theme.id}
+                        onClick={() => setBusinessInfo({...businessInfo, themeId: theme.id})}
+                        className={cn(
+                          "relative group flex flex-col gap-3 p-4 rounded-2xl border transition-all hover:scale-105",
+                          businessInfo.themeId === theme.id ? "border-primary bg-primary/10" : "border-white/5 bg-background/20"
+                        )}
+                      >
+                        <div className="flex gap-1 h-12 w-full rounded-lg overflow-hidden border border-white/5">
+                          <div className="flex-1" style={{ backgroundColor: `hsl(${theme.background})` }} />
+                          <div className="w-1/3" style={{ backgroundColor: `hsl(${theme.primary})` }} />
+                          <div className="w-1/3" style={{ backgroundColor: `hsl(${theme.accent})` }} />
+                        </div>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-center">{theme.label}</span>
+                        {businessInfo.themeId === theme.id && <CheckCircle2 size={16} className="absolute -top-2 -right-2 text-primary bg-background rounded-full" />}
+                      </button>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
 
-                <div className="space-y-4 pt-4 border-t border-white/5">
-                  <Label className="text-white uppercase font-bold text-xs">Logo Bisnis</Label>
-                  <div className="flex items-center gap-6 p-6 border-2 border-dashed border-white/10 rounded-3xl bg-background/20">
-                    <div className="relative min-h-[6rem] min-w-[6rem] max-w-[15rem] bg-[#0B1120] rounded-xl overflow-hidden border border-white/5 flex items-center justify-center p-4">
-                      {businessInfo.logoUrl ? (
-                        <img 
-                          src={businessInfo.logoUrl} 
-                          alt="Logo" 
-                          className="max-h-full w-auto object-contain"
-                        />
-                      ) : (
-                        <Cpu className="w-12 h-12 opacity-20" />
-                      )}
-                    </div>
-                    <div className="flex-1 space-y-3">
-                      <p className="text-sm text-muted-foreground">Upload logo fleksibel (mendukung horizontal/vertikal). Max 1MB.</p>
-                      <input type="file" className="hidden" id="logo-up" accept="image/*" onChange={(e) => handleImageUpload(e, 'logo')} />
-                      <Button asChild variant="secondary" className="cursor-pointer h-10 px-6 rounded-xl font-bold"><label htmlFor="logo-up">{isUploading === 'logo' ? '...' : 'Pilih File'}</label></Button>
-                    </div>
+              <Card className="rounded-3xl border-white/5 bg-card/50">
+                <CardContent className="p-8 space-y-8">
+                  {/* Font Selection */}
+                  <div className="space-y-4 p-6 bg-primary/5 rounded-2xl border border-primary/10">
+                    <Label className="text-white uppercase font-bold text-xs flex items-center gap-2">
+                      <Type size={14} className="text-primary" /> Gaya Huruf (Font Etnik)
+                    </Label>
+                    <Select 
+                      value={businessInfo.fontFamily} 
+                      onValueChange={(val) => setBusinessInfo({...businessInfo, fontFamily: val})}
+                    >
+                      <SelectTrigger className="rounded-xl h-12 bg-background/50 border-white/5 text-sm font-medium">
+                        <SelectValue placeholder="Pilih Font Website" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {ETHNIC_FONTS.map((font) => (
+                          <SelectItem key={font.name} value={font.name} className="py-3">
+                            <span style={{ fontFamily: font.name }}>{font.label}</span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
-                  <div className="space-y-6 p-6 bg-background/30 rounded-2xl border border-white/5 mt-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <Label className="text-xs font-bold uppercase flex items-center gap-2">
-                        <Maximize size={14} className="text-primary" /> Ukuran Logo (Tinggi)
-                      </Label>
-                      <Badge variant="outline" className="text-[10px] font-bold">{businessInfo.logoHeight}px</Badge>
+                  <div className="space-y-4 pt-4 border-t border-white/5">
+                    <Label className="text-white uppercase font-bold text-xs">Logo Bisnis</Label>
+                    <div className="flex items-center gap-6 p-6 border-2 border-dashed border-white/10 rounded-3xl bg-background/20">
+                      <div className="relative min-h-[6rem] min-w-[6rem] max-w-[15rem] bg-[#0B1120] rounded-xl overflow-hidden border border-white/5 flex items-center justify-center p-4">
+                        {businessInfo.logoUrl ? (
+                          <img 
+                            src={businessInfo.logoUrl} 
+                            alt="Logo" 
+                            className="max-h-full w-auto object-contain"
+                          />
+                        ) : (
+                          <Cpu className="w-12 h-12 opacity-20" />
+                        )}
+                      </div>
+                      <div className="flex-1 space-y-3">
+                        <input type="file" className="hidden" id="logo-up" accept="image/*" onChange={(e) => handleImageUpload(e, 'logo')} />
+                        <Button asChild variant="secondary" className="cursor-pointer h-10 px-6 rounded-xl font-bold"><label htmlFor="logo-up">{isUploading === 'logo' ? '...' : 'Pilih Logo'}</label></Button>
+                      </div>
                     </div>
-                    <Slider 
-                      value={[logoHValue]} 
-                      min={20}
-                      max={80} 
-                      step={1} 
-                      onValueChange={(val) => setBusinessInfo({...businessInfo, logoHeight: `${val[0]}`})} 
-                      className="py-4"
-                    />
+
+                    <div className="space-y-6 p-6 bg-background/30 rounded-2xl border border-white/5 mt-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <Label className="text-xs font-bold uppercase flex items-center gap-2">
+                          <Maximize size={14} className="text-primary" /> Ukuran Logo (Tinggi)
+                        </Label>
+                        <Badge variant="outline" className="text-[10px] font-bold">{businessInfo.logoHeight}px</Badge>
+                      </div>
+                      <Slider 
+                        value={[logoHValue]} 
+                        min={20}
+                        max={80} 
+                        step={1} 
+                        onValueChange={(val) => setBusinessInfo({...businessInfo, logoHeight: `${val[0]}`})} 
+                        className="py-4"
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Nama Logo (Putih)</Label><Input value={businessInfo.logoText} onChange={(e) => setBusinessInfo({...businessInfo, logoText: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" /></div>
-                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Nama Aksen (Biru)</Label><Input value={businessInfo.logoAccentText} onChange={(e) => setBusinessInfo({...businessInfo, logoAccentText: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5 text-primary" /></div>
-                </div>
-              </CardContent>
-            </Card>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-2"><Label className="text-xs font-bold uppercase">Nama Logo (Warna Tema)</Label><Input value={businessInfo.logoText} onChange={(e) => setBusinessInfo({...businessInfo, logoText: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" /></div>
+                    <div className="space-y-2"><Label className="text-xs font-bold uppercase">Nama Aksen</Label><Input value={businessInfo.logoAccentText} onChange={(e) => setBusinessInfo({...businessInfo, logoAccentText: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5 text-primary" /></div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
 
           {activeSection === 'hero' && (
@@ -392,7 +421,6 @@ export default function AdminDashboard() {
                       )}
                     </div>
                     <div className="flex-1 space-y-3">
-                      <p className="text-sm text-muted-foreground">Upload gambar tulisan untuk mengganti teks judul utama. Max 1MB.</p>
                       <input type="file" className="hidden" id="hero-title-up" accept="image/*" onChange={(e) => handleImageUpload(e, 'heroTitle')} />
                       <div className="flex gap-2">
                         <Button asChild variant="secondary" className="cursor-pointer h-10 px-6 rounded-xl font-bold">
@@ -421,7 +449,6 @@ export default function AdminDashboard() {
                       className="py-4"
                     />
                   </div>
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Jika gambar diunggah, maka teks judul di bawah akan disembunyikan otomatis.</p>
                 </div>
 
                 <div className="space-y-4">

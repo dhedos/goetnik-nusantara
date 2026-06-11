@@ -56,3 +56,34 @@ export const ADVANTAGES = [
     icon: ShieldCheck
   }
 ];
+
+export const THEMES = [
+  {
+    id: 'deep-sea',
+    label: 'Deep Sea (Modern)',
+    primary: '217 91% 60%',
+    accent: '189 94% 43%',
+    background: '222 47% 11%'
+  },
+  {
+    id: 'royal-gold',
+    label: 'Royal Gold (Mewah)',
+    primary: '45 100% 51%',
+    accent: '43 100% 70%',
+    background: '20 20% 8%'
+  },
+  {
+    id: 'earthy-forest',
+    label: 'Earthy Forest (Alam)',
+    primary: '142 71% 45%',
+    accent: '158 64% 52%',
+    background: '160 30% 8%'
+  },
+  {
+    id: 'terracotta',
+    label: 'Terracotta (Etnik)',
+    primary: '20 80% 50%',
+    accent: '30 100% 70%',
+    background: '15 40% 8%'
+  }
+];

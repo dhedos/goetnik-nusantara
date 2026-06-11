@@ -4,7 +4,7 @@ import './globals.css';
 import { FirebaseClientProvider } from '@/firebase';
 import { Toaster } from '@/components/ui/toaster';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
-import { DynamicFontLoader } from '@/components/DynamicFontLoader';
+import { DynamicStyleLoader } from '@/components/DynamicStyleLoader';
 
 export const metadata: Metadata = {
   title: 'Pusat Layanan Digital & Service',
@@ -25,7 +25,7 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased bg-background text-foreground">
         <FirebaseClientProvider>
-          <DynamicFontLoader businessId="main" />
+          <DynamicStyleLoader businessId="main" />
           {children}
           <FirebaseErrorListener />
           <Toaster />
