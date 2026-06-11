@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -141,7 +140,7 @@ export default function AdminDashboard() {
         toast({ 
           variant: "destructive",
           title: "Gagal Menyimpan", 
-          description: "Periksa koneksi internet atau izin akses Anda." 
+          description: "Periksa koneksi internet atau izin akses Anda di Firestore Rules." 
         });
       });
   };

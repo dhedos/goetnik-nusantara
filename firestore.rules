@@ -1,27 +1,26 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Jalur utama untuk identitas bisnis tunggal 'main'
+    // Aturan untuk bisnis utama 'main'
     match /businesses/main {
-      // Izinkan publik membaca data profil dan layanan
+      // Izinkan publik membaca data profil bisnis utama
       allow read: if true;
-      // Izinkan admin yang terautentikasi mengelola dokumen utama 'main'
+      // Izinkan admin yang login untuk menulis data profil bisnis utama
       allow write: if request.auth != null;
 
-      // Aturan untuk semua sub-koleksi dan dokumen di bawahnya (services, settings, profile, dll)
+      // Aturan untuk semua sub-koleksi (services, bookings, settings, dll)
       match /{allPaths=**} {
         allow read: if true;
         allow write: if request.auth != null;
       }
 
-      // Aturan khusus pesanan: Publik bisa kirim (create), Admin bisa baca/kelola
+      // Aturan khusus: Publik bisa kirim pesanan (create), Admin bisa kelola (read/write)
       match /bookings/{bookingId} {
         allow create: if true;
-        allow read, update, delete: if request.auth != null;
       }
     }
     
-    // Default deny untuk jalur lain di luar bisnis utama demi keamanan
+    // Default deny untuk jalur lain demi keamanan
     match /{document=**} {
       allow read, write: if false;
     }
