@@ -422,7 +422,7 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {/* Render Active Section (Contoh: Bookings) */}
+          {/* Section: Bookings */}
           {activeSection === 'bookings' && (
             <Card className="rounded-3xl border-border bg-card shadow-xl overflow-hidden">
               <CardHeader className="p-6 border-b border-border"><CardTitle>Pesanan Masuk</CardTitle></CardHeader>
@@ -445,6 +445,7 @@ export default function AdminDashboard() {
             </Card>
           )}
 
+          {/* Section: Portfolio */}
           {activeSection === 'portfolio' && (
             <Card className="rounded-3xl border-border bg-card shadow-xl overflow-hidden">
               <CardHeader className="p-8 border-b border-border">
@@ -477,6 +478,7 @@ export default function AdminDashboard() {
             </Card>
           )}
 
+          {/* Section: Contact */}
           {activeSection === 'contact' && (
             <Card className="rounded-3xl border-border bg-card shadow-xl">
               <CardContent className="p-8 space-y-8">
@@ -525,6 +527,7 @@ export default function AdminDashboard() {
             </Card>
           )}
 
+          {/* Section: External Links */}
           {activeSection === 'links' && (
              <div className="space-y-6">
                 <Button onClick={handleAddExternalLink} size="lg" className="rounded-2xl w-full md:w-auto px-12 h-16 font-black uppercase tracking-widest bg-primary text-primary-foreground hover:scale-105 transition-all shadow-2xl"><Plus className="mr-2" size={24} /> Tambah Tautan</Button>
@@ -554,6 +557,7 @@ export default function AdminDashboard() {
              </div>
           )}
 
+          {/* Section: Branding */}
           {activeSection === 'branding' && (
             <div className="space-y-8">
               <Card className="rounded-3xl border-border bg-card shadow-xl">
@@ -600,6 +604,7 @@ export default function AdminDashboard() {
             </div>
           )}
 
+          {/* Section: Hero */}
           {activeSection === 'hero' && (
             <Card className="rounded-3xl border-border bg-card shadow-xl">
               <CardContent className="p-8 space-y-8">
@@ -622,6 +627,7 @@ export default function AdminDashboard() {
             </Card>
           )}
 
+          {/* Section: Services */}
           {activeSection === 'services' && (
              <div className="space-y-8">
                 <Card className="rounded-3xl border-border bg-card shadow-xl">
@@ -701,6 +707,7 @@ export default function AdminDashboard() {
              </div>
           )}
 
+          {/* Section: About */}
           {activeSection === 'about' && (
             <Card className="rounded-3xl border-border bg-card shadow-xl">
               <CardContent className="p-8 space-y-6">
@@ -710,6 +717,7 @@ export default function AdminDashboard() {
             </Card>
           )}
 
+          {/* Section: Privacy */}
           {activeSection === 'privacy' && (
             <Card className="rounded-3xl border-border bg-card shadow-xl">
               <CardContent className="p-8 space-y-4">
@@ -719,6 +727,7 @@ export default function AdminDashboard() {
             </Card>
           )}
 
+          {/* Section: Social Media */}
           {activeSection === 'social' && (
             <Card className="rounded-3xl border-border bg-card shadow-xl">
               <CardContent className="p-8 space-y-6">

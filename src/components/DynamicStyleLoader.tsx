@@ -72,7 +72,7 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
     root.style.setProperty('--input', input);
     root.style.setProperty('--card', card);
 
-    // 3. Handle Logo for Loading Screen and Favicon
+    // 3. Handle Logo and Dynamic Favicon
     if (settings.logoUrl) {
       root.style.setProperty('--loading-logo', `url(${settings.logoUrl})`);
       root.classList.add('has-loading-logo');

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Cpu, Facebook, Instagram, Youtube, Fingerprint, ShoppingBag, Globe, Link as LinkIcon, ShoppingCart } from 'lucide-react';
