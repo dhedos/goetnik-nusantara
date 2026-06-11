@@ -69,6 +69,7 @@ function LoadingScreen({ text }: { text: string }) {
 function HomeContent() {
   const businessId = MAIN_BUSINESS_ID;
   const firestore = useFirestore();
+  const [isReady, setIsReady] = useState(false);
 
   const servicesQuery = useMemoFirebase(() => 
     firestore ? collection(firestore, 'businesses', businessId, 'services') : null, 
@@ -82,7 +83,23 @@ function HomeContent() {
   );
   const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
 
-  if (settingsLoading && !settings) {
+  // Efek untuk menangani timeout loading
+  useEffect(() => {
+    // Jika data sudah ada, langsung tampilkan
+    if (settings) {
+      setIsReady(true);
+      return;
+    }
+
+    // Jika setelah 2 detik data belum datang, paksa tampilkan dengan data default
+    const timer = setTimeout(() => {
+      setIsReady(true);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [settings]);
+
+  if (!isReady && settingsLoading && !settings) {
     return <LoadingScreen text="Menyiapkan Pengalaman Digital..." />;
   }
 
@@ -160,7 +177,7 @@ function HomeContent() {
                 <p className="text-muted-foreground max-w-2xl mx-auto text-xs md:text-base font-medium px-4">Solusi kreatif dan teknologi modern untuk mempercepat pertumbuhan bisnis Anda.</p>
               </div>
               
-              {servicesLoading ? (
+              {servicesLoading && !services ? (
                 <div className="flex flex-col items-center justify-center py-20 gap-6">
                   <div className="h-10 w-10 rounded-xl border-2 border-primary/20 border-t-primary animate-spin" />
                   <p className="text-muted-foreground animate-pulse tracking-widest text-[10px] uppercase font-bold">Menyiapkan Katalog...</p>
