@@ -52,6 +52,8 @@
         "fontFamily": { "type": "string", "description": "Selected Google Font name." },
         "heroBadge": { "type": "string" },
         "heroTitle": { "type": "string" },
+        "heroTitleImageUrl": { "type": "string", "description": "Image to replace the hero title text." },
+        "heroTitleImageHeight": { "type": "string" },
         "heroSubtitle": { "type": "string" },
         "heroImageUrl": { "type": "string" },
         "heroImagePosition": { "type": "string" },

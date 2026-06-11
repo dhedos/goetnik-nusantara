@@ -17,7 +17,7 @@ import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
-  Settings, ShoppingBag, ExternalLink, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, MoveVertical, Maximize, Type
+  Settings, ShoppingBag, ExternalLink, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, MoveVertical, Maximize, Type, Image as ImageIcon
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -83,6 +83,8 @@ export default function AdminDashboard() {
     fontFamily: 'Inter',
     heroBadge: 'Solusi Digital Terpercaya',
     heroTitle: BUSINESS_NAME_DEFAULT,
+    heroTitleImageUrl: '',
+    heroTitleImageHeight: '80',
     heroSubtitle: 'Kami melayani kebutuhan teknologi, desain grafis, dan pembuatan aplikasi secara profesional.',
     heroImageUrl: '',
     heroImagePosition: '50%',
@@ -115,6 +117,7 @@ export default function AdminDashboard() {
         ...settings,
         heroImagePosition: settings.heroImagePosition || '50%',
         logoHeight: settings.logoHeight || '36',
+        heroTitleImageHeight: settings.heroTitleImageHeight || '80',
         fontFamily: settings.fontFamily || 'Inter'
       }));
       hasLoadedSettings.current = true;
@@ -166,7 +169,7 @@ export default function AdminDashboard() {
       });
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: 'logo' | 'hero' | string) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: 'logo' | 'hero' | 'heroTitle' | string) => {
     const file = e.target.files?.[0];
     if (!file || !user || !firestore) return;
 
@@ -183,6 +186,8 @@ export default function AdminDashboard() {
         setBusinessInfo(prev => ({ ...prev, logoUrl: base64String }));
       } else if (target === 'hero') {
         setBusinessInfo(prev => ({ ...prev, heroImageUrl: base64String }));
+      } else if (target === 'heroTitle') {
+        setBusinessInfo(prev => ({ ...prev, heroTitleImageUrl: base64String }));
       } else {
         const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'services', target);
         updateDoc(docRef, { imageUrl: base64String });
@@ -230,6 +235,7 @@ export default function AdminDashboard() {
 
   const posValue = parseInt(businessInfo.heroImagePosition) || 50;
   const logoHValue = parseInt(businessInfo.logoHeight) || 36;
+  const heroTitleHValue = parseInt(businessInfo.heroTitleImageHeight) || 80;
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#0B1120] text-foreground">
@@ -368,8 +374,58 @@ export default function AdminDashboard() {
           {activeSection === 'hero' && (
             <Card className="rounded-3xl border-white/5 bg-card/50">
               <CardContent className="p-8 space-y-8">
+                {/* Hero Title Image Section */}
+                <div className="space-y-4 p-6 bg-primary/5 rounded-2xl border border-primary/10">
+                  <Label className="text-white uppercase font-bold text-xs flex items-center gap-2">
+                    <ImageIcon size={14} className="text-primary" /> Gambar Judul Utama (Branding Hero)
+                  </Label>
+                  <div className="flex items-center gap-6 p-6 border-2 border-dashed border-white/10 rounded-3xl bg-background/20">
+                    <div className="relative min-h-[6rem] min-w-[10rem] max-w-full bg-[#0B1120] rounded-xl overflow-hidden border border-white/5 flex items-center justify-center p-4">
+                      {businessInfo.heroTitleImageUrl ? (
+                        <img 
+                          src={businessInfo.heroTitleImageUrl} 
+                          alt="Hero Title" 
+                          className="max-h-full w-auto object-contain"
+                        />
+                      ) : (
+                        <div className="text-[10px] uppercase font-bold opacity-20">No Image Uploaded</div>
+                      )}
+                    </div>
+                    <div className="flex-1 space-y-3">
+                      <p className="text-sm text-muted-foreground">Upload gambar tulisan untuk mengganti teks judul utama. Max 1MB.</p>
+                      <input type="file" className="hidden" id="hero-title-up" accept="image/*" onChange={(e) => handleImageUpload(e, 'heroTitle')} />
+                      <div className="flex gap-2">
+                        <Button asChild variant="secondary" className="cursor-pointer h-10 px-6 rounded-xl font-bold">
+                          <label htmlFor="hero-title-up">{isUploading === 'heroTitle' ? '...' : 'Pilih Gambar'}</label>
+                        </Button>
+                        {businessInfo.heroTitleImageUrl && (
+                          <Button variant="ghost" onClick={() => setBusinessInfo({...businessInfo, heroTitleImageUrl: ''})} className="rounded-xl text-destructive h-10 px-4">Hapus</Button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6 p-6 bg-background/30 rounded-2xl border border-white/5 mt-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <Label className="text-xs font-bold uppercase flex items-center gap-2">
+                        <Maximize size={14} className="text-primary" /> Ukuran Gambar Judul (Tinggi)
+                      </Label>
+                      <Badge variant="outline" className="text-[10px] font-bold">{businessInfo.heroTitleImageHeight}px</Badge>
+                    </div>
+                    <Slider 
+                      value={[heroTitleHValue]} 
+                      min={40}
+                      max={200} 
+                      step={1} 
+                      onValueChange={(val) => setBusinessInfo({...businessInfo, heroTitleImageHeight: `${val[0]}`})} 
+                      className="py-4"
+                    />
+                  </div>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Jika gambar diunggah, maka teks judul di bawah akan disembunyikan otomatis.</p>
+                </div>
+
                 <div className="space-y-4">
-                  <Label className="text-xs font-bold uppercase">Gambar Banner (Hero)</Label>
+                  <Label className="text-xs font-bold uppercase">Gambar Banner (Background)</Label>
                   <div className="relative h-64 w-full bg-[#0B1120] rounded-2xl overflow-hidden border border-white/5 group">
                     {businessInfo.heroImageUrl ? (
                       <Image 
@@ -387,7 +443,7 @@ export default function AdminDashboard() {
                       <input type="file" className="hidden" id="hero-up" accept="image/*" onChange={(e) => handleImageUpload(e, 'hero')} />
                       <Button asChild variant="secondary" className="cursor-pointer shadow-2xl rounded-xl">
                         <label htmlFor="hero-up" className="cursor-pointer px-6 py-2">
-                          {isUploading === 'hero' ? '...' : 'Ganti Banner'}
+                          {isUploading === 'hero' ? '...' : 'Ganti Background'}
                         </label>
                       </Button>
                     </div>
@@ -412,7 +468,7 @@ export default function AdminDashboard() {
 
                 <div className="space-y-4">
                   <div className="space-y-2"><Label className="text-xs font-bold uppercase">Badge Hero</Label><Input value={businessInfo.heroBadge} onChange={(e) => setBusinessInfo({...businessInfo, heroBadge: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" /></div>
-                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Judul Hero</Label><Input value={businessInfo.heroTitle} onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" /></div>
+                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Judul Hero (Teks Alternatif)</Label><Input value={businessInfo.heroTitle} onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})} className="rounded-xl h-12 bg-background/50 border-white/5" /></div>
                   <div className="space-y-2"><Label className="text-xs font-bold uppercase">Sub-judul Hero</Label><Textarea value={businessInfo.heroSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, heroSubtitle: e.target.value})} className="rounded-xl min-h-[100px] bg-background/50 border-white/5" /></div>
                 </div>
               </CardContent>
