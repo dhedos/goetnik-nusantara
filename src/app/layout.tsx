@@ -17,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className="scroll-smooth" data-scroll-behavior="smooth">
+    <html lang="id" className="scroll-smooth" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -30,13 +30,13 @@ export default function RootLayout({
                   const theme = JSON.parse(localStorage.getItem('goetnik-theme-cache'));
                   if (theme) {
                     const root = document.documentElement;
-                    root.style.setProperty('--primary', theme.primary);
-                    root.style.setProperty('--accent', theme.accent);
-                    root.style.setProperty('--background', theme.background);
-                    root.style.setProperty('--foreground', theme.foreground);
-                    root.style.setProperty('--card', theme.card);
-                    root.style.setProperty('--border', theme.border);
-                    root.style.setProperty('--selected-font', theme.fontFamily);
+                    if (theme.primary) root.style.setProperty('--primary', theme.primary);
+                    if (theme.accent) root.style.setProperty('--accent', theme.accent);
+                    if (theme.background) root.style.setProperty('--background', theme.background);
+                    if (theme.foreground) root.style.setProperty('--foreground', theme.foreground);
+                    if (theme.card) root.style.setProperty('--card', theme.card);
+                    if (theme.border) root.style.setProperty('--border', theme.border);
+                    if (theme.fontFamily) root.style.setProperty('--selected-font', theme.fontFamily);
                   }
                 } catch (e) {}
               })();
