@@ -26,11 +26,16 @@ function LoadingScreen({ logoUrl }: { logoUrl?: string }) {
   const [cachedLogo, setCachedLogo] = useState<string | null>(null);
 
   useEffect(() => {
-    // Mencoba mengambil logo dari cache agar muncul instan saat reload
+    // Mencoba mengambil logo dari cache agar muncul instan saat reload halaman
     try {
-      const cache = JSON.parse(localStorage.getItem('goetnik-theme-cache') || '{}');
-      if (cache.logoUrl) setCachedLogo(cache.logoUrl);
-    } catch (e) {}
+      const cacheData = localStorage.getItem('goetnik-theme-cache');
+      if (cacheData) {
+        const cache = JSON.parse(cacheData);
+        if (cache.logoUrl) setCachedLogo(cache.logoUrl);
+      }
+    } catch (e) {
+      console.warn("Gagal memuat logo dari cache.");
+    }
   }, []);
 
   const displayLogo = logoUrl || cachedLogo;
@@ -38,16 +43,16 @@ function LoadingScreen({ logoUrl }: { logoUrl?: string }) {
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background text-center p-4">
       <div className="relative z-10 flex flex-col items-center">
-        {/* Kontainer Ikon dengan Animasi Pulse */}
-        <div className="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center animate-pulse">
+        {/* Kontainer Logo dengan Efek Pulse (Kedap-kedip) */}
+        <div className="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center animate-pulse transition-all duration-700">
           {displayLogo ? (
             <img 
               src={displayLogo} 
               alt="Loading Logo" 
-              className="max-w-full max-h-full object-contain filter grayscale brightness-125"
+              className="max-w-full max-h-full object-contain brightness-110 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
             />
           ) : (
-            <div className="w-20 h-20 rounded-2xl bg-primary/20 flex items-center justify-center text-primary shadow-2xl shadow-primary/20">
+            <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-2xl shadow-primary/20">
               <Cpu size={48} />
             </div>
           )}
@@ -80,14 +85,14 @@ function HomeContent() {
       setIsReady(true);
     }, 2000);
 
-    if (settings) {
+    if (settings && !settingsLoading) {
       setIsReady(true);
     }
 
     return () => clearTimeout(safetyTimer);
-  }, [settings]);
+  }, [settings, settingsLoading]);
 
-  if (!isReady && settingsLoading && !settings) {
+  if (!isReady) {
     return <LoadingScreen logoUrl={settings?.logoUrl} />;
   }
 
@@ -164,9 +169,7 @@ function HomeContent() {
               
               {servicesLoading && !services ? (
                 <div className="flex flex-col items-center justify-center py-20 gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary animate-pulse">
-                    <Cpu size={24} />
-                  </div>
+                  <Loader2 className="h-10 w-10 animate-spin text-primary opacity-20" />
                 </div>
               ) : services && services.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">

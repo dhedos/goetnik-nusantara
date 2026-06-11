@@ -74,7 +74,7 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
     document.documentElement.style.setProperty('--input', input);
     document.documentElement.style.setProperty('--card', card);
 
-    // Save to Cache for instant reload
+    // Save to Cache for instant reload (Termasuk logoUrl)
     try {
       localStorage.setItem('goetnik-theme-cache', JSON.stringify({
         primary: selectedTheme.primary,
@@ -86,7 +86,9 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
         fontFamily: fontValue,
         logoUrl: settings.logoUrl || ''
       }));
-    } catch (e) {}
+    } catch (e) {
+      console.warn("Gagal menyimpan preferensi tema ke localStorage.");
+    }
 
   }, [settings]);
 
