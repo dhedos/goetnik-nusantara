@@ -92,8 +92,6 @@
         "servicesSectionBadge": { "type": "string" },
         "servicesSectionTitle": { "type": "string" },
         "servicesSectionSubtitle": { "type": "string" },
-        "aiTitle": { "type": "string" },
-        "aiSubtitle": { "type": "string" },
         "privacyPolicy": { "type": "string" },
         "socialInstagram": { "type": "string" },
         "socialFacebook": { "type": "string" },

@@ -1,11 +1,9 @@
-
 "use client";
 
 import Image from 'next/image';
 import Link from 'next/link';
 import { Suspense, useEffect, useState } from 'react';
 import { Navbar } from '@/components/Navbar';
-import { AIAssistant } from '@/components/AIAssistant';
 import { BookingForm } from '@/components/BookingForm';
 import { ServiceCard } from '@/components/ServiceCard';
 import { Portfolio } from '@/components/Portfolio';
@@ -153,13 +151,11 @@ function HomeContent() {
             </div>
           </section>
 
-          <AIAssistant businessId={businessId} />
-          
           <section id="layanan" className="py-20 md:py-32 px-4 md:px-8 bg-secondary/5 relative">
             <div className="max-w-7xl mx-auto">
               <div className="text-center mb-12 md:mb-20 space-y-4">
                 <h2 className="text-2xl md:text-5xl font-bold text-foreground uppercase">{servicesTitle}</h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto text-xs md:text-base font-medium px-4">{servicesSubtitle}</p>
+                <p className="text-muted-foreground max-w-2xl mx-auto text-sm md:text-base font-medium px-4">{servicesSubtitle}</p>
               </div>
               
               {servicesLoading && !services ? (
