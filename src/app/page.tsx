@@ -19,18 +19,18 @@ import { collection, doc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2, Cpu } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ICON_MAP, BUSINESS_NAME_DEFAULT, MAIN_BUSINESS_ID } from '@/lib/constants';
 
-function LoadingScreen({ text }: { text: string }) {
+function LoadingScreen() {
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background text-center p-4">
       <div className="relative z-10 flex flex-col items-center">
-        <Loader2 className="h-10 w-10 animate-spin text-primary mb-6" />
-        <h2 className="text-foreground text-sm font-bold tracking-widest uppercase animate-pulse">
-          {text}
-        </h2>
+        {/* Pulsing Icon Brand (Kedap-Kedip) */}
+        <div className="w-20 h-20 rounded-2xl bg-primary/20 flex items-center justify-center text-primary animate-pulse shadow-2xl shadow-primary/20">
+          <Cpu size={48} />
+        </div>
       </div>
     </div>
   );
@@ -54,18 +54,20 @@ function HomeContent() {
   const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
 
   useEffect(() => {
-    if (settings) {
-      setIsReady(true);
-      return;
-    }
-    const timer = setTimeout(() => {
+    // Safety timeout: website akan tampil dalam maksimal 2 detik apapun kondisinya
+    const safetyTimer = setTimeout(() => {
       setIsReady(true);
     }, 2000);
-    return () => clearTimeout(timer);
+
+    if (settings) {
+      setIsReady(true);
+    }
+
+    return () => clearTimeout(safetyTimer);
   }, [settings]);
 
   if (!isReady && settingsLoading && !settings) {
-    return <LoadingScreen text="Menyiapkan..." />;
+    return <LoadingScreen />;
   }
 
   const heroPlaceholder = PlaceHolderImages.find(img => img.id === 'hero-tech');
@@ -141,8 +143,9 @@ function HomeContent() {
               
               {servicesLoading && !services ? (
                 <div className="flex flex-col items-center justify-center py-20 gap-4">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  <p className="text-muted-foreground text-[10px] uppercase font-bold tracking-widest">Menyiapkan Katalog...</p>
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary animate-pulse">
+                    <Cpu size={24} />
+                  </div>
                 </div>
               ) : services && services.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
@@ -182,7 +185,7 @@ function HomeContent() {
 
 export default function Home() {
   return (
-    <Suspense fallback={<LoadingScreen text="Menghubungkan..." />}>
+    <Suspense fallback={<LoadingScreen />}>
       <HomeContent />
     </Suspense>
   );
