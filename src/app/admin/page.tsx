@@ -90,8 +90,6 @@ export default function AdminDashboard() {
     themeId: 'heritage-red',
     heroBadge: 'Solusi Digital Terpercaya',
     heroTitle: BUSINESS_NAME_DEFAULT,
-    heroTitleImageUrl: '',
-    heroTitleImageHeight: '80',
     heroSubtitle: 'Kami melayani kebutuhan teknologi, desain grafis, dan pembuatan aplikasi secara profesional.',
     heroImageUrl: '',
     heroImagePosition: '50%',
@@ -124,7 +122,6 @@ export default function AdminDashboard() {
         ...settings,
         heroImagePosition: settings.heroImagePosition || '50%',
         logoHeight: settings.logoHeight || '36',
-        heroTitleImageHeight: settings.heroTitleImageHeight || '80',
         fontFamily: settings.fontFamily || 'Inter',
         themeId: settings.themeId || 'heritage-red'
       }));
@@ -217,8 +214,6 @@ export default function AdminDashboard() {
         setBusinessInfo(prev => ({ ...prev, logoUrl: base64String }));
       } else if (target === 'hero') {
         setBusinessInfo(prev => ({ ...prev, heroImageUrl: base64String }));
-      } else if (target === 'heroTitle') {
-        setBusinessInfo(prev => ({ ...prev, heroTitleImageUrl: base64String }));
       } else {
         const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'services', target);
         updateDoc(docRef, { imageUrl: base64String });
@@ -260,7 +255,6 @@ export default function AdminDashboard() {
       toast({ variant: "destructive", title: "Gagal", description: "Beberapa gambar gagal diunggah." });
     } finally {
       setIsUploading(null);
-      // Reset input agar bisa pilih file yang sama jika perlu
       e.target.value = '';
     }
   };
@@ -498,26 +492,6 @@ export default function AdminDashboard() {
           {activeSection === 'hero' && (
             <Card className="rounded-3xl border-border bg-card shadow-xl">
               <CardContent className="p-8 space-y-8">
-                <div className="space-y-4 p-6 bg-primary/5 rounded-2xl border border-primary/10">
-                  <Label className="text-foreground uppercase font-black text-xs flex items-center gap-2"><ImageIcon size={14} className="text-primary" /> Branding Gambar Judul (Hero Title)</Label>
-                  <div className="flex flex-col md:flex-row items-center gap-8 p-6 border-2 border-dashed border-border rounded-3xl bg-background/20">
-                    <div className="relative h-32 w-full md:w-64 bg-background rounded-2xl overflow-hidden border border-border flex items-center justify-center p-4">
-                      {businessInfo.heroTitleImageUrl ? <img src={businessInfo.heroTitleImageUrl} alt="Hero Title" className="max-h-full w-auto object-contain" /> : <div className="text-[10px] font-bold opacity-20">BELUM ADA GAMBAR</div>}
-                    </div>
-                    <div className="flex-1 space-y-4 w-full">
-                      <input type="file" className="hidden" id="hero-title-up" accept="image/*" onChange={(e) => handleImageUpload(e, 'heroTitle')} />
-                      <div className="flex gap-2">
-                        <Button asChild variant="secondary" className="flex-1 cursor-pointer h-12 rounded-xl font-bold"><label htmlFor="hero-title-up">{isUploading === 'heroTitle' ? '...' : 'Ganti Gambar'}</label></Button>
-                        {businessInfo.heroTitleImageUrl && <Button variant="ghost" className="text-destructive h-12" onClick={() => setBusinessInfo({...businessInfo, heroTitleImageUrl: ''})}>Hapus</Button>}
-                      </div>
-                      <div className="space-y-3">
-                        <div className="flex justify-between text-[10px] font-bold uppercase text-muted-foreground"><span>Tinggi Gambar</span><span>{businessInfo.heroTitleImageHeight}px</span></div>
-                        <Slider value={[parseInt(businessInfo.heroTitleImageHeight) || 80]} min={40} max={250} onValueChange={(v) => setBusinessInfo({...businessInfo, heroTitleImageHeight: v[0].toString()})} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
                 <div className="space-y-4">
                   <Label className="text-xs font-bold uppercase">Gambar Latar Belakang (Hero Background)</Label>
                   <div className="relative h-72 w-full bg-background rounded-3xl overflow-hidden border border-border group shadow-inner">
@@ -539,7 +513,7 @@ export default function AdminDashboard() {
 
                 <div className="space-y-6 pt-4 border-t border-border">
                   <div className="space-y-2"><Label className="text-xs font-bold uppercase">Badge Atas</Label><Input value={businessInfo.heroBadge} onChange={(e) => setBusinessInfo({...businessInfo, heroBadge: e.target.value})} className="rounded-xl h-12 bg-background border-border" /></div>
-                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Judul Alternatif (Teks)</Label><Input value={businessInfo.heroTitle} onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})} className="rounded-xl h-12 bg-background border-border font-bold" /></div>
+                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Judul Utama (Teks)</Label><Input value={businessInfo.heroTitle} onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})} className="rounded-xl h-12 bg-background border-border font-bold" /></div>
                   <div className="space-y-2"><Label className="text-xs font-bold uppercase">Sub-Judul / Deskripsi Hero</Label><Textarea value={businessInfo.heroSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, heroSubtitle: e.target.value})} className="rounded-xl min-h-[120px] bg-background border-border leading-relaxed" /></div>
                 </div>
               </CardContent>

@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from 'next/image';
@@ -77,8 +76,6 @@ function HomeContent() {
 
   const heroBadge = settings?.heroBadge || 'Solusi Digital Terpercaya';
   const heroTitle = settings?.heroTitle || BUSINESS_NAME_DEFAULT;
-  const heroTitleImageUrl = settings?.heroTitleImageUrl || '';
-  const heroTitleImageH = parseInt(settings?.heroTitleImageHeight) || 80;
   const heroSubtitle = settings?.heroSubtitle || 'Kami melayani kebutuhan teknologi, desain grafis, dan pembuatan aplikasi secara profesional.';
   const heroImagePos = settings?.heroImagePosition || '50%';
 
@@ -111,23 +108,9 @@ function HomeContent() {
                   {heroBadge}
                 </Badge>
                 
-                {heroTitleImageUrl ? (
-                  <div 
-                    className="relative animate-fade-in w-full flex items-center"
-                    style={{ height: `${heroTitleImageH}px` }}
-                  >
-                    <img 
-                      src={heroTitleImageUrl} 
-                      alt={heroTitle} 
-                      style={{ height: '100%', width: 'auto', maxWidth: '100%', objectFit: 'contain' }}
-                      className="block"
-                    />
-                  </div>
-                ) : (
-                  <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold animate-fade-in leading-[1.1] md:leading-[1] text-foreground break-words">
-                    {heroTitle}
-                  </h1>
-                )}
+                <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold animate-fade-in leading-[1.1] md:leading-[1] text-foreground break-words">
+                  {heroTitle}
+                </h1>
 
                 <p className="text-base md:text-xl text-foreground/60 animate-fade-in leading-relaxed max-w-2xl delay-100">
                   {heroSubtitle}
