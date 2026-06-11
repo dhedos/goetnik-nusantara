@@ -13,17 +13,19 @@ import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
-  Settings, ShoppingBag, ExternalLink as ExternalLinkIcon, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, Type, Grid3X3, UploadCloud, Link as LinkIcon, ShoppingCart, Search, Map as MapIcon, Palette, Sparkles
+  Settings, ShoppingBag, ExternalLink as ExternalLinkIcon, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, Type, Grid3X3, UploadCloud, Link as LinkIcon, ShoppingCart, Search, Map as MapIcon, Palette, Sparkles, Menu
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 import Image from 'next/image';
 import { PRIVACY_POLICY_DEFAULT, BUSINESS_NAME_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT, MAIN_BUSINESS_ID, THEMES } from '@/lib/constants';
 
@@ -43,11 +45,13 @@ export default function AdminDashboard() {
   const auth = useAuth();
   const firestore = useFirestore();
   const router = useRouter();
+  const isMobile = useIsMobile();
   const [activeSection, setActiveSection] = useState<AdminSection>('bookings');
   const [isUploading, setIsUploading] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const hasLoadedSettings = useRef(false);
   const [searchLocation, setSearchLocation] = useState('');
   
@@ -190,6 +194,13 @@ export default function AdminDashboard() {
       });
   };
 
+  const handleNavClick = (id: AdminSection) => {
+    setActiveSection(id);
+    if (isMobile) {
+      setIsSidebarOpen(false);
+    }
+  };
+
   const resizeAndCompressImage = (file: File, maxWidth: number = 1200, quality: number = 0.7): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -326,38 +337,59 @@ export default function AdminDashboard() {
     { id: 'privacy', label: 'Privasi', icon: Shield },
   ];
 
+  const SidebarContent = () => (
+    <div className="flex flex-col h-full">
+      <div className="p-6 border-b border-border">
+        <h2 className="text-xl font-bold text-primary tracking-tighter uppercase">PANEL ADMIN</h2>
+      </div>
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+        {navItems.map((item) => (
+          <button 
+            key={item.id} 
+            onClick={() => handleNavClick(item.id as AdminSection)} 
+            className={cn(
+              "flex items-center w-full gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all", 
+              activeSection === item.id ? "bg-primary text-primary-foreground shadow-lg" : "hover:bg-primary/10 text-foreground/70"
+            )}
+          >
+            <item.icon size={18} /> {item.label}
+          </button>
+        ))}
+      </nav>
+      <div className="p-4 border-t border-border space-y-2">
+        <Button variant="outline" className="w-full gap-2 rounded-xl text-xs font-bold border-border" onClick={() => window.open(window.location.origin, '_blank')}><ExternalLinkIcon size={14} /> Lihat Website</Button>
+        <Button variant="destructive" className="w-full gap-2 rounded-xl text-xs font-bold" onClick={handleLogout}><LogOut size={14} /> Keluar</Button>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="flex h-screen overflow-hidden bg-background text-foreground transition-colors duration-500" style={{ fontFamily: 'var(--selected-font)' }}>
-      <aside className="w-64 bg-card border-r border-border flex flex-col shrink-0">
-        <div className="p-6 border-b border-border">
-          <h2 className="text-xl font-bold text-primary tracking-tighter uppercase">PANEL ADMIN</h2>
-        </div>
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {navItems.map((item) => (
-            <button 
-              key={item.id} 
-              onClick={() => setActiveSection(item.id as AdminSection)} 
-              className={cn(
-                "flex items-center w-full gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all", 
-                activeSection === item.id ? "bg-primary text-primary-foreground shadow-lg" : "hover:bg-primary/10 text-foreground/70"
-              )}
-            >
-              <item.icon size={18} /> {item.label}
-            </button>
-          ))}
-        </nav>
-        <div className="p-4 border-t border-border space-y-2">
-          <Button variant="outline" className="w-full gap-2 rounded-xl text-xs font-bold border-border" onClick={() => window.open(window.location.origin, '_blank')}><ExternalLinkIcon size={14} /> Lihat Website</Button>
-          <Button variant="destructive" className="w-full gap-2 rounded-xl text-xs font-bold" onClick={handleLogout}><LogOut size={14} /> Keluar</Button>
-        </div>
+    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-background text-foreground transition-colors duration-500" style={{ fontFamily: 'var(--selected-font)' }}>
+      {/* Mobile Header */}
+      <div className="md:hidden flex items-center justify-between p-4 border-b border-border bg-card">
+        <h2 className="text-lg font-black text-primary tracking-tighter uppercase">ADMIN</h2>
+        <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon"><Menu /></Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="p-0 w-72 bg-card border-r border-border">
+            <SheetHeader className="sr-only"><SheetTitle>Menu Admin</SheetTitle></SheetHeader>
+            <SidebarContent />
+          </SheetContent>
+        </Sheet>
+      </div>
+
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex w-64 bg-card border-r border-border flex-col shrink-0">
+        <SidebarContent />
       </aside>
 
-      <main className="flex-1 overflow-y-auto p-8 bg-background/50">
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-background/50">
         <div className="max-w-4xl mx-auto space-y-8">
-          <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-black uppercase tracking-tighter text-foreground">{activeSection}</h1>
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+            <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-foreground">{activeSection}</h1>
             <div className="flex flex-col items-end gap-2">
-              <Button onClick={handleSaveBusinessInfo} size="lg" className="rounded-xl px-10 h-14 font-bold shadow-2xl transition-all active:scale-95" disabled={isSaving}>
+              <Button onClick={handleSaveBusinessInfo} size="lg" className="w-full md:w-auto rounded-xl px-10 h-14 font-bold shadow-2xl transition-all active:scale-95" disabled={isSaving}>
                 {isSaving ? <Loader2 className="animate-spin mr-2" /> : <Save className="mr-2" size={20} />}
                 Simpan Semua
               </Button>
@@ -374,14 +406,14 @@ export default function AdminDashboard() {
               <CardHeader className="p-6 border-b border-border"><CardTitle>Pesanan Masuk</CardTitle></CardHeader>
               <CardContent className="p-6 space-y-4">
                 {bookings?.map((b: any) => (
-                  <div key={b.id} className="flex justify-between items-center p-5 border border-border rounded-2xl bg-background/40 hover:bg-background/60 transition-colors">
-                    <div>
+                  <div key={b.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 border border-border rounded-2xl bg-background/40 hover:bg-background/60 transition-colors gap-4">
+                    <div className="flex-1">
                       <p className="font-bold text-lg">{b.fullName}</p>
                       <p className="text-sm text-muted-foreground">{b.service} • {b.whatsapp}</p>
                       <p className="text-xs text-muted-foreground/60 mt-1 italic">{b.notes || 'Tanpa catatan'}</p>
                     </div>
-                    <div className="flex gap-2">
-                       <Button variant="outline" size="sm" asChild className="rounded-xl h-10 px-4 font-bold"><a href={`https://wa.me/${b.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank">Chat WA</a></Button>
+                    <div className="flex gap-2 w-full sm:w-auto">
+                       <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none rounded-xl h-10 px-4 font-bold"><a href={`https://wa.me/${b.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank">Chat WA</a></Button>
                        <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 h-10 w-10" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'bookings', b.id))}><Trash2 size={18} /></Button>
                     </div>
                   </div>
@@ -473,8 +505,8 @@ export default function AdminDashboard() {
 
           {activeSection === 'links' && (
              <div className="space-y-6">
-                <Button onClick={handleAddExternalLink} size="lg" className="rounded-2xl px-12 h-16 font-black uppercase tracking-widest bg-primary text-primary-foreground hover:scale-105 transition-all shadow-2xl"><Plus className="mr-2" size={24} /> Tambah Tautan</Button>
-                <div className="grid md:grid-cols-1 gap-6">
+                <Button onClick={handleAddExternalLink} size="lg" className="rounded-2xl w-full md:w-auto px-12 h-16 font-black uppercase tracking-widest bg-primary text-primary-foreground hover:scale-105 transition-all shadow-2xl"><Plus className="mr-2" size={24} /> Tambah Tautan</Button>
+                <div className="grid gap-6">
                   {externalLinks?.map((link: any) => (
                     <Card key={link.id} className="bg-card rounded-3xl border-border overflow-hidden shadow-lg p-6">
                       <div className="grid md:grid-cols-3 gap-4 items-end">
@@ -504,7 +536,7 @@ export default function AdminDashboard() {
             <div className="space-y-8">
               <Card className="rounded-3xl border-border bg-card shadow-xl">
                 <CardHeader><CardTitle className="flex items-center gap-2"><Palette size={20} className="text-primary" /> Pilih Tema Website</CardTitle></CardHeader>
-                <CardContent className="p-8">
+                <CardContent className="p-4 md:p-8">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {THEMES.map((theme) => (
                       <button key={theme.id} onClick={() => setBusinessInfo({...businessInfo, themeId: theme.id})} className={cn("relative flex flex-col gap-3 p-4 rounded-2xl border transition-all", businessInfo.themeId === theme.id ? "border-primary bg-primary/10 ring-2 ring-primary/20" : "border-border bg-background/40")}>
@@ -526,7 +558,7 @@ export default function AdminDashboard() {
                   </div>
                   <div className="space-y-4">
                     <Label className="text-foreground uppercase font-black text-xs">Logo Bisnis</Label>
-                    <div className="flex flex-col md:flex-row items-center gap-8 p-8 border-2 border-dashed border-border rounded-3xl bg-background/20">
+                    <div className="flex flex-col items-center gap-8 p-8 border-2 border-dashed border-border rounded-3xl bg-background/20">
                       <div className="relative min-h-[8rem] min-w-[8rem] bg-background rounded-2xl overflow-hidden border border-border flex items-center justify-center p-4">
                         {businessInfo.logoUrl ? <img src={businessInfo.logoUrl} alt="Logo" className="max-h-full w-auto object-contain" /> : <Cpu className="w-16 h-16 opacity-10" />}
                       </div>
@@ -580,9 +612,9 @@ export default function AdminDashboard() {
                   </CardContent>
                 </Card>
 
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                   <h3 className="text-xl font-bold uppercase tracking-tight">Daftar Layanan Individu</h3>
-                  <Button onClick={handleAddService} size="lg" className="rounded-2xl px-8 h-12 font-black uppercase bg-primary text-primary-foreground shadow-lg"><Plus className="mr-2" size={18} /> Tambah Layanan</Button>
+                  <Button onClick={handleAddService} size="lg" className="w-full sm:w-auto rounded-2xl px-8 h-12 font-black uppercase bg-primary text-primary-foreground shadow-lg"><Plus className="mr-2" size={18} /> Tambah Layanan</Button>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
