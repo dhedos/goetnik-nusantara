@@ -10,19 +10,18 @@ export function FirebaseErrorListener() {
   useEffect(() => {
     const handlePermissionError = (error: FirestorePermissionError) => {
       if (error && error.context) {
-        // Log detail ke konsol dengan format yang jelas untuk debugging
-        // Kita menggunakan stringify untuk memastikan objek tidak tampil kosong di konsol beberapa browser
-        console.error('Firestore Access Denied Details:', JSON.stringify({
-          path: error.context.path,
-          operation: error.context.operation,
-          message: error.message
-        }, null, 2));
-
-        // Abaikan notifikasi toast untuk path 'main' karena seringkali hanya delay propagasi rules di awal
+        // Abaikan notifikasi untuk path 'main' karena seringkali hanya delay propagasi rules di awal
         // atau saat auth sedang diinisialisasi.
         const isMainPath = error.context.path.includes('main');
         
         if (!isMainPath) {
+          // Log detail ke konsol hanya untuk error yang bukan transien
+          console.error('Firestore Access Denied Details:', JSON.stringify({
+            path: error.context.path,
+            operation: error.context.operation,
+            message: error.message
+          }, null, 2));
+
           toast({
             variant: "destructive",
             title: "Akses Ditolak",
