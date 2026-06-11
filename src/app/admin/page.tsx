@@ -448,7 +448,6 @@ export default function AdminDashboard() {
             </Card>
           )}
 
-          {/* Sections lainnya di-render secara dinamis berdasarkan state activeSection... */}
           {activeSection === 'portfolio' && (
             <Card className="rounded-3xl border-border bg-card shadow-xl overflow-hidden">
               <CardHeader className="p-8 border-b border-border">

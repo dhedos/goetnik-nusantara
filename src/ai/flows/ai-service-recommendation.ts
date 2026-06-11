@@ -36,9 +36,12 @@ export async function recommendService(input: AIServiceRecommendationInput): Pro
 
 const prompt = ai.definePrompt({
   name: 'aiServiceRecommendationPrompt',
-  model: 'googleai/gemini-2.0-flash',
+  model: 'googleai/gemini-1.5-flash',
   input: { schema: AIServiceRecommendationInputSchema },
   output: { schema: AIServiceRecommendationOutputSchema },
+  config: {
+    temperature: 0.7,
+  },
   prompt: `Anda adalah pakar teknologi dan konsultan layanan digital senior. Tugas Anda adalah membantu pelanggan memilih layanan terbaik dari daftar yang tersedia.
 
 Berikut adalah daftar layanan aktif kami:
@@ -63,7 +66,13 @@ const aiServiceRecommendationFlow = ai.defineFlow(
     outputSchema: AIServiceRecommendationOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input);
-    return output!;
+    try {
+      const { output } = await prompt(input);
+      if (!output) throw new Error('AI tidak memberikan output');
+      return output;
+    } catch (error: any) {
+      console.error('Genkit Flow Error:', error);
+      throw error;
+    }
   }
 );
