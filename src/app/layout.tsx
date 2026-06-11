@@ -22,6 +22,27 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Cinzel:wght@400;700;900&family=Marcellus&family=Almendra:wght@400;700&family=Lora:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const theme = JSON.parse(localStorage.getItem('goetnik-theme-cache'));
+                  if (theme) {
+                    const root = document.documentElement;
+                    root.style.setProperty('--primary', theme.primary);
+                    root.style.setProperty('--accent', theme.accent);
+                    root.style.setProperty('--background', theme.background);
+                    root.style.setProperty('--foreground', theme.foreground);
+                    root.style.setProperty('--card', theme.card);
+                    root.style.setProperty('--border', theme.border);
+                    root.style.setProperty('--selected-font', theme.fontFamily);
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
       </head>
       <body className="font-body antialiased bg-background text-foreground">
         <FirebaseClientProvider>
