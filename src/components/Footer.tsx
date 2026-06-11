@@ -44,6 +44,12 @@ export function Footer({ businessId }: FooterProps) {
   const privacyPolicyContent = settings?.privacyPolicy || 'Kebijakan privasi belum diatur oleh admin.';
   const logoH = parseInt(settings?.logoHeight) || 32;
 
+  const formatSocialUrl = (url: string) => {
+    if (!url) return '#';
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    return `https://${url}`;
+  };
+
   const socialLinks = {
     instagram: settings?.socialInstagram || '',
     facebook: settings?.socialFacebook || '',
@@ -98,7 +104,7 @@ export function Footer({ businessId }: FooterProps) {
 
           <div className="flex gap-3 pt-2">
             <a 
-              href={socialLinks.instagram || '#'} 
+              href={formatSocialUrl(socialLinks.instagram)} 
               target={socialLinks.instagram ? "_blank" : "_self"}
               onClick={(e) => handleSocialClick(e, socialLinks.instagram, 'Instagram')}
               className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all"
@@ -106,7 +112,7 @@ export function Footer({ businessId }: FooterProps) {
               <Instagram size={18} />
             </a>
             <a 
-              href={socialLinks.facebook || '#'} 
+              href={formatSocialUrl(socialLinks.facebook)} 
               target={socialLinks.facebook ? "_blank" : "_self"}
               onClick={(e) => handleSocialClick(e, socialLinks.facebook, 'Facebook')}
               className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all"
@@ -114,7 +120,7 @@ export function Footer({ businessId }: FooterProps) {
               <Facebook size={18} />
             </a>
             <a 
-              href={socialLinks.youtube || '#'} 
+              href={formatSocialUrl(socialLinks.youtube)} 
               target={socialLinks.youtube ? "_blank" : "_self"}
               onClick={(e) => handleSocialClick(e, socialLinks.youtube, 'YouTube')}
               className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all"
@@ -122,7 +128,7 @@ export function Footer({ businessId }: FooterProps) {
               <Youtube size={18} />
             </a>
             <a 
-              href={socialLinks.tiktok || '#'} 
+              href={formatSocialUrl(socialLinks.tiktok)} 
               target={socialLinks.tiktok ? "_blank" : "_self"}
               onClick={(e) => handleSocialClick(e, socialLinks.tiktok, 'TikTok')}
               className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground transition-all"
