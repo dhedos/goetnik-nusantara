@@ -68,7 +68,7 @@ export function Contact({ businessId }: ContactProps) {
                     <WhatsAppIcon className="w-6 h-6" />
                   </div>
                   <div>
-                    <h4 className="font-bold mb-1">WhatsApp Aktif</h4>
+                    <h4 className="font-bold mb-1">WhatsApp</h4>
                     <p className="text-muted-foreground text-sm">+{whatsapp}</p>
                     <Button variant="link" className="p-0 h-auto text-primary mt-2" asChild>
                       <a href={`https://wa.me/${whatsapp}`} target="_blank">Chat Sekarang <ExternalLink size={12} className="ml-1" /></a>

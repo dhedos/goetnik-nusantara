@@ -138,7 +138,7 @@ _Dikirim melalui Sistem Pemesanan Website_`;
                     name="whatsapp"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nomor WhatsApp Anda</FormLabel>
+                        <FormLabel>WhatsApp</FormLabel>
                         <FormControl>
                           <Input placeholder="Contoh: 08123456789" type="tel" {...field} />
                         </FormControl>
