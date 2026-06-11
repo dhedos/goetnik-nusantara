@@ -66,6 +66,8 @@
         "ownerId": { "type": "string" },
         "name": { "type": "string" },
         "whatsapp": { "type": "string" },
+        "phoneNumber": { "type": "string" },
+        "showPhoneNumber": { "type": "boolean" },
         "address": { "type": "string" },
         "email": { "type": "string" },
         "mapEmbedUrl": { "type": "string" },

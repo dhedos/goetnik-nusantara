@@ -1,8 +1,9 @@
+
 "use client";
 
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
-import { MapPin, Mail, ExternalLink, Map as MapIcon } from 'lucide-react';
+import { MapPin, Mail, ExternalLink, Map as MapIcon, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT } from '@/lib/constants';
@@ -33,8 +34,9 @@ export function Contact({ businessId }: ContactProps) {
   const address = settings?.address || BUSINESS_ADDRESS_DEFAULT;
   const email = settings?.email || BUSINESS_EMAIL_DEFAULT;
   const whatsapp = settings?.whatsapp || OWNER_WHATSAPP_DEFAULT;
+  const phoneNumber = settings?.phoneNumber || '';
+  const showPhone = settings?.showPhoneNumber ?? false;
   const mapUrl = settings?.mapEmbedUrl;
-  
   const directMapUrl = settings?.mapDirectUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 
   return (
@@ -56,7 +58,7 @@ export function Contact({ businessId }: ContactProps) {
                     <MapPin size={20} />
                   </div>
                   <div>
-                    <h4 className="font-bold mb-1">Lokasi Kami</h4>
+                    <h4 className="font-bold mb-1">Alamat</h4>
                     <p className="text-muted-foreground text-sm whitespace-pre-wrap">{address}</p>
                   </div>
                 </CardContent>
@@ -76,6 +78,20 @@ export function Contact({ businessId }: ContactProps) {
                   </div>
                 </CardContent>
               </Card>
+
+              {showPhone && phoneNumber && (
+                <Card className="bg-secondary/20 border-border/50">
+                  <CardContent className="p-6 flex gap-4 items-start">
+                    <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0">
+                      <Phone size={20} />
+                    </div>
+                    <div>
+                      <h4 className="font-bold mb-1">No Telp</h4>
+                      <p className="text-muted-foreground text-sm">{phoneNumber}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               <Card className="bg-secondary/20 border-border/50">
                 <CardContent className="p-6 flex gap-4 items-start">
@@ -113,15 +129,13 @@ export function Contact({ businessId }: ContactProps) {
                   </div>
                 </>
               ) : (
-                <div className="flex flex-col items-center gap-4 p-8 text-center max-w-sm animate-in fade-in duration-500">
+                <div className="flex flex-col items-center gap-4 p-8 text-center max-w-sm">
                   <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
                     <MapIcon size={32} />
                   </div>
                   <div>
                     <h4 className="font-bold text-lg mb-2">Lokasi belum tersedia</h4>
-                    <p className="text-muted-foreground text-sm">
-                      Admin belum mengonfigurasi titik lokasi peta.
-                    </p>
+                    <p className="text-muted-foreground text-sm">Cari lokasi di Dashboard Admin untuk mengaktifkan peta.</p>
                   </div>
                 </div>
               )}
