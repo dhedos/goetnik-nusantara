@@ -14,7 +14,7 @@ import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
-  Settings, ShoppingBag, ExternalLink, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2
+  Settings, ShoppingBag, ExternalLink, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -34,8 +34,8 @@ export default function AdminDashboard() {
   const [isUploading, setIsUploading] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
   
-  // Pastikan data hanya diambil jika user sudah terotentikasi dan firestore tersedia
   const canFetchData = !!(firestore && user);
 
   const servicesQuery = useMemoFirebase(() => 
@@ -124,7 +124,11 @@ export default function AdminDashboard() {
     
     setDoc(docRef, data, { merge: true })
       .then(() => {
-        toast({ title: "Berhasil Disimpan", description: "Semua perubahan telah diterapkan ke website secara otomatis." });
+        setLastSaved(new Date());
+        toast({ 
+          title: "Berhasil Disimpan", 
+          description: "Semua perubahan telah diterapkan ke website secara otomatis." 
+        });
         setIsSaving(false);
       })
       .catch((e) => {
@@ -134,6 +138,11 @@ export default function AdminDashboard() {
           operation: 'write',
           requestResourceData: data,
         }));
+        toast({ 
+          variant: "destructive",
+          title: "Gagal Menyimpan", 
+          description: "Periksa koneksi internet atau izin akses Anda." 
+        });
       });
   };
 
@@ -227,12 +236,20 @@ export default function AdminDashboard() {
 
       <main className="flex-1 overflow-y-auto p-8 bg-[#0B1120]">
         <div className="max-w-4xl mx-auto space-y-8">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-start">
             <h1 className="text-3xl font-black italic uppercase text-white">{activeSection}</h1>
-            <Button onClick={handleSaveBusinessInfo} size="lg" className="rounded-xl px-8 h-12 font-bold shadow-xl" disabled={isSaving}>
-              {isSaving ? <Loader2 className="animate-spin mr-2" /> : <Save className="mr-2" size={20} />}
-              Simpan Semua
-            </Button>
+            <div className="flex flex-col items-end gap-2">
+              <Button onClick={handleSaveBusinessInfo} size="lg" className="rounded-xl px-8 h-12 font-bold shadow-xl" disabled={isSaving}>
+                {isSaving ? <Loader2 className="animate-spin mr-2" /> : <Save className="mr-2" size={20} />}
+                Simpan Semua
+              </Button>
+              {lastSaved && (
+                <div className="flex items-center gap-1.5 text-[10px] text-primary font-black uppercase tracking-widest animate-in fade-in slide-in-from-right-2">
+                  <CheckCircle2 size={12} />
+                  Tersimpan: {lastSaved.toLocaleTimeString('id-ID')}
+                </div>
+              )}
+            </div>
           </div>
 
           {activeSection === 'bookings' && (

@@ -10,12 +10,12 @@ export function FirebaseErrorListener() {
   useEffect(() => {
     const handlePermissionError = (error: FirestorePermissionError) => {
       if (error && error.context) {
-        // Abaikan notifikasi untuk path 'main' karena seringkali hanya delay propagasi rules di awal
-        // atau saat auth sedang diinisialisasi.
         const isMainPath = error.context.path.includes('main');
+        const isReadOperation = error.context.operation === 'get' || error.context.operation === 'list';
         
-        if (!isMainPath) {
-          // Log detail ke konsol hanya untuk error yang bukan transien
+        // Hanya abaikan error JIKA itu adalah operasi pembacaan (get/list) pada jalur utama (saat auth init)
+        // Jika itu operasi penulisan (write/create/update) atau pada jalur lain, tampilkan detailnya.
+        if (!(isMainPath && isReadOperation)) {
           console.error('Firestore Access Denied Details:', JSON.stringify({
             path: error.context.path,
             operation: error.context.operation,
