@@ -11,12 +11,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
-  Settings, ShoppingBag, ExternalLink, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, MoveVertical, Maximize
+  Settings, ShoppingBag, ExternalLink, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, MoveVertical, Maximize, Type
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -26,6 +27,15 @@ import Image from 'next/image';
 import { PRIVACY_POLICY_DEFAULT, BUSINESS_NAME_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT, MAIN_BUSINESS_ID } from '@/lib/constants';
 
 type AdminSection = 'bookings' | 'services' | 'branding' | 'hero' | 'about' | 'contact' | 'social' | 'privacy';
+
+const ETHNIC_FONTS = [
+  { name: 'Cinzel', label: 'Cinzel (Etnik Monumental)' },
+  { name: 'Marcellus', label: 'Marcellus (Klasik Bersih)' },
+  { name: 'Almendra', label: 'Almendra (Etnik Ukiran)' },
+  { name: 'Lora', label: 'Lora (Serif Anggun)' },
+  { name: 'Playfair Display', label: 'Playfair (Mewah Tradisional)' },
+  { name: 'Inter', label: 'Inter (Modern Standar)' }
+];
 
 export default function AdminDashboard() {
   const { user, loading: authLoading } = useUser();
@@ -70,6 +80,7 @@ export default function AdminDashboard() {
     logoAccentText: 'NUSANTARA',
     logoUrl: '',
     logoHeight: '36',
+    fontFamily: 'Inter',
     heroBadge: 'Solusi Digital Terpercaya',
     heroTitle: BUSINESS_NAME_DEFAULT,
     heroSubtitle: 'Kami melayani kebutuhan teknologi, desain grafis, dan pembuatan aplikasi secara profesional.',
@@ -103,7 +114,8 @@ export default function AdminDashboard() {
         ...prev,
         ...settings,
         heroImagePosition: settings.heroImagePosition || '50%',
-        logoHeight: settings.logoHeight || '36'
+        logoHeight: settings.logoHeight || '36',
+        fontFamily: settings.fontFamily || 'Inter'
       }));
       hasLoadedSettings.current = true;
     }
@@ -208,7 +220,7 @@ export default function AdminDashboard() {
   const navItems = [
     { id: 'bookings', label: 'Pesanan', icon: ShoppingBag },
     { id: 'services', label: 'Layanan', icon: Settings },
-    { id: 'branding', label: 'Logo & Teks', icon: Layout },
+    { id: 'branding', label: 'Logo & Tipografi', icon: Layout },
     { id: 'hero', label: 'Banner Utama', icon: Globe },
     { id: 'about', label: 'Tentang Kami', icon: Info },
     { id: 'contact', label: 'Kontak & Peta', icon: MapPin },
@@ -284,7 +296,30 @@ export default function AdminDashboard() {
           {activeSection === 'branding' && (
             <Card className="rounded-3xl border-white/5 bg-card/50">
               <CardContent className="p-8 space-y-8">
-                <div className="space-y-4">
+                {/* Font Selection */}
+                <div className="space-y-4 p-6 bg-primary/5 rounded-2xl border border-primary/10">
+                  <Label className="text-white uppercase font-bold text-xs flex items-center gap-2">
+                    <Type size={14} className="text-primary" /> Gaya Huruf (Font Etnik)
+                  </Label>
+                  <Select 
+                    value={businessInfo.fontFamily} 
+                    onValueChange={(val) => setBusinessInfo({...businessInfo, fontFamily: val})}
+                  >
+                    <SelectTrigger className="rounded-xl h-12 bg-background/50 border-white/5 text-sm font-medium">
+                      <SelectValue placeholder="Pilih Font Website" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ETHNIC_FONTS.map((font) => (
+                        <SelectItem key={font.name} value={font.name} className="py-3">
+                          <span style={{ fontFamily: font.name }}>{font.label}</span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest leading-relaxed">Pilih font yang mencerminkan nuansa Nusantara untuk seluruh website Anda.</p>
+                </div>
+
+                <div className="space-y-4 pt-4 border-t border-white/5">
                   <Label className="text-white uppercase font-bold text-xs">Logo Bisnis</Label>
                   <div className="flex items-center gap-6 p-6 border-2 border-dashed border-white/10 rounded-3xl bg-background/20">
                     <div className="relative h-24 w-24 bg-[#0B1120] rounded-xl overflow-hidden border border-white/5">
@@ -312,7 +347,6 @@ export default function AdminDashboard() {
                       onValueChange={(val) => setBusinessInfo({...businessInfo, logoHeight: `${val[0]}`})} 
                       className="py-4"
                     />
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest text-center">Sesuaikan ukuran logo agar pas dengan menu navigasi</p>
                   </div>
                 </div>
                 <div className="grid md:grid-cols-2 gap-6">
@@ -366,7 +400,6 @@ export default function AdminDashboard() {
                     onValueChange={(val) => setBusinessInfo({...businessInfo, heroImagePosition: `${val[0]}%`})} 
                     className="py-4"
                   />
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest text-center">Geser slider di atas untuk menyesuaikan fokus gambar banner</p>
                 </div>
 
                 <div className="space-y-4">

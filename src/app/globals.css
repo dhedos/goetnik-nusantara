@@ -25,6 +25,10 @@
     --input: 222 47% 25%;
     --ring: 217 91% 60%;
     --radius: 1rem;
+    
+    /* Dynamic Font Variable */
+    --selected-font: 'Inter', sans-serif;
+    --font-weight-display: 800;
   }
 }
 
@@ -33,7 +37,12 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-body antialiased selection:bg-primary/30 overflow-x-hidden;
+    @apply bg-background text-foreground antialiased selection:bg-primary/30 overflow-x-hidden;
+    font-family: var(--selected-font);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--selected-font);
   }
 }
 
