@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Image from 'next/image';
-import { LucideIcon, Check, ArrowRight, Info, ShoppingCart } from 'lucide-react';
+import { LucideIcon, Check, ArrowRight, Info, ShoppingCart, X } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -63,7 +63,7 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
 
   return (
     <Card className="flex flex-col h-full bg-card/40 border-white/5 hover:border-primary/30 transition-all duration-500 group overflow-hidden rounded-[2rem] shadow-2xl relative">
-      {/* Tampilan Grid: Tetap Object-Cover agar rapi */}
+      {/* Tampilan Grid: Tetap Object-Cover agar rapi dalam grid susunan depan */}
       <div className="relative h-72 overflow-hidden bg-background/50">
         {hasGallery ? (
           <Carousel 
@@ -146,23 +146,24 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
               <Info size={14} className="mr-2" /> Lihat Detail
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-3xl w-[95vw] rounded-3xl border-border bg-card p-0 overflow-hidden shadow-2xl">
+          <DialogContent className="max-w-4xl w-[95vw] rounded-3xl border-border bg-card p-0 overflow-hidden shadow-2xl">
             <ScrollArea className="max-h-[90vh]">
               <div className="p-0">
-                {/* Modal Gallery: Object-Contain agar gambar asli UTUH terlihat */}
-                <div className="relative h-[40vh] sm:h-[60vh] bg-background/90 flex items-center justify-center overflow-hidden">
+                {/* Modal Gallery: Tinggi lebih besar di mobile (60vh) agar gambar portrait tidak terpotong dan terlihat utuh */}
+                <div className="relative h-[60vh] sm:h-[70vh] bg-background/95 flex items-center justify-center overflow-hidden">
                    {allImages.length > 0 ? (
                       <Carousel className="w-full h-full">
-                        <CarouselContent className="h-[40vh] sm:h-[60vh]">
+                        <CarouselContent className="h-[60vh] sm:h-[70vh]">
                           {allImages.map((img, index) => (
                             <CarouselItem key={index} className="h-full flex items-center justify-center">
-                              <div className="relative w-full h-full p-4">
+                              <div className="relative w-full h-full p-6 sm:p-10">
                                 <Image 
                                   src={img}
                                   alt={`${name} - ${index + 1}`}
                                   fill
                                   className="object-contain"
                                   unoptimized={img.startsWith('data:')}
+                                  priority
                                 />
                               </div>
                             </CarouselItem>
@@ -170,8 +171,8 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
                         </CarouselContent>
                         {allImages.length > 1 && (
                           <>
-                            <CarouselPrevious className="left-4 bg-black/40 border-none text-white hover:bg-black/60 z-30" />
-                            <CarouselNext className="right-4 bg-black/40 border-none text-white hover:bg-black/60 z-30" />
+                            <CarouselPrevious className="left-4 bg-black/60 border-none text-white hover:bg-black/80 z-30 h-10 w-10" />
+                            <CarouselNext className="right-4 bg-black/60 border-none text-white hover:bg-black/80 z-30 h-10 w-10" />
                           </>
                         )}
                       </Carousel>
@@ -183,49 +184,49 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
                    </div>
                 </div>
 
-                <div className="p-6 sm:p-10 space-y-8">
+                <div className="p-6 sm:p-12 space-y-10">
                   <DialogHeader className="space-y-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
-                        <Icon size={32} />
+                    <div className="flex items-center gap-5">
+                      <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shadow-inner">
+                        <Icon size={36} />
                       </div>
                       <div>
-                        <DialogTitle className="text-2xl sm:text-3xl font-black uppercase tracking-tighter text-foreground">
+                        <DialogTitle className="text-2xl sm:text-4xl font-black uppercase tracking-tighter text-foreground leading-none">
                           {name}
                         </DialogTitle>
-                        <p className="text-primary font-bold text-sm">{price}</p>
+                        <p className="text-primary font-bold text-base mt-2">{price}</p>
                       </div>
                     </div>
                   </DialogHeader>
 
-                  <div className="space-y-6">
+                  <div className="space-y-8">
                     <div className="space-y-3">
-                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Deskripsi Layanan</h4>
-                      <p className="text-foreground/80 text-sm sm:text-base leading-relaxed whitespace-pre-wrap">
+                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-60">Deskripsi Layanan</h4>
+                      <p className="text-foreground/90 text-sm sm:text-lg leading-relaxed whitespace-pre-wrap">
                         {description}
                       </p>
                     </div>
 
                     <div className="space-y-4">
-                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Fitur & Keunggulan</h4>
-                      <div className="grid sm:grid-cols-2 gap-3">
+                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground opacity-60">Fitur & Keunggulan</h4>
+                      <div className="grid sm:grid-cols-2 gap-4">
                         {features && features.map((feature, i) => (
-                          <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-secondary/20 border border-border/50">
-                            <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                              <Check size={12} strokeWidth={4} />
+                          <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-secondary/20 border border-border/40 hover:bg-secondary/30 transition-colors">
+                            <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-primary shrink-0">
+                              <Check size={14} strokeWidth={4} />
                             </div>
-                            <span className="text-xs font-bold uppercase tracking-tight opacity-70">{feature}</span>
+                            <span className="text-xs sm:text-sm font-bold uppercase tracking-tight opacity-80">{feature}</span>
                           </div>
                         ))}
                       </div>
                     </div>
                   </div>
 
-                  <div className="pt-6 border-t border-border flex flex-col sm:flex-row gap-4">
-                    <Button onClick={handleOrderClick} size="lg" className="flex-1 rounded-2xl h-16 font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20">
-                      <ShoppingCart className="mr-2" size={18} /> Pesan Sekarang
+                  <div className="pt-8 border-t border-border flex flex-col sm:flex-row gap-4">
+                    <Button onClick={handleOrderClick} size="lg" className="flex-1 rounded-2xl h-16 font-black uppercase tracking-widest text-xs shadow-2xl shadow-primary/30 active:scale-95 transition-all">
+                      <ShoppingCart className="mr-2" size={20} /> Pesan Sekarang
                     </Button>
-                    <Button variant="ghost" onClick={() => setIsModalOpen(false)} className="rounded-2xl h-16 px-8 font-bold uppercase text-[10px] tracking-widest">
+                    <Button variant="ghost" onClick={() => setIsModalOpen(false)} className="rounded-2xl h-16 px-10 font-bold uppercase text-[10px] tracking-widest hover:bg-secondary/20">
                       Kembali
                     </Button>
                   </div>
