@@ -87,7 +87,7 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
       updateIcon('dynamic-apple-icon', settings.logoUrl);
     }
 
-    // Save to Cache for instant reload on next visit
+    // Simpan ke Cache untuk muat ulang instan pada kunjungan berikutnya
     try {
       localStorage.setItem('goetnik-theme-cache', JSON.stringify({
         primary: selectedTheme.primary,
