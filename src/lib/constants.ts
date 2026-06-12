@@ -1,5 +1,5 @@
 
-import { Monitor, HardDrive, Palette, Globe, CheckCircle, Clock, ShieldCheck, Laptop, Phone, Wrench } from 'lucide-react';
+import { Monitor, HardDrive, Palette, Globe, CheckCircle, Clock, ShieldCheck, Laptop, Phone, Wrench, Mail, Smartphone, Cpu, Settings, PenTool } from 'lucide-react';
 
 export const MAIN_BUSINESS_ID = "main";
 export const BUSINESS_NAME_DEFAULT = "Go Etnik NUSANTARA";
@@ -25,14 +25,34 @@ export const ICON_MAP: Record<string, any> = {
   Monitor,
   HardDrive,
   Palette,
+  PenTool,
   Globe,
   CheckCircle,
   Clock,
   ShieldCheck,
   Laptop,
   Phone,
-  Wrench
+  Wrench,
+  Mail,
+  Smartphone,
+  Cpu,
+  Settings
 };
+
+export const ICON_OPTIONS = [
+  { value: 'Laptop', label: 'Service Laptop' },
+  { value: 'Monitor', label: 'Monitor / Layar' },
+  { value: 'Palette', label: 'Desain Grafis' },
+  { value: 'PenTool', label: 'Logo / Ilustrasi' },
+  { value: 'Mail', label: 'Undangan Online' },
+  { value: 'Settings', label: 'Instalasi OS/Software' },
+  { value: 'Globe', label: 'Website / Digital' },
+  { value: 'Smartphone', label: 'Aplikasi HP' },
+  { value: 'Cpu', label: 'Hardware / Upgrade' },
+  { value: 'Wrench', label: 'Perbaikan Fisik' },
+  { value: 'ShieldCheck', label: 'Keamanan / Antivirus' },
+  { value: 'Phone', label: 'Komunikasi' },
+];
 
 export const ADVANTAGES = [
   {

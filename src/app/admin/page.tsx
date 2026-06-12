@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
@@ -25,7 +26,7 @@ import { FirestorePermissionError } from '@/firebase/errors';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import Image from 'next/image';
-import { PRIVACY_POLICY_DEFAULT, BUSINESS_NAME_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT, MAIN_BUSINESS_ID, THEMES } from '@/lib/constants';
+import { PRIVACY_POLICY_DEFAULT, BUSINESS_NAME_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT, MAIN_BUSINESS_ID, THEMES, ICON_OPTIONS } from '@/lib/constants';
 
 type AdminSection = 'bookings' | 'services' | 'portfolio' | 'links' | 'branding' | 'hero' | 'about' | 'contact' | 'social' | 'privacy';
 
@@ -197,7 +198,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // Diperbarui untuk mendukung ukuran penuh dan kualitas tinggi
   const resizeAndCompressImage = (file: File, maxWidth: number = 1600, quality: number = 0.9): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -210,7 +210,6 @@ export default function AdminDashboard() {
           let width = img.width;
           let height = img.height;
           
-          // Tetap menjaga rasio asli tapi batasi jika terlalu ekstrem (4K+)
           if (width > maxWidth) {
             height = (maxWidth / width) * height;
             width = maxWidth;
@@ -223,7 +222,6 @@ export default function AdminDashboard() {
           ctx?.clearRect(0, 0, width, height);
           ctx?.drawImage(img, 0, 0, width, height);
           
-          // Gunakan PNG untuk logo agar transparan, atau WebP untuk lainnya agar efisien tapi tajam
           const isLogo = file.name.toLowerCase().includes('logo');
           const format = isLogo ? 'image/png' : 'image/webp';
           const compressedBase64 = canvas.toDataURL(format, quality);
@@ -240,7 +238,6 @@ export default function AdminDashboard() {
     if (!file || !user || !firestore) return;
     setIsUploading(target);
     try {
-      // Gunakan maxWidth lebih besar untuk banner/layanan
       const isBranding = target === 'logo' || target === 'hero';
       const compressedBase64 = await resizeAndCompressImage(file, isBranding ? 1800 : 1600);
       
@@ -326,7 +323,7 @@ export default function AdminDashboard() {
       name: 'Layanan Baru',
       price: 'Rp 0',
       description: 'Deskripsi layanan...',
-      iconName: 'Monitor',
+      iconName: 'Laptop',
       imageUrl: '',
       galleryUrls: [],
       features: ['Fitur Layanan'],
@@ -399,7 +396,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-background text-foreground transition-colors duration-500" style={{ fontFamily: 'var(--selected-font)' }}>
-      {/* Mobile Top Header */}
       <div className="md:hidden flex items-center justify-between p-4 border-b border-border bg-card">
         <h2 className="text-lg font-black text-primary tracking-tighter uppercase">ADMIN</h2>
         <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
@@ -412,12 +408,10 @@ export default function AdminDashboard() {
         </Sheet>
       </div>
 
-      {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 bg-card border-r border-border flex-col shrink-0">
         <SidebarContent />
       </aside>
 
-      {/* Main Area */}
       <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-background/50">
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
@@ -435,7 +429,6 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {/* Section: Bookings */}
           {activeSection === 'bookings' && (
             <Card className="rounded-3xl border-border bg-card shadow-xl overflow-hidden">
               <CardHeader className="p-6 border-b border-border"><CardTitle>Pesanan Masuk</CardTitle></CardHeader>
@@ -458,7 +451,6 @@ export default function AdminDashboard() {
             </Card>
           )}
 
-          {/* Section: Portfolio */}
           {activeSection === 'portfolio' && (
             <Card className="rounded-3xl border-border bg-card shadow-xl overflow-hidden">
               <CardHeader className="p-8 border-b border-border">
@@ -498,7 +490,6 @@ export default function AdminDashboard() {
             </Card>
           )}
 
-          {/* Section: Contact */}
           {activeSection === 'contact' && (
             <Card className="rounded-3xl border-border bg-card shadow-xl">
               <CardContent className="p-8 space-y-8">
@@ -547,7 +538,6 @@ export default function AdminDashboard() {
             </Card>
           )}
 
-          {/* Section: External Links */}
           {activeSection === 'links' && (
              <div className="space-y-6">
                 <Button onClick={handleAddExternalLink} size="lg" className="rounded-2xl w-full md:w-auto px-12 h-16 font-black uppercase tracking-widest bg-primary text-primary-foreground hover:scale-105 transition-all shadow-2xl"><Plus className="mr-2" size={24} /> Tambah Tautan</Button>
@@ -577,7 +567,6 @@ export default function AdminDashboard() {
              </div>
           )}
 
-          {/* Section: Branding */}
           {activeSection === 'branding' && (
             <div className="space-y-8">
               <Card className="rounded-3xl border-border bg-card shadow-xl">
@@ -624,7 +613,6 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* Section: Hero */}
           {activeSection === 'hero' && (
             <Card className="rounded-3xl border-border bg-card shadow-xl">
               <CardContent className="p-8 space-y-8">
@@ -647,7 +635,6 @@ export default function AdminDashboard() {
             </Card>
           )}
 
-          {/* Section: Services */}
           {activeSection === 'services' && (
              <div className="space-y-8">
                 <Card className="rounded-3xl border-border bg-card shadow-xl">
@@ -716,7 +703,19 @@ export default function AdminDashboard() {
                           <div className="space-y-1"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40">Nama Layanan</Label><Input defaultValue={s.name} className="rounded-xl h-12 bg-background border-border font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { name: e.target.value })} /></div>
                           <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40">Harga / Biaya</Label><Input defaultValue={s.price} className="rounded-xl h-12 bg-background border-border font-bold text-primary" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { price: e.target.value })} /></div>
-                            <div className="space-y-1"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40">Ikon (Lucide)</Label><Input defaultValue={s.iconName} className="rounded-xl h-12 bg-background border-border font-mono text-xs" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { iconName: e.target.value })} /></div>
+                            <div className="space-y-1">
+                              <Label className="text-[10px] font-black uppercase tracking-widest opacity-40">Ikon (Lucide)</Label>
+                              <Select defaultValue={s.iconName} onValueChange={(val) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { iconName: val })}>
+                                <SelectTrigger className="rounded-xl h-12 bg-background border-border font-bold">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {ICON_OPTIONS.map((opt) => (
+                                    <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
                           </div>
                           <div className="space-y-1"><Label className="text-[10px] font-black uppercase tracking-widest opacity-40">Deskripsi Singkat</Label><Textarea defaultValue={s.description} className="rounded-xl min-h-[100px] bg-background border-border text-sm leading-relaxed" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { description: e.target.value })} /></div>
                         </div>
@@ -727,7 +726,6 @@ export default function AdminDashboard() {
              </div>
           )}
 
-          {/* Section: About */}
           {activeSection === 'about' && (
             <Card className="rounded-3xl border-border bg-card shadow-xl">
               <CardContent className="p-8 space-y-6">
@@ -737,7 +735,6 @@ export default function AdminDashboard() {
             </Card>
           )}
 
-          {/* Section: Privacy */}
           {activeSection === 'privacy' && (
             <Card className="rounded-3xl border-border bg-card shadow-xl">
               <CardContent className="p-8 space-y-4">
@@ -747,7 +744,6 @@ export default function AdminDashboard() {
             </Card>
           )}
 
-          {/* Section: Social Media */}
           {activeSection === 'social' && (
             <Card className="rounded-3xl border-border bg-card shadow-xl">
               <CardContent className="p-8 space-y-6">
