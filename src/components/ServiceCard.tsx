@@ -64,21 +64,8 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
 
   return (
     <Card className="flex flex-col h-full bg-card/40 border-white/5 hover:border-primary/30 transition-all duration-500 group overflow-hidden rounded-[2rem] shadow-2xl relative">
-      {/* Container Gambar / Carousel - Menggunakan object-contain agar utuh */}
-      <div className="relative h-72 overflow-hidden bg-background/50 flex items-center justify-center">
-        {/* Efek blurred background untuk estetika jika gambar tidak penuh */}
-        {allImages.length > 0 && (
-          <div className="absolute inset-0 z-0 opacity-20 blur-xl scale-110 pointer-events-none">
-            <Image 
-              src={allImages[0]}
-              alt="Blur Background"
-              fill
-              className="object-cover"
-              unoptimized={allImages[0].startsWith('data:')}
-            />
-          </div>
-        )}
-
+      {/* Container Gambar / Carousel - Menggunakan object-cover untuk grid yang rapi */}
+      <div className="relative h-72 overflow-hidden bg-background/50">
         {hasGallery ? (
           <Carousel 
             className="w-full h-full z-10"
@@ -86,13 +73,13 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
           >
             <CarouselContent className="h-72">
               {allImages.map((img, index) => (
-                <CarouselItem key={index} className="h-72 flex items-center justify-center">
-                  <div className="relative w-full h-full p-2">
+                <CarouselItem key={index} className="h-72">
+                  <div className="relative w-full h-full">
                     <Image 
                       src={img}
                       alt={`${name} - ${index + 1}`}
                       fill
-                      className="object-contain"
+                      className="object-cover"
                       unoptimized={img.startsWith('data:')}
                     />
                   </div>
@@ -106,19 +93,19 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
           </Carousel>
         ) : (
           allImages.length > 0 && (
-            <div className="relative w-full h-full z-10 p-2">
+            <div className="relative w-full h-full z-10">
               <Image 
                 src={allImages[0]}
                 alt={name}
                 fill
-                className="object-contain transition-transform duration-1000 group-hover:scale-105"
+                className="object-cover transition-transform duration-1000 group-hover:scale-105"
                 unoptimized={allImages[0].startsWith('data:')}
               />
             </div>
           )
         )}
         
-        <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent pointer-events-none z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent pointer-events-none z-10" />
         
         {/* Badge Harga Mengambang */}
         <div className="absolute top-4 right-4 bg-primary/90 backdrop-blur-md text-primary-foreground px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl z-20">
@@ -165,13 +152,13 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
           <DialogContent className="max-w-3xl w-[95vw] rounded-3xl border-border bg-card p-0 overflow-hidden shadow-2xl">
             <ScrollArea className="max-h-[90vh]">
               <div className="p-0">
-                {/* Modal Gallery - Menggunakan object-contain untuk ukuran penuh */}
-                <div className="relative h-[40vh] sm:h-[60vh] bg-background/80 flex items-center justify-center">
+                {/* Modal Gallery - Menggunakan object-contain untuk melihat gambar secara UTUH */}
+                <div className="relative h-[40vh] sm:h-[60vh] bg-background/90 flex items-center justify-center overflow-hidden">
                    {allImages.length > 0 ? (
                       <Carousel className="w-full h-full">
-                        <CarouselContent className="h-full">
+                        <CarouselContent className="h-[40vh] sm:h-[60vh]">
                           {allImages.map((img, index) => (
-                            <CarouselItem key={index} className="h-[40vh] sm:h-[60vh] flex items-center justify-center">
+                            <CarouselItem key={index} className="h-full flex items-center justify-center">
                               <div className="relative w-full h-full p-4">
                                 <Image 
                                   src={img}
