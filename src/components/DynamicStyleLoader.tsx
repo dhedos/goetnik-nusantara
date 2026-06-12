@@ -22,7 +22,7 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
 
     const root = document.documentElement;
 
-    // 1. Handle Font
+    // 1. Gaya Huruf
     const font = settings.fontFamily || 'Inter';
     const fontValue = `'${font}', sans-serif`;
     root.style.setProperty('--selected-font', fontValue);
@@ -30,7 +30,7 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
     const isEthnic = ['Cinzel', 'Almendra', 'Playfair Display', 'Marcellus', 'Lora'].includes(font);
     root.style.setProperty('--font-weight-display', isEthnic ? '700' : '800');
 
-    // 2. Handle Theme
+    // 2. Tema & Warna
     const themeId = settings.themeId || 'heritage-red';
     const selectedTheme = THEMES.find(t => t.id === themeId) || THEMES[0];
 
@@ -72,7 +72,7 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
     root.style.setProperty('--input', input);
     root.style.setProperty('--card', card);
 
-    // 3. Handle Logo, Dynamic Favicon & Home Screen Icons
+    // 3. Logo & Dynamic Branding (Favicon, iOS, Android)
     if (settings.logoUrl) {
       root.style.setProperty('--loading-logo', `url(${settings.logoUrl})`);
       root.classList.add('has-loading-logo');
@@ -87,7 +87,7 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
       updateIcon('dynamic-apple-icon', settings.logoUrl);
     }
 
-    // Simpan ke Cache untuk muat ulang instan pada kunjungan berikutnya
+    // Cache untuk rendering instan saat reload (Head Script)
     try {
       localStorage.setItem('goetnik-theme-cache', JSON.stringify({
         primary: selectedTheme.primary,

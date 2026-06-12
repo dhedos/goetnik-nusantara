@@ -218,7 +218,7 @@ export default function AdminDashboard() {
           canvas.height = height;
           const ctx = canvas.getContext('2d');
           
-          // Memastikan kanvas bersih dan transparan sebelum menggambar
+          // Memastikan kanvas bersih dan transparan total sebelum menggambar (Fix Hitam)
           ctx?.clearRect(0, 0, width, height);
           ctx?.drawImage(img, 0, 0, width, height);
           
@@ -226,7 +226,7 @@ export default function AdminDashboard() {
           const isLogoTarget = target.toLowerCase().includes('logo');
           const format = isLogoTarget ? 'image/png' : 'image/webp';
           
-          // PNG tidak menggunakan parameter quality
+          // PNG tidak menggunakan parameter quality, akan mengabaikannya
           const compressedBase64 = canvas.toDataURL(format, isLogoTarget ? undefined : quality);
           resolve(compressedBase64);
         };
@@ -539,35 +539,6 @@ export default function AdminDashboard() {
                 </div>
               </CardContent>
             </Card>
-          )}
-
-          {activeSection === 'links' && (
-             <div className="space-y-6">
-                <Button onClick={handleAddExternalLink} size="lg" className="rounded-2xl w-full md:w-auto px-12 h-16 font-black uppercase tracking-widest bg-primary text-primary-foreground hover:scale-105 transition-all shadow-2xl"><Plus className="mr-2" size={24} /> Tambah Tautan</Button>
-                <div className="grid gap-6">
-                  {externalLinks?.map((link: any) => (
-                    <Card key={link.id} className="bg-card rounded-3xl border-border overflow-hidden shadow-lg p-6">
-                      <div className="grid md:grid-cols-3 gap-4 items-end">
-                        <div className="space-y-2">
-                          <Label className="text-xs font-bold uppercase">Judul Link</Label>
-                          <Input defaultValue={link.title} className="rounded-xl h-12 bg-background border-border font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'external-links', link.id), { title: e.target.value })} />
-                        </div>
-                        <div className="space-y-2">
-                          <Label className="text-xs font-bold uppercase">Platform</Label>
-                          <Select defaultValue={link.platform} onValueChange={(val) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'external-links', link.id), { platform: val })}>
-                            <SelectTrigger className="rounded-xl h-12 bg-background border-border"><SelectValue /></SelectTrigger>
-                            <SelectContent><SelectItem value="Shopee">Shopee</SelectItem><SelectItem value="Tokopedia">Tokopedia</SelectItem><SelectItem value="Lazada">Lazada</SelectItem><SelectItem value="Website">Website Partner</SelectItem><SelectItem value="Lainnya">Lainnya</SelectItem></SelectContent>
-                          </Select>
-                        </div>
-                        <div className="flex gap-2">
-                          <div className="flex-1 space-y-2"><Label className="text-xs font-bold uppercase">URL</Label><Input defaultValue={link.url} className="rounded-xl h-12 bg-background border-border" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'external-links', link.id), { url: e.target.value })} /></div>
-                          <Button variant="destructive" size="icon" className="rounded-xl h-12 w-12 shrink-0" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'external-links', link.id))}><Trash2 size={18} /></Button>
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-             </div>
           )}
 
           {activeSection === 'branding' && (

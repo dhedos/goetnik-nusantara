@@ -76,10 +76,10 @@ function HomeContent() {
   const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
 
   useEffect(() => {
-    // Kurangi waktu tunggu buatan agar aplikasi lebih responsif jika data sudah ada
+    // Kurangi waktu tunggu buatan agar lebih responsif
     const safetyTimer = setTimeout(() => {
       setIsReady(true);
-    }, 1000);
+    }, 800);
 
     if (settings && !settingsLoading) {
       setIsReady(true);

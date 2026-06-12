@@ -28,7 +28,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Cinzel:wght@400;700;900&family=Marcellus&family=Almendra:wght@400;700&family=Lora:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
         
-        {/* Transparent initial placeholders to avoid Firebase/Vercel default icon flash */}
+        {/* Placeholder transparan untuk menghindari ikon default pihak ketiga */}
         <link id="dynamic-favicon" rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1 1%22></svg>" />
         <link id="dynamic-shortcut-icon" rel="shortcut icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1 1%22></svg>" />
         <link id="dynamic-apple-icon" rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 1 1%22></svg>" />
@@ -41,7 +41,6 @@ export default function RootLayout({
                   const theme = JSON.parse(localStorage.getItem('goetnik-theme-cache'));
                   if (theme) {
                     const root = document.documentElement;
-                    // Terapkan semua variabel CSS tema segera untuk menghindari flash
                     if (theme.primary) root.style.setProperty('--primary', theme.primary);
                     if (theme.accent) root.style.setProperty('--accent', theme.accent);
                     if (theme.background) root.style.setProperty('--background', theme.background);
@@ -54,7 +53,6 @@ export default function RootLayout({
                       root.style.setProperty('--loading-logo', 'url(' + theme.logoUrl + ')');
                       root.classList.add('has-loading-logo');
                       
-                      // Pembaruan Ikon Segera dari Cache
                       const fav = document.getElementById('dynamic-favicon');
                       const favShort = document.getElementById('dynamic-shortcut-icon');
                       const appleIcon = document.getElementById('dynamic-apple-icon');
