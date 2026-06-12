@@ -16,6 +16,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -145,16 +146,16 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
               <Info size={14} className="mr-2" /> Lihat Detail
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-4xl w-[95vw] rounded-3xl border-border bg-card p-0 overflow-hidden shadow-2xl">
-            <ScrollArea className="h-full max-h-[90vh]">
+          <DialogContent className="max-w-4xl w-[95vw] rounded-3xl border-border bg-card p-0 overflow-hidden shadow-2xl outline-none">
+            <ScrollArea className="h-full max-h-[95vh]">
               <div className="p-0">
-                <div className="relative h-[75vh] md:h-[80vh] bg-background/95 flex items-center justify-center overflow-hidden">
+                <div className="relative h-[80vh] md:h-[80vh] bg-background/95 flex items-center justify-center">
                    {allImages.length > 0 ? (
                       <Carousel className="w-full h-full">
-                        <CarouselContent className="h-[75vh] md:h-[80vh]">
+                        <CarouselContent className="h-[80vh] md:h-[80vh]">
                           {allImages.map((img, index) => (
                             <CarouselItem key={index} className="h-full flex items-center justify-center">
-                              <div className="relative w-full h-full p-4 sm:p-10">
+                              <div className="relative w-full h-full p-0 sm:p-10">
                                 <Image 
                                   src={img}
                                   alt={`${name} - ${index + 1}`}
@@ -192,6 +193,9 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
                         <DialogTitle className="text-2xl sm:text-4xl font-black uppercase tracking-tighter text-foreground leading-none">
                           {name}
                         </DialogTitle>
+                        <DialogDescription className="sr-only">
+                          Detail informasi paket layanan {name}
+                        </DialogDescription>
                         <p className="text-primary font-bold text-base mt-2">{price}</p>
                       </div>
                     </div>
