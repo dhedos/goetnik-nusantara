@@ -63,7 +63,6 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
 
   return (
     <Card className="flex flex-col h-full bg-card/40 border-white/5 hover:border-primary/30 transition-all duration-500 group overflow-hidden rounded-[2rem] shadow-2xl relative">
-      {/* Tampilan Grid: Tetap Object-Cover agar rapi dalam grid susunan depan */}
       <div className="relative h-72 overflow-hidden bg-background/50">
         {hasGallery ? (
           <Carousel 
@@ -147,16 +146,15 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-4xl w-[95vw] rounded-3xl border-border bg-card p-0 overflow-hidden shadow-2xl">
-            <ScrollArea className="max-h-[90vh]">
+            <ScrollArea className="h-full max-h-[90vh]">
               <div className="p-0">
-                {/* Modal Gallery: Tinggi lebih besar di mobile (60vh) agar gambar portrait tidak terpotong dan terlihat utuh */}
-                <div className="relative h-[60vh] sm:h-[70vh] bg-background/95 flex items-center justify-center overflow-hidden">
+                <div className="relative h-[75vh] md:h-[80vh] bg-background/95 flex items-center justify-center overflow-hidden">
                    {allImages.length > 0 ? (
                       <Carousel className="w-full h-full">
-                        <CarouselContent className="h-[60vh] sm:h-[70vh]">
+                        <CarouselContent className="h-[75vh] md:h-[80vh]">
                           {allImages.map((img, index) => (
                             <CarouselItem key={index} className="h-full flex items-center justify-center">
-                              <div className="relative w-full h-full p-6 sm:p-10">
+                              <div className="relative w-full h-full p-4 sm:p-10">
                                 <Image 
                                   src={img}
                                   alt={`${name} - ${index + 1}`}
