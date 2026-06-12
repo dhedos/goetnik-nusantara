@@ -1,8 +1,9 @@
+
 "use client";
 
 import * as React from 'react';
 import Image from 'next/image';
-import { LucideIcon, Check, ArrowRight } from 'lucide-react';
+import { LucideIcon, Check, ArrowRight, Info, ShoppingCart } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -13,7 +14,17 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import Autoplay from "embla-carousel-autoplay";
+import { cn } from '@/lib/utils';
 
 interface ServiceCardProps {
   name: string;
@@ -27,10 +38,10 @@ interface ServiceCardProps {
 }
 
 export function ServiceCard({ name, icon: Icon, price, description, features, imageId, imageUrl, galleryUrls = [] }: ServiceCardProps) {
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
   const placeholder = PlaceHolderImages.find(img => img.id === imageId);
   const mainImage = imageUrl || placeholder?.imageUrl;
   
-  // Gabungkan gambar utama dengan galeri
   const allImages = React.useMemo(() => {
     const imgs = [];
     if (mainImage) imgs.push(mainImage);
@@ -40,10 +51,17 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
 
   const hasGallery = allImages.length > 1;
 
-  // Konfigurasi Autoplay
   const plugin = React.useRef(
     Autoplay({ delay: 3000, stopOnInteraction: true, stopOnMouseEnter: true })
   );
+
+  const handleOrderClick = () => {
+    setIsModalOpen(false);
+    const element = document.getElementById('pesan');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <Card className="flex flex-col h-full bg-card/40 border-white/5 hover:border-primary/30 transition-all duration-500 group overflow-hidden rounded-[2rem] shadow-2xl relative">
@@ -89,42 +107,137 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent pointer-events-none" />
         
         {/* Badge Harga Mengambang */}
-        <div className="absolute top-4 right-4 bg-primary/90 backdrop-blur-md text-primary-foreground px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-xl z-10">
+        <div className="absolute top-4 right-4 bg-primary/90 backdrop-blur-md text-primary-foreground px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl z-10">
           {price}
         </div>
 
         {/* Ikon Layanan */}
         <div className="absolute bottom-6 left-6 flex items-center gap-4 z-10">
-          <div className="w-14 h-14 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center shadow-2xl shadow-primary/40 group-hover:rotate-12 transition-transform duration-500">
-            <Icon size={28} />
+          <div className="w-12 h-12 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center shadow-2xl shadow-primary/40 group-hover:rotate-12 transition-transform duration-500">
+            <Icon size={24} />
           </div>
-          <CardTitle className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter drop-shadow-lg">
+          <CardTitle className="text-lg md:text-xl font-black text-white uppercase tracking-tighter drop-shadow-lg truncate max-w-[180px]">
             {name}
           </CardTitle>
         </div>
       </div>
       
       <CardHeader className="pt-8 px-8 pb-4">
-        <p className="text-white/60 text-sm leading-relaxed font-medium">
+        <p className="text-white/60 text-sm leading-relaxed font-medium line-clamp-2">
           {description}
         </p>
       </CardHeader>
       
       <CardContent className="flex-1 px-8 pt-2">
         <div className="space-y-3.5">
-          {features && features.map((feature, i) => (
-            <div key={i} className="flex items-start gap-3 text-xs font-bold uppercase tracking-wider">
-              <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 mt-0.5">
-                <Check size={12} strokeWidth={4} />
+          {features && features.slice(0, 3).map((feature, i) => (
+            <div key={i} className="flex items-start gap-3 text-[10px] font-bold uppercase tracking-wider">
+              <div className="w-4 h-4 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 mt-0.5">
+                <Check size={10} strokeWidth={4} />
               </div>
-              <span className="text-white/40 group-hover:text-white/70 transition-colors">{feature}</span>
+              <span className="text-white/40 group-hover:text-white/70 transition-colors line-clamp-1">{feature}</span>
             </div>
           ))}
         </div>
       </CardContent>
       
-      <CardFooter className="p-8 pt-6">
-        <Button asChild className="w-full rounded-2xl h-14 font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20 hover:scale-[1.03] transition-all group" variant="default">
+      <CardFooter className="p-8 pt-6 flex flex-col gap-3">
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="w-full rounded-xl h-12 font-bold uppercase tracking-wider text-[10px] border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary">
+              <Info size={14} className="mr-2" /> Lihat Detail
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-3xl w-[95vw] rounded-3xl border-border bg-card p-0 overflow-hidden">
+            <ScrollArea className="max-h-[90vh]">
+              <div className="p-0">
+                {/* Modal Gallery */}
+                <div className="relative h-[30vh] sm:h-[45vh] bg-muted/20">
+                   {allImages.length > 0 ? (
+                      <Carousel className="w-full h-full">
+                        <CarouselContent className="h-full">
+                          {allImages.map((img, index) => (
+                            <CarouselItem key={index} className="h-[30vh] sm:h-[45vh]">
+                              <div className="relative w-full h-full">
+                                <Image 
+                                  src={img}
+                                  alt={`${name} - ${index + 1}`}
+                                  fill
+                                  className="object-cover"
+                                  unoptimized={img.startsWith('data:')}
+                                />
+                              </div>
+                            </CarouselItem>
+                          ))}
+                        </CarouselContent>
+                        {allImages.length > 1 && (
+                          <>
+                            <CarouselPrevious className="left-4 bg-black/40 border-none text-white hover:bg-black/60" />
+                            <CarouselNext className="right-4 bg-black/40 border-none text-white hover:bg-black/60" />
+                          </>
+                        )}
+                      </Carousel>
+                   ) : (
+                     <div className="flex items-center justify-center h-full opacity-20"><Info size={48} /></div>
+                   )}
+                   <div className="absolute top-4 left-4 z-10 bg-primary px-4 py-1.5 rounded-full text-primary-foreground text-[10px] font-black uppercase tracking-widest shadow-2xl">
+                     {price}
+                   </div>
+                </div>
+
+                <div className="p-6 sm:p-10 space-y-8">
+                  <DialogHeader className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                        <Icon size={32} />
+                      </div>
+                      <div>
+                        <DialogTitle className="text-2xl sm:text-3xl font-black uppercase tracking-tighter text-foreground">
+                          {name}
+                        </DialogTitle>
+                        <p className="text-primary font-bold text-sm">{price}</p>
+                      </div>
+                    </div>
+                  </DialogHeader>
+
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Deskripsi Layanan</h4>
+                      <p className="text-foreground/80 text-sm sm:text-base leading-relaxed whitespace-pre-wrap">
+                        {description}
+                      </p>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Fitur & Keunggulan</h4>
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        {features && features.map((feature, i) => (
+                          <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-secondary/20 border border-border/50">
+                            <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                              <Check size={12} strokeWidth={4} />
+                            </div>
+                            <span className="text-xs font-bold uppercase tracking-tight opacity-70">{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-6 border-t border-border flex flex-col sm:flex-row gap-4">
+                    <Button onClick={handleOrderClick} size="lg" className="flex-1 rounded-2xl h-16 font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20">
+                      <ShoppingCart className="mr-2" size={18} /> Pesan Sekarang
+                    </Button>
+                    <Button variant="ghost" onClick={() => setIsModalOpen(false)} className="rounded-2xl h-16 px-8 font-bold uppercase text-[10px] tracking-widest">
+                      Kembali
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </ScrollArea>
+          </DialogContent>
+        </Dialog>
+
+        <Button asChild className="w-full rounded-2xl h-14 font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/20 hover:scale-[1.03] transition-all group" variant="default">
           <a href="#pesan" className="flex items-center justify-center gap-2">
             Pilih Layanan <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
           </a>
