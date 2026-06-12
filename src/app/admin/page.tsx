@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
@@ -198,7 +197,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const resizeAndCompressImage = (file: File, maxWidth: number = 1600, quality: number = 0.9): Promise<string> => {
+  const resizeAndCompressImage = (file: File, target: string, maxWidth: number = 1600, quality: number = 0.9): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -219,12 +218,16 @@ export default function AdminDashboard() {
           canvas.height = height;
           const ctx = canvas.getContext('2d');
           
+          // Memastikan kanvas bersih dan transparan sebelum menggambar
           ctx?.clearRect(0, 0, width, height);
           ctx?.drawImage(img, 0, 0, width, height);
           
-          const isLogo = file.name.toLowerCase().includes('logo');
-          const format = isLogo ? 'image/png' : 'image/webp';
-          const compressedBase64 = canvas.toDataURL(format, quality);
+          // Jika target adalah logo, gunakan PNG agar transparansi terjaga maksimal
+          const isLogoTarget = target.toLowerCase().includes('logo');
+          const format = isLogoTarget ? 'image/png' : 'image/webp';
+          
+          // PNG tidak menggunakan parameter quality
+          const compressedBase64 = canvas.toDataURL(format, isLogoTarget ? undefined : quality);
           resolve(compressedBase64);
         };
         img.onerror = reject;
@@ -239,7 +242,7 @@ export default function AdminDashboard() {
     setIsUploading(target);
     try {
       const isBranding = target === 'logo' || target === 'hero';
-      const compressedBase64 = await resizeAndCompressImage(file, isBranding ? 1800 : 1600);
+      const compressedBase64 = await resizeAndCompressImage(file, target, isBranding ? 1800 : 1600);
       
       if (target === 'logo') {
         setBusinessInfo(prev => ({ ...prev, logoUrl: compressedBase64 }));
@@ -263,7 +266,7 @@ export default function AdminDashboard() {
     setIsUploading(`gallery-${serviceId}`);
     try {
       for (const file of files) {
-        const compressedBase64 = await resizeAndCompressImage(file, 1600, 0.9);
+        const compressedBase64 = await resizeAndCompressImage(file, `gallery-${serviceId}`, 1600, 0.9);
         const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'services', serviceId);
         await updateDoc(docRef, {
           galleryUrls: arrayUnion(compressedBase64)
@@ -298,7 +301,7 @@ export default function AdminDashboard() {
     let count = 0;
     try {
       for (const file of files) {
-        const compressedBase64 = await resizeAndCompressImage(file, 1600, 0.9);
+        const compressedBase64 = await resizeAndCompressImage(file, 'portfolio', 1600, 0.9);
         const colRef = collection(firestore, 'businesses', MAIN_BUSINESS_ID, 'portfolio');
         await addDoc(colRef, {
           imageUrl: compressedBase64,
@@ -594,7 +597,7 @@ export default function AdminDashboard() {
                   <div className="space-y-4">
                     <Label className="text-foreground uppercase font-black text-xs">Logo Bisnis</Label>
                     <div className="flex flex-col items-center gap-8 p-8 border-2 border-dashed border-border rounded-3xl bg-background/20">
-                      <div className="relative min-h-[8rem] min-w-[8rem] rounded-2xl overflow-hidden border border-border flex items-center justify-center p-4 bg-background/40">
+                      <div className="relative min-h-[8rem] min-w-[8rem] rounded-2xl overflow-hidden border border-border flex items-center justify-center p-4 bg-transparent">
                         {businessInfo.logoUrl ? <img src={businessInfo.logoUrl} alt="Logo" className="max-h-full w-auto object-contain" /> : <Cpu className="w-16 h-16 opacity-10" />}
                       </div>
                       <div className="flex-1 space-y-4 w-full">
@@ -680,7 +683,7 @@ export default function AdminDashboard() {
                            </div>
                            <div className="grid grid-cols-4 gap-2">
                               {s.galleryUrls?.map((img: string, idx: number) => (
-                                <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-border group/gal bg-background/40">
+                                <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-border group/gal bg-transparent">
                                    <Image src={img} alt="Gallery" fill className="object-contain" unoptimized />
                                    <button 
                                       onClick={() => handleRemoveGalleryImage(s.id, img)}
