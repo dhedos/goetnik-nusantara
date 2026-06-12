@@ -94,14 +94,14 @@ export function Footer({ businessId }: FooterProps) {
           <Link href="/" className="flex items-center gap-2">
             {logoUrl ? (
               <div 
-                className="relative shrink-0 transition-all duration-300 flex items-center"
+                className="relative shrink-0 transition-all duration-300 flex items-center bg-transparent"
                 style={{ height: `${logoH}px` }}
               >
                 <img 
                   src={logoUrl} 
                   alt="Logo" 
                   style={{ height: '100%', width: 'auto', objectFit: 'contain' }}
-                  className="block"
+                  className="block bg-transparent"
                 />
               </div>
             ) : (

@@ -53,14 +53,14 @@ export function Navbar({ businessId }: NavbarProps) {
         <Link href="/" className="flex items-center gap-2 md:gap-3 group max-w-[70%] sm:max-w-none">
           {logoUrl ? (
             <div 
-              className="relative shrink-0 transition-all duration-300 flex items-center"
+              className="relative shrink-0 transition-all duration-300 flex items-center bg-transparent"
               style={{ height: scrolled ? `${Math.max(24, logoH * 0.7)}px` : `${logoH}px` }}
             >
               <img 
                 src={logoUrl} 
                 alt="Logo" 
                 style={{ height: '100%', width: 'auto', objectFit: 'contain' }}
-                className="block"
+                className="block bg-transparent"
               />
             </div>
           ) : (

@@ -197,7 +197,8 @@ export default function AdminDashboard() {
     }
   };
 
-  const resizeAndCompressImage = (file: File, maxWidth: number = 1200, quality: number = 0.7): Promise<string> => {
+  // Diperbarui untuk mendukung transparansi dengan PNG/WebP
+  const resizeAndCompressImage = (file: File, maxWidth: number = 1200, quality: number = 0.8): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -215,8 +216,13 @@ export default function AdminDashboard() {
           canvas.width = width;
           canvas.height = height;
           const ctx = canvas.getContext('2d');
+          
+          // Pastikan background transparan
+          ctx?.clearRect(0, 0, width, height);
           ctx?.drawImage(img, 0, 0, width, height);
-          const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+          
+          // Gunakan PNG untuk mendukung transparansi penuh
+          const compressedBase64 = canvas.toDataURL('image/png');
           resolve(compressedBase64);
         };
         img.onerror = reject;
@@ -253,7 +259,7 @@ export default function AdminDashboard() {
     setIsUploading(`gallery-${serviceId}`);
     try {
       for (const file of files) {
-        const compressedBase64 = await resizeAndCompressImage(file, 1000, 0.6);
+        const compressedBase64 = await resizeAndCompressImage(file, 1000, 0.7);
         const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'services', serviceId);
         await updateDoc(docRef, {
           galleryUrls: arrayUnion(compressedBase64)
@@ -288,7 +294,7 @@ export default function AdminDashboard() {
     let count = 0;
     try {
       for (const file of files) {
-        const compressedBase64 = await resizeAndCompressImage(file, 1000, 0.6);
+        const compressedBase64 = await resizeAndCompressImage(file, 1000, 0.7);
         const colRef = collection(firestore, 'businesses', MAIN_BUSINESS_ID, 'portfolio');
         await addDoc(colRef, {
           imageUrl: compressedBase64,
@@ -585,7 +591,7 @@ export default function AdminDashboard() {
                   <div className="space-y-4">
                     <Label className="text-foreground uppercase font-black text-xs">Logo Bisnis</Label>
                     <div className="flex flex-col items-center gap-8 p-8 border-2 border-dashed border-border rounded-3xl bg-background/20">
-                      <div className="relative min-h-[8rem] min-w-[8rem] bg-background rounded-2xl overflow-hidden border border-border flex items-center justify-center p-4">
+                      <div className="relative min-h-[8rem] min-w-[8rem] rounded-2xl overflow-hidden border border-border flex items-center justify-center p-4">
                         {businessInfo.logoUrl ? <img src={businessInfo.logoUrl} alt="Logo" className="max-h-full w-auto object-contain" /> : <Cpu className="w-16 h-16 opacity-10" />}
                       </div>
                       <div className="flex-1 space-y-4 w-full">
