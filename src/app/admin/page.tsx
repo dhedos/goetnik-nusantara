@@ -197,8 +197,8 @@ export default function AdminDashboard() {
     }
   };
 
-  // Diperbarui untuk mendukung transparansi dengan PNG/WebP
-  const resizeAndCompressImage = (file: File, maxWidth: number = 1200, quality: number = 0.8): Promise<string> => {
+  // Diperbarui untuk mendukung ukuran penuh dan kualitas tinggi
+  const resizeAndCompressImage = (file: File, maxWidth: number = 1600, quality: number = 0.9): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -209,20 +209,24 @@ export default function AdminDashboard() {
           const canvas = document.createElement('canvas');
           let width = img.width;
           let height = img.height;
+          
+          // Tetap menjaga rasio asli tapi batasi jika terlalu ekstrem (4K+)
           if (width > maxWidth) {
             height = (maxWidth / width) * height;
             width = maxWidth;
           }
+          
           canvas.width = width;
           canvas.height = height;
           const ctx = canvas.getContext('2d');
           
-          // Pastikan background transparan
           ctx?.clearRect(0, 0, width, height);
           ctx?.drawImage(img, 0, 0, width, height);
           
-          // Gunakan PNG untuk mendukung transparansi penuh
-          const compressedBase64 = canvas.toDataURL('image/png');
+          // Gunakan PNG untuk logo agar transparan, atau WebP untuk lainnya agar efisien tapi tajam
+          const isLogo = file.name.toLowerCase().includes('logo');
+          const format = isLogo ? 'image/png' : 'image/webp';
+          const compressedBase64 = canvas.toDataURL(format, quality);
           resolve(compressedBase64);
         };
         img.onerror = reject;
@@ -236,7 +240,10 @@ export default function AdminDashboard() {
     if (!file || !user || !firestore) return;
     setIsUploading(target);
     try {
-      const compressedBase64 = await resizeAndCompressImage(file);
+      // Gunakan maxWidth lebih besar untuk banner/layanan
+      const isBranding = target === 'logo' || target === 'hero';
+      const compressedBase64 = await resizeAndCompressImage(file, isBranding ? 1800 : 1600);
+      
       if (target === 'logo') {
         setBusinessInfo(prev => ({ ...prev, logoUrl: compressedBase64 }));
       } else if (target === 'hero') {
@@ -259,7 +266,7 @@ export default function AdminDashboard() {
     setIsUploading(`gallery-${serviceId}`);
     try {
       for (const file of files) {
-        const compressedBase64 = await resizeAndCompressImage(file, 1000, 0.7);
+        const compressedBase64 = await resizeAndCompressImage(file, 1600, 0.9);
         const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'services', serviceId);
         await updateDoc(docRef, {
           galleryUrls: arrayUnion(compressedBase64)
@@ -294,7 +301,7 @@ export default function AdminDashboard() {
     let count = 0;
     try {
       for (const file of files) {
-        const compressedBase64 = await resizeAndCompressImage(file, 1000, 0.7);
+        const compressedBase64 = await resizeAndCompressImage(file, 1600, 0.9);
         const colRef = collection(firestore, 'businesses', MAIN_BUSINESS_ID, 'portfolio');
         await addDoc(colRef, {
           imageUrl: compressedBase64,
@@ -470,10 +477,17 @@ export default function AdminDashboard() {
                     </div>
                   </label>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="columns-2 md:columns-3 gap-4 space-y-4">
                   {portfolio?.map((item: any) => (
-                    <div key={item.id} className="relative aspect-square rounded-2xl overflow-hidden border border-border group shadow-lg">
-                      <Image src={item.imageUrl} alt="Portfolio" fill className="object-cover transition-transform group-hover:scale-110" unoptimized />
+                    <div key={item.id} className="relative rounded-2xl overflow-hidden border border-border group shadow-lg bg-card break-inside-avoid">
+                      <Image 
+                        src={item.imageUrl} 
+                        alt="Portfolio" 
+                        width={800} 
+                        height={1200} 
+                        className="w-full h-auto object-contain transition-transform group-hover:scale-105" 
+                        unoptimized 
+                      />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <Button variant="destructive" size="icon" className="rounded-full h-10 w-10" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'portfolio', item.id))}><Trash2 size={18} /></Button>
                       </div>
@@ -591,7 +605,7 @@ export default function AdminDashboard() {
                   <div className="space-y-4">
                     <Label className="text-foreground uppercase font-black text-xs">Logo Bisnis</Label>
                     <div className="flex flex-col items-center gap-8 p-8 border-2 border-dashed border-border rounded-3xl bg-background/20">
-                      <div className="relative min-h-[8rem] min-w-[8rem] rounded-2xl overflow-hidden border border-border flex items-center justify-center p-4">
+                      <div className="relative min-h-[8rem] min-w-[8rem] rounded-2xl overflow-hidden border border-border flex items-center justify-center p-4 bg-background/40">
                         {businessInfo.logoUrl ? <img src={businessInfo.logoUrl} alt="Logo" className="max-h-full w-auto object-contain" /> : <Cpu className="w-16 h-16 opacity-10" />}
                       </div>
                       <div className="flex-1 space-y-4 w-full">
@@ -654,7 +668,7 @@ export default function AdminDashboard() {
                     <Card key={s.id} className="bg-card rounded-3xl border-border overflow-hidden shadow-lg group flex flex-col">
                       <div className="h-56 bg-muted/20 relative overflow-hidden flex items-center justify-center">
                         {s.imageUrl ? (
-                          <Image src={s.imageUrl} alt={s.name} fill className="object-cover transition-transform group-hover:scale-105" unoptimized />
+                          <Image src={s.imageUrl} alt={s.name} fill className="object-contain transition-transform group-hover:scale-105" unoptimized />
                         ) : (
                           <div className="flex flex-col items-center gap-2 text-muted-foreground/30">
                             <ImageIcon size={48} />
@@ -679,8 +693,8 @@ export default function AdminDashboard() {
                            </div>
                            <div className="grid grid-cols-4 gap-2">
                               {s.galleryUrls?.map((img: string, idx: number) => (
-                                <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-border group/gal">
-                                   <Image src={img} alt="Gallery" fill className="object-cover" unoptimized />
+                                <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-border group/gal bg-background/40">
+                                   <Image src={img} alt="Gallery" fill className="object-contain" unoptimized />
                                    <button 
                                       onClick={() => handleRemoveGalleryImage(s.id, img)}
                                       className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover/gal:opacity-100 transition-opacity"
