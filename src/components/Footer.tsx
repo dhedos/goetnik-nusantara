@@ -50,7 +50,7 @@ export function Footer({ businessId }: FooterProps) {
   const privacyPolicyContent = settings?.privacyPolicy || 'Kebijakan privasi belum diatur oleh admin.';
   const logoH = parseInt(settings?.logoHeight) || 32;
 
-  const hasLogo = logoUrl || logoText || logoAccentText;
+  const hasLogoContent = logoUrl || logoText || logoAccentText;
 
   const formatSocialUrl = (url: string) => {
     if (!url) return '#';
@@ -92,7 +92,7 @@ export function Footer({ businessId }: FooterProps) {
     <footer className="bg-card/30 border-t border-border pt-16 pb-8 px-4">
       <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 mb-12">
         <div className="md:col-span-1 space-y-6">
-          {hasLogo && (
+          {hasLogoContent && (
             <Link href="/" className="flex items-center gap-2">
               {logoUrl && (
                 <div 

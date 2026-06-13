@@ -35,7 +35,7 @@ export function Navbar({ businessId }: NavbarProps) {
   const logoUrl = settings?.logoUrl || '';
   const logoH = parseInt(settings?.logoHeight) || 36;
 
-  const hasLogo = logoUrl || logoText || logoAccentText;
+  const hasLogoContent = logoUrl || logoText || logoAccentText;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -51,7 +51,7 @@ export function Navbar({ businessId }: NavbarProps) {
       scrolled ? "bg-background/90 backdrop-blur-xl border-b border-white/5 py-3 shadow-xl" : "bg-transparent"
     )}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        {hasLogo ? (
+        {hasLogoContent ? (
           <Link href="/" className="flex items-center gap-2 md:gap-3 group max-w-[70%] sm:max-w-none">
             {logoUrl && (
               <div 
@@ -74,7 +74,7 @@ export function Navbar({ businessId }: NavbarProps) {
             )}
           </Link>
         ) : (
-          <div className="w-1" /> // Spacer jika tidak ada logo
+          <div className="w-1" /> 
         )}
 
         {/* Desktop Links */}
@@ -104,7 +104,7 @@ export function Navbar({ businessId }: NavbarProps) {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden fixed inset-x-0 top-[60px] md:top-[64px] bg-background/98 backdrop-blur-2xl border-b border-white/5 p-8 flex flex-col gap-2 animate-in slide-in-from-top-4 duration-300 z-[99] h-[calc(100vh-60px)] overflow-y-auto">
+        <div className="md:hidden fixed inset-x-0 top-[60px] bg-background/98 backdrop-blur-2xl border-b border-white/5 p-8 flex flex-col gap-2 animate-in slide-in-from-top-4 duration-300 z-[99] h-[calc(100vh-60px)] overflow-y-auto">
           {NAV_LINKS.map((link) => (
             <Link 
               key={link.name} 
