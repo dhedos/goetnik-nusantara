@@ -16,43 +16,23 @@ import { useFirestore, useCollection, useDoc, useMemoFirebase } from '@/firebase
 import { collection, doc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ArrowRight, Loader2, Cpu } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { ICON_MAP, BUSINESS_NAME_DEFAULT, MAIN_BUSINESS_ID } from '@/lib/constants';
+import { ICON_MAP, MAIN_BUSINESS_ID } from '@/lib/constants';
 
 function LoadingScreen({ logoUrl }: { logoUrl?: string }) {
-  const [hasLogo, setHasLogo] = useState(false);
-
-  useEffect(() => {
-    const root = document.documentElement;
-    const hasCssLogo = root.style.getPropertyValue('--loading-logo') !== '';
-    if (hasCssLogo || logoUrl) {
-      setHasLogo(true);
-    }
-  }, [logoUrl]);
-
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background text-center p-4">
       <div className="relative z-10 flex flex-col items-center">
-        <div className="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center animate-pulse transition-all duration-700">
-          {logoUrl ? (
+        {logoUrl && (
+          <div className="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center animate-pulse transition-all duration-700">
             <img 
               src={logoUrl} 
               alt="Loading Logo" 
               className="max-w-full max-h-full object-contain brightness-110 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
             />
-          ) : (
-            <div className="relative w-full h-full flex items-center justify-center">
-              <div 
-                className="absolute inset-0 bg-contain bg-center bg-no-repeat opacity-0 [.has-loading-logo_&]:opacity-100 transition-opacity duration-300 brightness-110 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
-                style={{ backgroundImage: 'var(--loading-logo)' }}
-              />
-              <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-2xl shadow-primary/20 [.has-loading-logo_&]:hidden">
-                <Cpu size={48} />
-              </div>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -76,7 +56,6 @@ function HomeContent() {
   const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
 
   useEffect(() => {
-    // Kurangi waktu tunggu buatan agar lebih responsif
     const safetyTimer = setTimeout(() => {
       setIsReady(true);
     }, 800);
@@ -96,12 +75,12 @@ function HomeContent() {
   const heroDisplayImage = settings?.heroImageUrl || heroPlaceholder?.imageUrl;
   const serviceImageIds = ['service-os', 'service-repair', 'service-design', 'service-web'];
 
-  const heroTitle = settings?.heroTitle || BUSINESS_NAME_DEFAULT;
-  const heroSubtitle = settings?.heroSubtitle || 'Kami melayani kebutuhan teknologi, desain grafis, dan pembuatan aplikasi secara profesional.';
+  const heroTitle = settings?.heroTitle || '';
+  const heroSubtitle = settings?.heroSubtitle || '';
   const heroImagePos = settings?.heroImagePosition || '50%';
 
   const servicesTitle = settings?.servicesSectionTitle || 'Layanan Unggulan';
-  const servicesSubtitle = settings?.servicesSectionSubtitle || 'Solusi kreatif dan teknologi modern untuk mempercepat pertumbuhan bisnis Anda.';
+  const servicesSubtitle = settings?.servicesSectionSubtitle || '';
 
   return (
     <>
@@ -119,7 +98,6 @@ function HomeContent() {
                   fill 
                   className="object-cover opacity-20" 
                   style={{ objectPosition: `center ${heroImagePos}` }}
-                  unoptimized={heroDisplayImage.startsWith('data:')} 
                   priority
                 />
               )}
@@ -128,13 +106,17 @@ function HomeContent() {
             
             <div className="max-w-7xl mx-auto w-full relative z-10">
               <div className="space-y-6 md:space-y-8 max-w-4xl">
-                <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.2] md:leading-[1] text-foreground break-words">
-                  {heroTitle}
-                </h1>
+                {heroTitle && (
+                  <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.2] md:leading-[1] text-foreground break-words">
+                    {heroTitle}
+                  </h1>
+                )}
 
-                <p className="text-sm md:text-xl text-foreground/60 leading-relaxed max-w-2xl px-1">
-                  {heroSubtitle}
-                </p>
+                {heroSubtitle && (
+                  <p className="text-sm md:text-xl text-foreground/60 leading-relaxed max-w-2xl px-1">
+                    {heroSubtitle}
+                  </p>
+                )}
 
                 <div className="flex flex-col sm:flex-row gap-4 pt-6 md:pt-8">
                   <Link href="#pesan" className="w-full sm:w-auto">
@@ -156,7 +138,7 @@ function HomeContent() {
             <div className="max-w-7xl mx-auto">
               <div className="text-center mb-12 md:mb-20 space-y-4">
                 <h2 className="text-2xl md:text-5xl font-bold text-foreground uppercase">{servicesTitle}</h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto text-sm md:text-base font-medium px-4">{servicesSubtitle}</p>
+                {servicesSubtitle && <p className="text-muted-foreground max-w-2xl mx-auto text-sm md:text-base font-medium px-4">{servicesSubtitle}</p>}
               </div>
               
               {servicesLoading && !services ? (

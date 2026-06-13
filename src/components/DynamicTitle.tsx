@@ -19,6 +19,8 @@ export function DynamicTitle({ businessId }: DynamicTitleProps) {
   useEffect(() => {
     if (settings?.name) {
       document.title = `${settings.name} | Solusi Profesional`;
+    } else {
+      document.title = 'Pusat Layanan Digital';
     }
   }, [settings]);
 

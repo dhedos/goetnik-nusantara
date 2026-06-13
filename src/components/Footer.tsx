@@ -1,8 +1,7 @@
 "use client";
 
-import { Cpu, Facebook, Instagram, Youtube, Fingerprint, ShoppingBag, Globe, Link as LinkIcon, ShoppingCart } from 'lucide-react';
+import { Instagram, Facebook, Youtube, Fingerprint, Globe, Link as LinkIcon, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useFirestore, useDoc, useMemoFirebase, useCollection } from '@/firebase';
 import { doc, collection, query, orderBy } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
@@ -43,13 +42,15 @@ export function Footer({ businessId }: FooterProps) {
   );
   const { data: externalLinks } = useCollection(linksQuery);
   
-  const logoText = settings?.logoText || 'Go Etnik';
-  const logoAccentText = settings?.logoAccentText || 'NUSANTARA';
+  const logoText = settings?.logoText || '';
+  const logoAccentText = settings?.logoAccentText || '';
   const logoUrl = settings?.logoUrl || '';
-  const businessName = settings?.name || 'Go Etnik NUSANTARA';
-  const aboutSubtitle = settings?.heroSubtitle || 'Kami menyediakan layanan service laptop profesional, desain grafis estetik, dan pembuatan aplikasi modern.';
+  const businessName = settings?.name || '';
+  const aboutSubtitle = settings?.heroSubtitle || '';
   const privacyPolicyContent = settings?.privacyPolicy || 'Kebijakan privasi belum diatur oleh admin.';
   const logoH = parseInt(settings?.logoHeight) || 32;
+
+  const hasLogo = logoUrl || logoText || logoAccentText;
 
   const formatSocialUrl = (url: string) => {
     if (!url) return '#';
@@ -91,36 +92,35 @@ export function Footer({ businessId }: FooterProps) {
     <footer className="bg-card/30 border-t border-border pt-16 pb-8 px-4">
       <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 mb-12">
         <div className="md:col-span-1 space-y-6">
-          <Link href="/" className="flex items-center gap-2">
-            {logoUrl ? (
-              <div 
-                className="relative shrink-0 transition-all duration-300 flex items-center bg-transparent"
-                style={{ height: `${logoH}px` }}
-              >
-                <img 
-                  src={logoUrl} 
-                  alt="Logo" 
-                  style={{ height: '100%', width: 'auto', objectFit: 'contain' }}
-                  className="block bg-transparent"
-                />
-              </div>
-            ) : (
-              <div 
-                className="rounded bg-primary flex items-center justify-center text-primary-foreground transition-all shrink-0"
-                style={{ height: `${logoH}px`, width: `${logoH}px` }}
-              >
-                <Cpu size={logoH * 0.5} />
-              </div>
-            )}
-            <div className="flex items-center text-lg md:text-xl font-bold gap-2">
-              <span className="text-foreground">{logoText}</span>
-              <span className="text-primary">{logoAccentText}</span>
-            </div>
-          </Link>
+          {hasLogo && (
+            <Link href="/" className="flex items-center gap-2">
+              {logoUrl && (
+                <div 
+                  className="relative shrink-0 transition-all duration-300 flex items-center bg-transparent"
+                  style={{ height: `${logoH}px` }}
+                >
+                  <img 
+                    src={logoUrl} 
+                    alt="Logo" 
+                    style={{ height: '100%', width: 'auto', objectFit: 'contain' }}
+                    className="block bg-transparent"
+                  />
+                </div>
+              )}
+              {(logoText || logoAccentText) && (
+                <div className="flex items-center text-lg md:text-xl font-bold gap-2">
+                  <span className="text-foreground">{logoText}</span>
+                  <span className="text-primary">{logoAccentText}</span>
+                </div>
+              )}
+            </Link>
+          )}
           
-          <p className="text-muted-foreground max-w-sm text-xs leading-relaxed">
-            {aboutSubtitle}
-          </p>
+          {aboutSubtitle && (
+            <p className="text-muted-foreground max-w-sm text-xs leading-relaxed">
+              {aboutSubtitle}
+            </p>
+          )}
 
           <div className="flex gap-3 pt-2">
             <a 

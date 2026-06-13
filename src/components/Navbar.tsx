@@ -1,9 +1,8 @@
 "use client";
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { Menu, X, Cpu } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
@@ -31,10 +30,12 @@ export function Navbar({ businessId }: NavbarProps) {
   );
   const { data: settings } = useDoc(settingsRef);
 
-  const logoText = settings?.logoText || 'Go Etnik';
-  const logoAccentText = settings?.logoAccentText || 'NUSANTARA';
+  const logoText = settings?.logoText || '';
+  const logoAccentText = settings?.logoAccentText || '';
   const logoUrl = settings?.logoUrl || '';
   const logoH = parseInt(settings?.logoHeight) || 36;
+
+  const hasLogo = logoUrl || logoText || logoAccentText;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -50,35 +51,31 @@ export function Navbar({ businessId }: NavbarProps) {
       scrolled ? "bg-background/90 backdrop-blur-xl border-b border-white/5 py-3 shadow-xl" : "bg-transparent"
     )}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 md:gap-3 group max-w-[70%] sm:max-w-none">
-          {logoUrl ? (
-            <div 
-              className="relative shrink-0 transition-all duration-300 flex items-center bg-transparent"
-              style={{ height: scrolled ? `${Math.max(24, logoH * 0.7)}px` : `${logoH}px` }}
-            >
-              <img 
-                src={logoUrl} 
-                alt="Logo" 
-                style={{ height: '100%', width: 'auto', objectFit: 'contain' }}
-                className="block bg-transparent"
-              />
-            </div>
-          ) : (
-            <div 
-              className="rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-lg group-hover:scale-105 transition-all shrink-0"
-              style={{ 
-                height: scrolled ? `${Math.max(24, logoH * 0.7)}px` : `${logoH}px`, 
-                width: scrolled ? `${Math.max(24, logoH * 0.7)}px` : `${logoH}px` 
-              }}
-            >
-              <Cpu size={scrolled ? Math.max(12, logoH * 0.35) : logoH * 0.5} />
-            </div>
-          )}
-          <div className="flex flex-col sm:flex-row sm:items-center text-sm sm:text-base md:text-xl font-bold leading-none gap-0 sm:gap-1.5 truncate">
-            <span className="text-white truncate">{logoText}</span>
-            <span className="text-primary truncate">{logoAccentText}</span>
-          </div>
-        </Link>
+        {hasLogo ? (
+          <Link href="/" className="flex items-center gap-2 md:gap-3 group max-w-[70%] sm:max-w-none">
+            {logoUrl && (
+              <div 
+                className="relative shrink-0 transition-all duration-300 flex items-center bg-transparent"
+                style={{ height: scrolled ? `${Math.max(24, logoH * 0.7)}px` : `${logoH}px` }}
+              >
+                <img 
+                  src={logoUrl} 
+                  alt="Logo" 
+                  style={{ height: '100%', width: 'auto', objectFit: 'contain' }}
+                  className="block bg-transparent"
+                />
+              </div>
+            )}
+            {(logoText || logoAccentText) && (
+              <div className="flex flex-col sm:flex-row sm:items-center text-sm sm:text-base md:text-xl font-bold leading-none gap-0 sm:gap-1.5 truncate">
+                {logoText && <span className="text-white truncate">{logoText}</span>}
+                {logoAccentText && <span className="text-primary truncate">{logoAccentText}</span>}
+              </div>
+            )}
+          </Link>
+        ) : (
+          <div className="w-1" /> // Spacer jika tidak ada logo
+        )}
 
         {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-8">
