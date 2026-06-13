@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
@@ -484,9 +483,11 @@ export default function AdminDashboard() {
                       <Image 
                         src={item.imageUrl} 
                         alt="Portfolio" 
-                        fill
+                        width={0}
+                        height={0}
                         sizes="100vw"
-                        className="w-full h-auto object-contain transition-transform group-hover:scale-105" 
+                        style={{ width: '100%', height: 'auto' }}
+                        className="object-contain transition-transform group-hover:scale-105" 
                       />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <Button variant="destructive" size="icon" className="rounded-full h-10 w-10" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'portfolio', item.id))}><Trash2 size={18} /></Button>
@@ -520,13 +521,24 @@ export default function AdminDashboard() {
                 <CardContent className="p-8 space-y-8">
                   <div className="space-y-4 p-6 bg-primary/5 rounded-2xl border border-primary/10">
                     <Label className="text-foreground uppercase font-black text-xs flex items-center gap-2"><Type size={14} className="text-primary" /> Gaya Huruf</Label>
-                    <Select value={businessInfo.fontFamily} onValueChange={(val) => setBusinessInfo({...businessInfo, fontFamily: val})}><SelectTrigger className="rounded-xl h-12 bg-background/50 border-border font-bold"><SelectValue /></SelectTrigger><SelectContent>{ETHNIC_FONTS.map((font) => (<SelectItem key={font.name} value={font.name}><span style={{ fontFamily: font.name }}>{font.label}</span></SelectItem>))}</SelectContent></Select>
+                    <select value={businessInfo.fontFamily} onChange={(e) => setBusinessInfo({...businessInfo, fontFamily: e.target.value})} className="w-full rounded-xl h-12 bg-background/50 border-border font-bold px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20">
+                      {ETHNIC_FONTS.map((font) => (<option key={font.name} value={font.name} style={{ fontFamily: font.name }}>{font.label}</option>))}
+                    </select>
                   </div>
                   <div className="space-y-4">
                     <Label className="text-foreground uppercase font-black text-xs">Logo Bisnis</Label>
                     <div className="flex flex-col items-center gap-8 p-8 border-2 border-dashed border-border rounded-3xl bg-background/20">
                       <div className="relative min-h-[8rem] min-w-[8rem] rounded-2xl overflow-hidden border border-border flex items-center justify-center p-4 bg-transparent shadow-inner">
-                        {businessInfo.logoUrl ? <img src={businessInfo.logoUrl} alt="Logo" className="max-h-full w-auto object-contain" /> : <div className="text-[10px] opacity-20 uppercase font-bold">Logo Belum Diunggah</div>}
+                        {businessInfo.logoUrl ? (
+                          <img 
+                            src={businessInfo.logoUrl} 
+                            alt="Logo" 
+                            className="object-contain" 
+                            style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '100%' }}
+                          />
+                        ) : (
+                          <div className="text-[10px] opacity-20 uppercase font-bold">Logo Belum Diunggah</div>
+                        )}
                       </div>
                       <div className="flex-1 space-y-4 w-full">
                         <input type="file" className="hidden" id="logo-up" accept="image/*" onChange={(e) => handleImageUpload(e, 'logo')} />
@@ -586,7 +598,13 @@ export default function AdminDashboard() {
                     <Card key={s.id} className="bg-card rounded-3xl border-border overflow-hidden shadow-lg group flex flex-col">
                       <div className="h-56 bg-muted/20 relative overflow-hidden flex items-center justify-center">
                         {s.imageUrl ? (
-                          <Image src={s.imageUrl} alt={s.name} fill sizes="100vw" className="object-contain transition-transform group-hover:scale-105" />
+                          <Image 
+                            src={s.imageUrl} 
+                            alt={s.name} 
+                            fill 
+                            sizes="(max-width: 768px) 100vw, 50vw" 
+                            className="object-contain transition-transform group-hover:scale-105" 
+                          />
                         ) : (
                           <div className="flex flex-col items-center gap-2 text-muted-foreground/30">
                             <ImageIcon size={48} />
@@ -612,7 +630,13 @@ export default function AdminDashboard() {
                            <div className="grid grid-cols-4 gap-2">
                               {s.galleryUrls?.map((img: string, idx: number) => (
                                 <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-border group/gal bg-transparent">
-                                   <Image src={img} alt="Gallery" fill sizes="100vw" className="object-contain" />
+                                   <Image 
+                                      src={img} 
+                                      alt="Gallery" 
+                                      fill 
+                                      sizes="(max-width: 768px) 25vw, 12vw" 
+                                      className="object-contain" 
+                                   />
                                    <button 
                                       onClick={() => handleRemoveGalleryImage(s.id, img)}
                                       className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover/gal:opacity-100 transition-opacity"

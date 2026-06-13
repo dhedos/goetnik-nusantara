@@ -3,7 +3,6 @@
 import Image from 'next/image';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
-import { Badge } from '@/components/ui/badge';
 import { Loader2, Maximize2 } from 'lucide-react';
 
 interface PortfolioProps {
@@ -13,7 +12,6 @@ interface PortfolioProps {
 export function Portfolio({ businessId }: PortfolioProps) {
   const firestore = useFirestore();
   
-  // Jalur query konsisten dengan MAIN_BUSINESS_ID
   const portfolioQueryFixed = useMemoFirebase(() => 
     firestore ? query(collection(firestore, 'businesses', businessId, 'portfolio'), orderBy('createdAt', 'desc')) : null, 
     [firestore, businessId]
@@ -44,14 +42,15 @@ export function Portfolio({ businessId }: PortfolioProps) {
               className="relative group rounded-3xl overflow-hidden border border-border/10 shadow-xl bg-card/40 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 animate-fade-in break-inside-avoid"
               style={{ animationDelay: `${i * 100}ms` }}
             >
-              <div className="relative">
+              <div className="relative w-full h-auto">
                 <Image 
                   src={item.imageUrl} 
                   alt="Hasil Karya" 
-                  width={800}
-                  height={1200}
-                  className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-105" 
-                  unoptimized={item.imageUrl.startsWith('data:')} 
+                  width={0}
+                  height={0}
+                  sizes="100vw"
+                  style={{ width: '100%', height: 'auto' }}
+                  className="object-contain transition-transform duration-700 group-hover:scale-105" 
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-8">
                   <div className="flex items-center gap-3">

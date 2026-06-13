@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from 'react';
@@ -148,7 +147,6 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-4xl w-[95vw] rounded-3xl border-border bg-card p-0 overflow-hidden shadow-2xl outline-none">
-            {/* Accessibility: hidden title and description for Radix compliance */}
             <DialogTitle className="sr-only">{name}</DialogTitle>
             <DialogDescription className="sr-only">Rincian lengkap paket layanan {name}</DialogDescription>
             

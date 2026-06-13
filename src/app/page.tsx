@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from 'next/image';
@@ -30,7 +29,8 @@ function LoadingScreen({ logoUrl }: { logoUrl?: string }) {
             <img 
               src={logoUrl} 
               alt="Loading Logo" 
-              className="max-w-full max-h-full object-contain brightness-110 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+              className="object-contain brightness-110 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+              style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '100%' }}
             />
           </div>
         )}
