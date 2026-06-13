@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Instagram, Facebook, Youtube, Fingerprint, Globe, Link as LinkIcon, ShoppingCart } from 'lucide-react';
@@ -8,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -45,7 +47,7 @@ export function Footer({ businessId }: FooterProps) {
   const logoText = settings?.logoText || '';
   const logoAccentText = settings?.logoAccentText || '';
   const logoUrl = settings?.logoUrl || '';
-  const businessName = settings?.name || '';
+  const businessName = settings?.name || 'Bisnis Kami';
   const aboutSubtitle = settings?.heroSubtitle || '';
   const privacyPolicyContent = settings?.privacyPolicy || 'Kebijakan privasi belum diatur oleh admin.';
   const logoH = parseInt(settings?.logoHeight) || 32;
@@ -200,8 +202,12 @@ export function Footer({ businessId }: FooterProps) {
                     <button className="hover:text-primary transition-colors text-left">Kebijakan Privasi</button>
                   </DialogTrigger>
                   <DialogContent className="max-w-2xl max-h-[80vh] rounded-2xl border-border bg-card">
+                    {/* Accessibility headers */}
+                    <DialogTitle className="sr-only">Kebijakan Privasi</DialogTitle>
+                    <DialogDescription className="sr-only">Halaman kebijakan privasi lengkap untuk {businessName}</DialogDescription>
+                    
                     <DialogHeader>
-                      <DialogTitle className="text-xl font-bold text-foreground">Kebijakan Privasi</DialogTitle>
+                      <h2 className="text-xl font-bold text-foreground">Kebijakan Privasi</h2>
                     </DialogHeader>
                     <ScrollArea className="h-full max-h-[60vh] mt-4 pr-4">
                       <div className="text-muted-foreground text-sm whitespace-pre-wrap leading-relaxed">
