@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from 'next/image';
@@ -96,6 +97,7 @@ function HomeContent() {
                   src={heroDisplayImage} 
                   alt="Hero Background" 
                   fill 
+                  sizes="100vw"
                   className="object-cover opacity-20" 
                   style={{ objectPosition: `center ${heroImagePos}` }}
                   priority

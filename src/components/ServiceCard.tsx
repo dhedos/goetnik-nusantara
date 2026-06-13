@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from 'react';
@@ -78,8 +79,8 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
                       src={img}
                       alt={`${name} - ${index + 1}`}
                       fill
+                      sizes="100vw"
                       className="object-cover"
-                      unoptimized={img.startsWith('data:')}
                     />
                   </div>
                 </CarouselItem>
@@ -97,8 +98,8 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
                 src={allImages[0]}
                 alt={name}
                 fill
+                sizes="100vw"
                 className="object-cover transition-transform duration-1000 group-hover:scale-105"
-                unoptimized={allImages[0].startsWith('data:')}
               />
             </div>
           )
@@ -160,8 +161,8 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
                                   src={img}
                                   alt={`${name} - ${index + 1}`}
                                   fill
+                                  sizes="100vw"
                                   className="object-contain"
-                                  unoptimized={img.startsWith('data:')}
                                   priority
                                 />
                               </div>

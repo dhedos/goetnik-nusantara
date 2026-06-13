@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
@@ -212,11 +213,9 @@ export default function AdminDashboard() {
           const ctx = canvas.getContext('2d');
           if (!ctx) return reject(new Error('Canvas context failed'));
           
-          // Penting: Bersihkan canvas agar benar-benar transparan sebelum menggambar
           ctx.clearRect(0, 0, width, height);
           ctx.drawImage(img, 0, 0, width, height);
           
-          // Gunakan PNG untuk logo agar transparansi terjaga 100%
           const format = isLogo ? 'image/png' : 'image/webp';
           const quality = isLogo ? 1.0 : 0.8;
           
@@ -485,8 +484,8 @@ export default function AdminDashboard() {
                       <Image 
                         src={item.imageUrl} 
                         alt="Portfolio" 
-                        width={800} 
-                        height={1200} 
+                        fill
+                        sizes="100vw"
                         className="w-full h-auto object-contain transition-transform group-hover:scale-105" 
                       />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -551,7 +550,7 @@ export default function AdminDashboard() {
                 <div className="space-y-4">
                   <Label className="text-xs font-bold uppercase">Background Hero</Label>
                   <div className="relative h-72 w-full bg-background rounded-3xl overflow-hidden border border-border group">
-                    {businessInfo.heroImageUrl ? <Image src={businessInfo.heroImageUrl} alt="Hero" fill className="object-cover opacity-60" style={{ objectPosition: `center ${businessInfo.heroImagePosition}` }} /> : <div className="flex items-center justify-center h-full opacity-10"><Globe size={64} /></div>}
+                    {businessInfo.heroImageUrl ? <Image src={businessInfo.heroImageUrl} alt="Hero" fill sizes="100vw" className="object-cover opacity-60" style={{ objectPosition: `center ${businessInfo.heroImagePosition}` }} /> : <div className="flex items-center justify-center h-full opacity-10"><Globe size={64} /></div>}
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all bg-black/40">
                       <input type="file" className="hidden" id="hero-up" accept="image/*" onChange={(e) => handleImageUpload(e, 'hero')} />
                       <Button asChild variant="secondary" className="rounded-xl px-8 h-12 font-bold"><label htmlFor="hero-up">{isUploading === 'hero' ? <Loader2 className="animate-spin" /> : 'Ganti Background'}</label></Button>
@@ -587,7 +586,7 @@ export default function AdminDashboard() {
                     <Card key={s.id} className="bg-card rounded-3xl border-border overflow-hidden shadow-lg group flex flex-col">
                       <div className="h-56 bg-muted/20 relative overflow-hidden flex items-center justify-center">
                         {s.imageUrl ? (
-                          <Image src={s.imageUrl} alt={s.name} fill className="object-contain transition-transform group-hover:scale-105" />
+                          <Image src={s.imageUrl} alt={s.name} fill sizes="100vw" className="object-contain transition-transform group-hover:scale-105" />
                         ) : (
                           <div className="flex flex-col items-center gap-2 text-muted-foreground/30">
                             <ImageIcon size={48} />
@@ -613,7 +612,7 @@ export default function AdminDashboard() {
                            <div className="grid grid-cols-4 gap-2">
                               {s.galleryUrls?.map((img: string, idx: number) => (
                                 <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-border group/gal bg-transparent">
-                                   <Image src={img} alt="Gallery" fill className="object-contain" />
+                                   <Image src={img} alt="Gallery" fill sizes="100vw" className="object-contain" />
                                    <button 
                                       onClick={() => handleRemoveGalleryImage(s.id, img)}
                                       className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover/gal:opacity-100 transition-opacity"
