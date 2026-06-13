@@ -12,12 +12,8 @@ interface PortfolioProps {
 
 export function Portfolio({ businessId }: PortfolioProps) {
   const firestore = useFirestore();
-  const portfolioQuery = useMemoFirebase(() => 
-    firestore ? query(collection(firestore, businessId === 'main' ? 'businesses' : 'businesses', businessId === 'main' ? 'main' : businessId, 'portfolio'), orderBy('createdAt', 'desc')) : null, 
-    [firestore, businessId]
-  );
   
-  // Perbaikan jalur query agar konsisten dengan MAIN_BUSINESS_ID
+  // Jalur query konsisten dengan MAIN_BUSINESS_ID
   const portfolioQueryFixed = useMemoFirebase(() => 
     firestore ? query(collection(firestore, 'businesses', businessId, 'portfolio'), orderBy('createdAt', 'desc')) : null, 
     [firestore, businessId]
@@ -55,7 +51,7 @@ export function Portfolio({ businessId }: PortfolioProps) {
                   width={800}
                   height={1200}
                   className="w-full h-auto object-contain transition-transform duration-700 group-hover:scale-105" 
-                  unoptimized 
+                  unoptimized={item.imageUrl.startsWith('data:')} 
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-8">
                   <div className="flex items-center gap-3">

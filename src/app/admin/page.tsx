@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
-import { useUser, useFirestore, useCollection, useDoc, useAuth, useMemoFirebase } from '@/firebase';
+import { useUser, useFirestore, useCollection, useDoc, useAuth, useMemoFirebase, useStorage } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,7 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc, serverTimestamp, query, orderBy, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
@@ -42,6 +43,7 @@ export default function AdminDashboard() {
   const { user, loading: authLoading } = useUser();
   const auth = useAuth();
   const firestore = useFirestore();
+  const storage = useStorage();
   const router = useRouter();
   const isMobile = useIsMobile();
   const [activeSection, setActiveSection] = useState<AdminSection>('bookings');
@@ -197,7 +199,10 @@ export default function AdminDashboard() {
     }
   };
 
-  const resizeAndCompressImage = (file: File, target: string, maxWidth: number = 1600, quality: number = 0.9): Promise<string> => {
+  /**
+   * Mengoptimalkan gambar: Resize ke 1920px (max), konversi ke WebP, kompresi target 200-300KB.
+   */
+  const optimizeImage = (file: File, maxWidth: number = 1920, quality: number = 0.8): Promise<Blob> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -217,18 +222,13 @@ export default function AdminDashboard() {
           canvas.width = width;
           canvas.height = height;
           const ctx = canvas.getContext('2d');
-          
-          // Memastikan kanvas bersih dan transparan total sebelum menggambar (Fix Hitam)
           ctx?.clearRect(0, 0, width, height);
           ctx?.drawImage(img, 0, 0, width, height);
           
-          // Jika target adalah logo, gunakan PNG agar transparansi terjaga maksimal
-          const isLogoTarget = target.toLowerCase().includes('logo');
-          const format = isLogoTarget ? 'image/png' : 'image/webp';
-          
-          // PNG tidak menggunakan parameter quality, akan mengabaikannya
-          const compressedBase64 = canvas.toDataURL(format, isLogoTarget ? undefined : quality);
-          resolve(compressedBase64);
+          canvas.toBlob((blob) => {
+            if (blob) resolve(blob);
+            else reject(new Error('Canvas conversion failed'));
+          }, 'image/webp', quality);
         };
         img.onerror = reject;
       };
@@ -236,23 +236,31 @@ export default function AdminDashboard() {
     });
   };
 
+  const uploadToStorage = async (blob: Blob, path: string) => {
+    if (!storage) throw new Error('Storage not available');
+    const storageRef = ref(storage, path);
+    await uploadBytes(storageRef, blob);
+    return getDownloadURL(storageRef);
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: string) => {
     const file = e.target.files?.[0];
-    if (!file || !user || !firestore) return;
+    if (!file || !user || !firestore || !storage) return;
     setIsUploading(target);
     try {
-      const isBranding = target === 'logo' || target === 'hero';
-      const compressedBase64 = await resizeAndCompressImage(file, target, isBranding ? 1800 : 1600);
+      const optimizedBlob = await optimizeImage(file);
+      const fileName = `${target}_${Date.now()}.webp`;
+      const url = await uploadToStorage(optimizedBlob, `businesses/${MAIN_BUSINESS_ID}/${fileName}`);
       
       if (target === 'logo') {
-        setBusinessInfo(prev => ({ ...prev, logoUrl: compressedBase64 }));
+        setBusinessInfo(prev => ({ ...prev, logoUrl: url }));
       } else if (target === 'hero') {
-        setBusinessInfo(prev => ({ ...prev, heroImageUrl: compressedBase64 }));
+        setBusinessInfo(prev => ({ ...prev, heroImageUrl: url }));
       } else {
         const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'services', target);
-        updateDoc(docRef, { imageUrl: compressedBase64 });
+        updateDoc(docRef, { imageUrl: url });
       }
-      toast({ title: "Gambar Berhasil Dimuat", description: "Klik simpan untuk menerapkan secara permanen." });
+      toast({ title: "Berhasil", description: "Gambar telah dioptimalkan dan diunggah." });
     } catch (err) {
       toast({ variant: "destructive", title: "Gagal", description: "Gagal memproses gambar." });
     } finally {
@@ -262,14 +270,17 @@ export default function AdminDashboard() {
 
   const handleServiceGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>, serviceId: string) => {
     const files = Array.from(e.target.files || []);
-    if (files.length === 0 || !user || !firestore) return;
+    if (files.length === 0 || !user || !firestore || !storage) return;
     setIsUploading(`gallery-${serviceId}`);
     try {
       for (const file of files) {
-        const compressedBase64 = await resizeAndCompressImage(file, `gallery-${serviceId}`, 1600, 0.9);
+        const optimizedBlob = await optimizeImage(file);
+        const fileName = `service_${serviceId}_gallery_${Date.now()}_${Math.random().toString(36).substr(2, 5)}.webp`;
+        const url = await uploadToStorage(optimizedBlob, `businesses/${MAIN_BUSINESS_ID}/services/${serviceId}/${fileName}`);
+        
         const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'services', serviceId);
         await updateDoc(docRef, {
-          galleryUrls: arrayUnion(compressedBase64)
+          galleryUrls: arrayUnion(url)
         });
       }
       toast({ title: "Berhasil", description: "Foto galeri telah ditambahkan." });
@@ -296,15 +307,18 @@ export default function AdminDashboard() {
 
   const handleMultiplePortfolioUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    if (files.length === 0 || !user || !firestore) return;
+    if (files.length === 0 || !user || !firestore || !storage) return;
     setIsUploading('portfolio');
     let count = 0;
     try {
       for (const file of files) {
-        const compressedBase64 = await resizeAndCompressImage(file, 'portfolio', 1600, 0.9);
+        const optimizedBlob = await optimizeImage(file);
+        const fileName = `portfolio_${Date.now()}_${Math.random().toString(36).substr(2, 5)}.webp`;
+        const url = await uploadToStorage(optimizedBlob, `businesses/${MAIN_BUSINESS_ID}/portfolio/${fileName}`);
+        
         const colRef = collection(firestore, 'businesses', MAIN_BUSINESS_ID, 'portfolio');
         await addDoc(colRef, {
-          imageUrl: compressedBase64,
+          imageUrl: url,
           createdAt: serverTimestamp(),
           ownerId: user.uid
         });
@@ -481,7 +495,7 @@ export default function AdminDashboard() {
                         width={800} 
                         height={1200} 
                         className="w-full h-auto object-contain transition-transform group-hover:scale-105" 
-                        unoptimized 
+                        unoptimized={item.imageUrl.startsWith('data:')}
                       />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <Button variant="destructive" size="icon" className="rounded-full h-10 w-10" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'portfolio', item.id))}><Trash2 size={18} /></Button>
@@ -573,7 +587,7 @@ export default function AdminDashboard() {
                       </div>
                       <div className="flex-1 space-y-4 w-full">
                         <input type="file" className="hidden" id="logo-up" accept="image/*" onChange={(e) => handleImageUpload(e, 'logo')} />
-                        <Button asChild variant="secondary" className="w-full h-12 rounded-xl font-bold"><label htmlFor="logo-up">Unggah Logo Baru</label></Button>
+                        <Button asChild variant="secondary" className="w-full h-12 rounded-xl font-bold"><label htmlFor="logo-up">{isUploading === 'logo' ? <Loader2 className="animate-spin" /> : 'Unggah Logo Baru'}</label></Button>
                         <div className="space-y-3">
                           <div className="flex justify-between text-[10px] font-bold uppercase"><span>Ukuran Logo</span><span>{businessInfo.logoHeight}px</span></div>
                           <Slider value={[parseInt(businessInfo.logoHeight) || 36]} min={20} max={100} onValueChange={(v) => setBusinessInfo({...businessInfo, logoHeight: v[0].toString()})} />
@@ -593,10 +607,10 @@ export default function AdminDashboard() {
                 <div className="space-y-4">
                   <Label className="text-xs font-bold uppercase">Background Hero</Label>
                   <div className="relative h-72 w-full bg-background rounded-3xl overflow-hidden border border-border group">
-                    {businessInfo.heroImageUrl ? <Image src={businessInfo.heroImageUrl} alt="Hero" fill className="object-cover opacity-60" style={{ objectPosition: `center ${businessInfo.heroImagePosition}` }} unoptimized /> : <div className="flex items-center justify-center h-full opacity-10"><Globe size={64} /></div>}
+                    {businessInfo.heroImageUrl ? <Image src={businessInfo.heroImageUrl} alt="Hero" fill className="object-cover opacity-60" style={{ objectPosition: `center ${businessInfo.heroImagePosition}` }} unoptimized={businessInfo.heroImageUrl.startsWith('data:')} /> : <div className="flex items-center justify-center h-full opacity-10"><Globe size={64} /></div>}
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all bg-black/40">
                       <input type="file" className="hidden" id="hero-up" accept="image/*" onChange={(e) => handleImageUpload(e, 'hero')} />
-                      <Button asChild variant="secondary" className="rounded-xl px-8 h-12 font-bold"><label htmlFor="hero-up">Ganti Background</label></Button>
+                      <Button asChild variant="secondary" className="rounded-xl px-8 h-12 font-bold"><label htmlFor="hero-up">{isUploading === 'hero' ? <Loader2 className="animate-spin" /> : 'Ganti Background'}</label></Button>
                     </div>
                   </div>
                   <Slider value={[parseInt(businessInfo.heroImagePosition) || 50]} max={100} onValueChange={(v) => setBusinessInfo({...businessInfo, heroImagePosition: `${v[0]}%`})} />
@@ -629,7 +643,7 @@ export default function AdminDashboard() {
                     <Card key={s.id} className="bg-card rounded-3xl border-border overflow-hidden shadow-lg group flex flex-col">
                       <div className="h-56 bg-muted/20 relative overflow-hidden flex items-center justify-center">
                         {s.imageUrl ? (
-                          <Image src={s.imageUrl} alt={s.name} fill className="object-contain transition-transform group-hover:scale-105" unoptimized />
+                          <Image src={s.imageUrl} alt={s.name} fill className="object-contain transition-transform group-hover:scale-105" unoptimized={s.imageUrl.startsWith('data:')} />
                         ) : (
                           <div className="flex flex-col items-center gap-2 text-muted-foreground/30">
                             <ImageIcon size={48} />
@@ -638,7 +652,7 @@ export default function AdminDashboard() {
                         )}
                         <div className="absolute top-4 right-4 flex gap-2 z-10">
                           <input type="file" className="hidden" id={`s-main-${s.id}`} accept="image/*" onChange={(e) => handleImageUpload(e, s.id)} />
-                          <Button variant="secondary" size="sm" asChild className="opacity-0 group-hover:opacity-100 transition-opacity shadow-lg rounded-full px-4"><label htmlFor={`s-main-${s.id}`}>Ganti Utama</label></Button>
+                          <Button variant="secondary" size="sm" asChild className="opacity-0 group-hover:opacity-100 transition-opacity shadow-lg rounded-full px-4"><label htmlFor={`s-main-${s.id}`}>{isUploading === s.id ? <Loader2 className="animate-spin" /> : 'Ganti Utama'}</label></Button>
                           <Button variant="destructive" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity shadow-lg h-9 w-9 rounded-full" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id))}><Trash2 size={16} /></Button>
                         </div>
                       </div>
@@ -649,13 +663,13 @@ export default function AdminDashboard() {
                              <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Galeri Contoh Gambar</Label>
                              <div className="relative">
                                 <input type="file" className="hidden" id={`s-gallery-${s.id}`} multiple accept="image/*" onChange={(e) => handleServiceGalleryUpload(e, s.id)} />
-                                <Button variant="outline" size="sm" asChild className="h-7 text-[10px] rounded-lg px-2"><label htmlFor={`s-gallery-${s.id}`}>{isUploading === `gallery-${s.id}` ? 'Loading...' : '+ Tambah Foto'}</label></Button>
+                                <Button variant="outline" size="sm" asChild className="h-7 text-[10px] rounded-lg px-2"><label htmlFor={`s-gallery-${s.id}`}>{isUploading === `gallery-${s.id}` ? <Loader2 className="animate-spin" /> : '+ Tambah Foto'}</label></Button>
                              </div>
                            </div>
                            <div className="grid grid-cols-4 gap-2">
                               {s.galleryUrls?.map((img: string, idx: number) => (
                                 <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-border group/gal bg-transparent">
-                                   <Image src={img} alt="Gallery" fill className="object-contain" unoptimized />
+                                   <Image src={img} alt="Gallery" fill className="object-contain" unoptimized={img.startsWith('data:')} />
                                    <button 
                                       onClick={() => handleRemoveGalleryImage(s.id, img)}
                                       className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover/gal:opacity-100 transition-opacity"
