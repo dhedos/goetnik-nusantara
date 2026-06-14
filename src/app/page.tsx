@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from 'next/image';
@@ -127,12 +128,12 @@ function HomeContent() {
 
                 <div className="flex flex-col sm:flex-row gap-4 pt-6 md:pt-8">
                   <Link href="#pesan" className="w-full sm:w-auto">
-                    <Button size="lg" className="rounded-xl w-full px-8 md:px-10 shadow-2xl shadow-primary/30 h-14 md:h-16 text-sm md:text-base font-bold uppercase tracking-widest hover:scale-105 transition-all">
+                    <Button size="lg" className="rounded-none w-full px-8 md:px-10 shadow-2xl shadow-primary/30 h-14 md:h-16 text-sm md:text-base font-bold uppercase tracking-widest hover:scale-105 transition-all">
                       Konsultasi Gratis <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5" />
                     </Button>
                   </Link>
                   <Link href="#layanan" className="w-full sm:w-auto">
-                    <Button variant="outline" size="lg" className="rounded-xl w-full px-8 md:px-10 h-14 md:h-16 text-sm md:text-base font-bold border-white/10 bg-white/5 backdrop-blur-3xl hover:bg-white/10 transition-all uppercase tracking-widest">
+                    <Button variant="outline" size="lg" className="rounded-none w-full px-8 md:px-10 h-14 md:h-16 text-sm md:text-base font-bold border-white/10 bg-white/5 backdrop-blur-3xl hover:bg-white/10 transition-all uppercase tracking-widest">
                       Lihat Layanan
                     </Button>
                   </Link>
@@ -160,13 +161,14 @@ function HomeContent() {
                         {...s} 
                         icon={ICON_MAP[s.iconName] || ICON_MAP.Laptop} 
                         imageId={`service-${['os','repair','design','web'][i%4]}`} 
+                        galleryUrls={s.galleryUrls || []}
                       />
                     </div>
                   ))}
                 </div>
               ) : (
-                <Card className="max-w-2xl mx-auto p-12 text-center bg-card/10 border-dashed border-border rounded-3xl">
-                  <div className="w-16 h-16 bg-muted/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Card className="max-w-2xl mx-auto p-12 text-center bg-card/10 border-dashed border-border rounded-none">
+                  <div className="w-16 h-16 bg-muted/10 rounded-none flex items-center justify-center mx-auto mb-6">
                     <ImageIcon size={32} className="opacity-10" />
                   </div>
                   <h3 className="text-xl font-bold mb-3 text-muted-foreground uppercase tracking-widest">Layanan Segera Hadir</h3>

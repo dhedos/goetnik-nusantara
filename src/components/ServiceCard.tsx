@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from 'react';
@@ -192,8 +193,8 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
                     </CarouselContent>
                     {allImages.length > 1 && (
                       <>
-                        <CarouselPrevious className="left-6 bg-black/40 border-none text-white hidden sm:flex" />
-                        <CarouselNext className="right-6 bg-black/40 border-none text-white hidden sm:flex" />
+                        <CarouselPrevious className="left-6 bg-black/40 border-none text-white hidden sm:flex rounded-none" />
+                        <CarouselNext className="right-6 bg-black/40 border-none text-white hidden sm:flex rounded-none" />
                       </>
                     )}
                   </Carousel>
