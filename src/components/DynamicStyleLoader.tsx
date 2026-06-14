@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useDoc, useMemoFirebase, useFirestore } from '@/firebase';
 import { doc } from 'firebase/firestore';
-import { THEMES } from '@/lib/constants';
+import { THEMES, MAIN_BUSINESS_ID } from '@/lib/constants';
 
 interface DynamicStyleLoaderProps {
   businessId: string;
@@ -12,8 +12,8 @@ interface DynamicStyleLoaderProps {
 export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
   const firestore = useFirestore();
   const settingsRef = useMemoFirebase(() => 
-    firestore ? doc(firestore, 'businesses', businessId, 'settings', 'profile') : null, 
-    [firestore, businessId]
+    firestore ? doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'settings', 'profile') : null, 
+    [firestore]
   );
   const { data: settings } = useDoc(settingsRef);
 
@@ -26,9 +26,6 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
     const font = settings.fontFamily || 'Inter';
     const fontValue = `'${font}', sans-serif`;
     root.style.setProperty('--selected-font', fontValue);
-    
-    const isEthnic = ['Cinzel', 'Almendra', 'Playfair Display', 'Marcellus', 'Lora'].includes(font);
-    root.style.setProperty('--font-weight-display', isEthnic ? '700' : '800');
 
     // 2. Tema & Warna
     const themeId = settings.themeId || 'heritage-red';
@@ -38,79 +35,47 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
     root.style.setProperty('--accent', selectedTheme.accent);
     root.style.setProperty('--background', selectedTheme.background);
     
+    // Automatic Foreground & Card Color calculation
     const bgParts = selectedTheme.background.split(' ');
     const lValue = parseInt(bgParts[2]);
     const isLight = lValue > 60;
     
-    let foreground: string;
-    let mutedForeground: string;
-    let border: string;
-    let input: string;
-    let card: string;
-
     const h = bgParts[0];
     const s = bgParts[1];
 
     if (isLight) {
-      foreground = '20 20% 12%'; 
-      mutedForeground = '20 10% 40%'; 
-      border = '30 20% 85%'; 
-      input = '30 20% 85% / 0.5';
-      card = `${h} ${s} ${Math.max(0, lValue - 3)}%`; 
+      root.style.setProperty('--foreground', '20 20% 12%');
+      root.style.setProperty('--card', `${h} ${s} ${Math.max(0, lValue - 3)}%`);
+      root.style.setProperty('--border', '30 20% 85%');
     } else {
-      foreground = '210 40% 98%';
-      mutedForeground = '215 20% 65%';
-      border = '217 19% 27% / 0.15';
-      input = '217 19% 27% / 0.1';
-      card = `${h} ${s} ${Math.min(100, lValue + 3)}%`; 
+      root.style.setProperty('--foreground', '210 40% 98%');
+      root.style.setProperty('--card', `${h} ${s} ${Math.min(100, lValue + 3)}%`);
+      root.style.setProperty('--border', '217 19% 27% / 0.15');
     }
 
-    root.style.setProperty('--foreground', foreground);
-    root.style.setProperty('--card-foreground', foreground);
-    root.style.setProperty('--muted-foreground', mutedForeground);
-    root.style.setProperty('--border', border);
-    root.style.setProperty('--input', input);
-    root.style.setProperty('--card', card);
-
-    // 3. Logo & Dynamic Branding (Favicon, iOS, Android)
+    // 3. Logo & Favicon Sync
     if (settings.logoUrl) {
-      root.style.setProperty('--loading-logo', `url(${settings.logoUrl})`);
-      root.classList.add('has-loading-logo');
-      
-      // Update Favicon with a more robust method to force browser refresh
-      const updateFavicons = (url: string) => {
-        const rels = ['icon', 'shortcut icon', 'apple-touch-icon'];
-        
-        rels.forEach(rel => {
-          // Remove existing link elements for this relation
-          const existing = document.querySelectorAll(`link[rel*="${rel.split(' ')[0]}"]`);
-          existing.forEach(el => el.parentNode?.removeChild(el));
-
-          // Create a new fresh link element
-          const link = document.createElement('link');
-          link.rel = rel;
-          link.href = url;
-          // Most browsers support PNG/DataURI for favicons without explicit type
-          if (url.startsWith('data:image/png')) {
-            link.type = 'image/png';
+      // Update Favicons Dynamicly
+      const updateFavicon = (url: string) => {
+        ['icon', 'shortcut icon', 'apple-touch-icon'].forEach(rel => {
+          let link = document.querySelector(`link[rel*="${rel}"]`) as HTMLLinkElement;
+          if (!link) {
+            link = document.createElement('link');
+            link.rel = rel;
+            document.head.appendChild(link);
           }
-          
-          document.head.appendChild(link);
+          link.href = url;
         });
       };
-
-      updateFavicons(settings.logoUrl);
+      updateFavicon(settings.logoUrl);
     }
 
-    // Cache untuk rendering instan saat reload (Head Script)
+    // Cache current theme for fast hydration script in layout.tsx
     try {
       localStorage.setItem('goetnik-theme-cache', JSON.stringify({
         primary: selectedTheme.primary,
         accent: selectedTheme.accent,
         background: selectedTheme.background,
-        foreground,
-        card,
-        border,
         fontFamily: fontValue,
         logoUrl: settings.logoUrl || ''
       }));
