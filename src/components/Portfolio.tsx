@@ -3,9 +3,9 @@
 
 import * as React from 'react';
 import Image from 'next/image';
-import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, query, orderBy } from 'firebase/firestore';
-import { Loader2, Maximize2, X, ExternalLink, Link as LinkIcon } from 'lucide-react';
+import { useFirestore, useCollection, useMemoFirebase, useDoc } from '@/firebase';
+import { collection, query, orderBy, doc } from 'firebase/firestore';
+import { Loader2, Maximize2, X, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { MAIN_BUSINESS_ID } from '@/lib/constants';
 
 interface PortfolioProps {
   businessId: string;
@@ -28,6 +29,15 @@ export function Portfolio({ businessId }: PortfolioProps) {
     [firestore, businessId]
   );
   const { data: portfolio, loading } = useCollection(portfolioQueryFixed);
+
+  const settingsRef = useMemoFirebase(() => 
+    firestore ? doc(firestore, 'businesses', businessId, 'settings', 'profile') : null, 
+    [firestore, businessId]
+  );
+  const { data: settings } = useDoc(settingsRef);
+
+  const showGlobalLink = settings?.showPortfolioExternalUrl ?? false;
+  const globalUrl = settings?.portfolioExternalUrl || '';
 
   if (loading) return (
     <div className="py-20 flex flex-col items-center justify-center gap-4">
@@ -65,13 +75,6 @@ export function Portfolio({ businessId }: PortfolioProps) {
                       className="object-contain transition-transform duration-700 group-hover:scale-105" 
                     />
                     
-                    {/* Link Indicator in Grid - Bottom Edge */}
-                    {item.externalLink && (item.showLink ?? true) && (
-                      <div className="absolute bottom-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity bg-primary/90 text-primary-foreground p-2 rounded-xl shadow-lg">
-                        <LinkIcon size={14} />
-                      </div>
-                    )}
-
                     <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-8">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground shadow-lg">
@@ -100,14 +103,7 @@ export function Portfolio({ businessId }: PortfolioProps) {
                   </div>
                 </div>
                 
-                <div className="absolute top-4 right-4 z-[80] flex items-center gap-2">
-                  {item.externalLink && (item.showLink ?? true) && (
-                    <Button asChild size="sm" className="rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border-none text-white font-bold h-10 px-6">
-                      <a href={item.externalLink.startsWith('http') ? item.externalLink : `https://${item.externalLink}`} target="_blank">
-                        <ExternalLink size={16} className="mr-2" /> Lihat Karya Lainnya
-                      </a>
-                    </Button>
-                  )}
+                <div className="absolute top-4 right-4 z-[80]">
                   <DialogTrigger asChild>
                     <button className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors backdrop-blur-md">
                       <X size={20} />
@@ -118,6 +114,21 @@ export function Portfolio({ businessId }: PortfolioProps) {
             </Dialog>
           ))}
         </div>
+
+        {/* Portfolio External Link Button */}
+        {showGlobalLink && globalUrl && (
+          <div className="mt-16 flex justify-center animate-fade-in">
+            <Button 
+              asChild
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 sm:px-12 py-7 sm:py-8 rounded-2xl sm:rounded-[2rem] text-sm sm:text-xl font-black uppercase tracking-widest shadow-[0_20px_50px_rgba(var(--primary),0.3)] hover:scale-[1.03] transition-all group h-auto"
+            >
+              <a href={globalUrl.startsWith('http') ? globalUrl : `https://${globalUrl}`} target="_blank" className="flex items-center gap-4">
+                Portofolio Kami Selengkapnya 
+                <ArrowRight className="h-5 w-5 sm:h-7 sm:w-7 group-hover:translate-x-2 transition-transform" />
+              </a>
+            </Button>
+          </div>
+        )}
 
         {/* Portfolio End Indicator */}
         <div className="mt-16 pt-8 border-t border-border/5 flex flex-col items-center">

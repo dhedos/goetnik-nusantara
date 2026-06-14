@@ -19,7 +19,7 @@ import {
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
   Settings, ShoppingBag, ExternalLink as ExternalLinkIcon, MapPin, Instagram, Facebook, Youtube, CheckCircle2, Type, Grid3X3, UploadCloud, Link as LinkIcon, ImageIcon, X,
-  Menu, Palette, Link as LinkSimpleIcon
+  Menu, Palette, Link as LinkSimpleIcon, ArrowRight
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -131,6 +131,8 @@ export default function AdminDashboard() {
     servicesSectionBadge: '',
     servicesSectionTitle: 'Layanan Unggulan',
     servicesSectionSubtitle: '',
+    portfolioExternalUrl: '',
+    showPortfolioExternalUrl: false,
     privacyPolicy: PRIVACY_POLICY_DEFAULT,
     socialInstagram: '',
     socialFacebook: '',
@@ -157,7 +159,8 @@ export default function AdminDashboard() {
         logoHeight: settings.logoHeight || '36',
         fontFamily: settings.fontFamily || 'Inter',
         themeId: settings.themeId || 'heritage-red',
-        showPhoneNumber: settings.showPhoneNumber ?? false
+        showPhoneNumber: settings.showPhoneNumber ?? false,
+        showPortfolioExternalUrl: settings.showPortfolioExternalUrl ?? false
       }));
       hasLoadedSettings.current = true;
     }
@@ -314,8 +317,6 @@ export default function AdminDashboard() {
         const colRef = collection(firestore, 'businesses', MAIN_BUSINESS_ID, 'portfolio');
         await addDoc(colRef, {
           imageUrl: dataUrl,
-          externalLink: '',
-          showLink: true,
           createdAt: serverTimestamp(),
           ownerId: user.uid
         });
@@ -514,6 +515,23 @@ export default function AdminDashboard() {
                 <CardTitle className="flex items-center gap-2"><Grid3X3 size={20} className="text-primary" /> Galeri Portofolio</CardTitle>
               </CardHeader>
               <CardContent className="p-8 space-y-8">
+                <div className="p-6 bg-primary/5 rounded-2xl border border-primary/10 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-bold uppercase">Tautan Portofolio Utama (Selengkapnya)</Label>
+                    <Switch 
+                      checked={businessInfo.showPortfolioExternalUrl} 
+                      onCheckedChange={(val) => setBusinessInfo({...businessInfo, showPortfolioExternalUrl: val})}
+                    />
+                  </div>
+                  <Input 
+                    placeholder="Contoh: https://pinterest.com/profilanda" 
+                    value={businessInfo.portfolioExternalUrl} 
+                    onChange={(e) => setBusinessInfo({...businessInfo, portfolioExternalUrl: e.target.value})}
+                    className="rounded-xl h-12 bg-background border-border"
+                  />
+                  <p className="text-[10px] text-muted-foreground italic uppercase font-medium">Link ini akan muncul sebagai tombol "PORTFOLIO KAMI SELENGKAPNYA" di bagian bawah galeri.</p>
+                </div>
+
                 <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-border rounded-3xl bg-primary/5 group hover:bg-primary/10 transition-all">
                   <input type="file" id="portfolio-up" className="hidden" multiple accept="image/*" onChange={handleMultiplePortfolioUpload} />
                   <label htmlFor="portfolio-up" className="flex flex-col items-center gap-4 cursor-pointer">
@@ -540,24 +558,6 @@ export default function AdminDashboard() {
                         <div className="absolute top-2 right-2">
                            <Button variant="destructive" size="icon" className="rounded-full h-8 w-8 shadow-lg" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'portfolio', item.id))}><Trash2 size={14} /></Button>
                         </div>
-                      </div>
-                      <div className="p-4 space-y-4 border-t border-border">
-                        <div className="flex items-center justify-between">
-                          <Label className="text-[10px] font-black uppercase opacity-60">Tautan Detail</Label>
-                          <div className="flex items-center gap-2">
-                            <span className="text-[9px] font-bold uppercase opacity-40">Tampilkan Link?</span>
-                            <Switch 
-                              checked={item.showLink ?? true} 
-                              onCheckedChange={(val) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'portfolio', item.id), { showLink: val })}
-                            />
-                          </div>
-                        </div>
-                        <Input 
-                          placeholder="https://..." 
-                          defaultValue={item.externalLink || ''} 
-                          onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'portfolio', item.id), { externalLink: e.target.value })}
-                          className="h-9 text-xs rounded-xl"
-                        />
                       </div>
                     </div>
                   ))}
