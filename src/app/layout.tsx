@@ -22,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className="scroll-smooth" data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html lang="id" data-scroll-behavior="smooth" className="scroll-smooth" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -47,7 +47,11 @@ export default function RootLayout({
                       const updateIcon = (url) => {
                         const existingIcons = document.querySelectorAll("link[rel*='icon']");
                         if (existingIcons.length > 0) {
-                          existingIcons.forEach(link => link.setAttribute('href', url));
+                          existingIcons.forEach(link => {
+                            if (link.getAttribute('href') !== url) {
+                              link.setAttribute('href', url);
+                            }
+                          });
                         } else {
                           const icon = document.createElement('link');
                           icon.rel = 'icon';

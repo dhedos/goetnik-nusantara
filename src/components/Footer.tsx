@@ -148,7 +148,7 @@ export function Footer({ businessId }: FooterProps) {
                 href={formatSocialUrl(socialLinks[soc.id as keyof typeof socialLinks])} 
                 target={socialLinks[soc.id as keyof typeof socialLinks] ? "_blank" : "_self"}
                 onClick={(e) => handleSocialClick(e, socialLinks[soc.id as keyof typeof socialLinks], soc.label)}
-                className="w-11 h-11 rounded-2xl border border-white/10 flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all shadow-lg"
+                className="w-11 h-11 rounded-none border border-white/10 flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all shadow-lg"
               >
                 <soc.icon size={20} />
               </a>
@@ -197,7 +197,7 @@ export function Footer({ businessId }: FooterProps) {
                   <DialogTrigger asChild>
                     <button className="hover:text-primary transition-colors text-left">Kebijakan Privasi</button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-2xl max-h-[85vh] rounded-[2rem] border-white/10 bg-card p-10 shadow-2xl z-[80]">
+                  <DialogContent className="max-w-2xl max-h-[85vh] rounded-none border-white/10 bg-card p-10 shadow-2xl z-[80]">
                     <DialogTitle className="sr-only">Kebijakan Privasi</DialogTitle>
                     <DialogDescription className="sr-only">Rincian kebijakan privasi data pengguna untuk {businessName}</DialogDescription>
                     
@@ -220,7 +220,7 @@ export function Footer({ businessId }: FooterProps) {
         <div className="flex flex-col md:flex-row items-center gap-6">
           <p className="text-center md:text-left">{footerCopyright || `© ${currentYear} ${businessName}. Seluruh Hak Cipta Dilindungi.`}</p>
           <div className="flex items-center gap-4">
-             <span className="h-1 w-1 rounded-full bg-white/10 hidden md:block" />
+             <span className="h-1 w-1 rounded-none bg-white/10 hidden md:block" />
              <Link href="/login" className="opacity-30 hover:opacity-100 hover:text-primary transition-all p-2 flex items-center gap-2" title="Admin Login">
                 <Fingerprint size={16} />
              </Link>
