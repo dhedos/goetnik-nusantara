@@ -24,8 +24,8 @@ import { ICON_MAP, MAIN_BUSINESS_ID } from '@/lib/constants';
 function LoadingScreen({ logoUrl }: { logoUrl?: string }) {
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background text-center p-4">
-      <div className="relative z-10 flex flex-col items-center gap-6">
-        {logoUrl ? (
+      <div className="relative z-10 flex flex-col items-center">
+        {logoUrl && (
           <div className="w-32 h-32 md:w-48 md:h-48 flex items-center justify-center animate-pulse transition-all duration-700">
             <img 
               src={logoUrl} 
@@ -33,11 +33,6 @@ function LoadingScreen({ logoUrl }: { logoUrl?: string }) {
               className="object-contain brightness-110 drop-shadow-[0_0_20px_rgba(255,255,255,0.15)]"
               style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '100%' }}
             />
-          </div>
-        ) : (
-          <div className="flex flex-col items-center gap-4">
-            <Loader2 className="h-12 w-12 animate-spin text-primary opacity-50" />
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30">Menyiapkan Pengalaman Digital</p>
           </div>
         )}
       </div>
@@ -64,8 +59,6 @@ function HomeContent() {
   const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
 
   useEffect(() => {
-    // Ambil logo dari cache localStorage setelah komponen terpasang di browser
-    // untuk menghindari kesalahan hidrasi.
     try {
       const cache = localStorage.getItem('goetnik-theme-cache');
       if (cache) {
@@ -78,16 +71,13 @@ function HomeContent() {
   }, []);
 
   useEffect(() => {
-    // Pastikan kita sudah memiliki data settings sebelum menampilkan konten
     if (settings !== undefined && !settingsLoading) {
-      // Memberikan sedikit waktu buffer untuk kelancaran visual
-      const timer = setTimeout(() => setIsReady(true), 300);
-      return () => clearTimeout(timer);
+      // Menghilangkan jeda waktu agar terasa lebih instan
+      setIsReady(true);
     }
   }, [settings, settingsLoading]);
 
   if (!isReady) {
-    // Prioritaskan logo dari Firestore, jika belum ada gunakan dari cache
     const logoToDisplay = settings?.logoUrl || cachedLogo;
     return <LoadingScreen logoUrl={logoToDisplay} />;
   }
