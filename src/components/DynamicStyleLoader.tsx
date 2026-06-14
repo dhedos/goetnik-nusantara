@@ -48,32 +48,31 @@ export function DynamicStyleLoader({ businessId }: { businessId: string }) {
       root.style.setProperty('--border', '217 19% 27% / 0.15');
     }
 
-    // 3. Favicon Browser Sync (Aggressive Replacement)
-    if (settings.logoUrl) {
+    // 3. Favicon & Logo Cache Sync
+    const logoUrl = settings.logoUrl || '';
+    if (logoUrl) {
       const updateFavicon = (url: string) => {
-        // Remove all current icon tags
         const existingIcons = document.querySelectorAll("link[rel*='icon']");
         existingIcons.forEach(el => el.parentNode?.removeChild(el));
 
-        // Create new tags
-        ['icon', 'shortcut icon', 'apple-touch-icon'].forEach(rel => {
+        ['icon', 'apple-touch-icon'].forEach(rel => {
           const newLink = document.createElement('link');
           newLink.rel = rel;
           newLink.href = url;
           document.head.appendChild(newLink);
         });
       };
-      updateFavicon(settings.logoUrl);
+      updateFavicon(logoUrl);
     }
 
-    // Update Local Cache for layout script
+    // Update Local Cache for the layout head script
     try {
       localStorage.setItem('goetnik-theme-cache', JSON.stringify({
         primary: selectedTheme.primary,
         accent: selectedTheme.accent,
         background: selectedTheme.background,
         fontFamily: fontValue,
-        logoUrl: settings.logoUrl || ''
+        logoUrl: logoUrl
       }));
     } catch (e) {}
 

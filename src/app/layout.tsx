@@ -37,26 +37,30 @@ export default function RootLayout({
                   if (cache) {
                     const theme = JSON.parse(cache);
                     const root = document.documentElement;
+                    
+                    // Apply dynamic variables
                     if (theme.primary) root.style.setProperty('--primary', theme.primary);
                     if (theme.accent) root.style.setProperty('--accent', theme.accent);
                     if (theme.background) root.style.setProperty('--background', theme.background);
                     if (theme.fontFamily) root.style.setProperty('--selected-font', theme.fontFamily);
                     
+                    // Aggressive Favicon Sync to prevent default flicker
                     if (theme.logoUrl) {
-                      const setFavicon = (url) => {
-                        const existingLinks = document.querySelectorAll("link[rel*='icon']");
-                        existingLinks.forEach(l => l.parentNode.removeChild(l));
-                        const link = document.createElement('link');
-                        link.rel = 'icon';
-                        link.href = url;
-                        document.head.appendChild(link);
+                      const updateIcon = (url) => {
+                        const links = document.querySelectorAll("link[rel*='icon']");
+                        links.forEach(l => l.parentNode.removeChild(l));
                         
-                        const appleLink = document.createElement('link');
-                        appleLink.rel = 'apple-touch-icon';
-                        appleLink.href = url;
-                        document.head.appendChild(appleLink);
+                        const icon = document.createElement('link');
+                        icon.rel = 'icon';
+                        icon.href = url;
+                        document.head.appendChild(icon);
+                        
+                        const appleIcon = document.createElement('link');
+                        appleIcon.rel = 'apple-touch-icon';
+                        appleIcon.href = url;
+                        document.head.appendChild(appleIcon);
                       };
-                      setFavicon(theme.logoUrl);
+                      updateIcon(theme.logoUrl);
                     }
                   }
                 } catch (e) {}
