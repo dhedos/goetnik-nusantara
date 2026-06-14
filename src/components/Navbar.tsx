@@ -51,9 +51,9 @@ export function Navbar({ businessId }: NavbarProps) {
       "fixed top-0 left-0 right-0 z-40 transition-all duration-300 px-4 md:px-8 py-4",
       (scrolled && !isOpen) ? "bg-background/90 backdrop-blur-xl border-b border-white/5 py-3 shadow-xl" : "bg-transparent"
     )}>
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         {hasLogoContent ? (
-          <Link href="/" className="flex items-center gap-2 md:gap-3 group max-w-[70%] sm:max-w-none">
+          <Link href="/" className="flex items-center gap-2 md:gap-3 group shrink min-w-0">
             {logoUrl && (
               <div 
                 className="relative shrink-0 transition-all duration-300 flex items-center bg-transparent"
@@ -68,7 +68,7 @@ export function Navbar({ businessId }: NavbarProps) {
               </div>
             )}
             {(logoText || logoAccentText) && (
-              <div className="flex flex-col sm:flex-row sm:items-center text-sm sm:text-base md:text-xl font-bold leading-none gap-0 sm:gap-1.5 truncate">
+              <div className="flex flex-col sm:flex-row sm:items-center text-sm sm:text-base md:text-xl font-bold leading-tight gap-0 sm:gap-1.5 min-w-0">
                 {logoText && <span className="text-white truncate">{logoText}</span>}
                 {logoAccentText && <span className="text-primary truncate">{logoAccentText}</span>}
               </div>
@@ -79,12 +79,12 @@ export function Navbar({ businessId }: NavbarProps) {
         )}
 
         {/* Desktop Links */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-6 lg:gap-8 shrink-0">
           {NAV_LINKS.map((link) => (
             <Link 
               key={link.name} 
               href={link.href}
-              className="text-[11px] uppercase tracking-widest font-bold text-white/70 hover:text-primary transition-all"
+              className="text-[11px] uppercase tracking-widest font-bold text-white/70 hover:text-primary transition-all whitespace-nowrap"
             >
               {link.name}
             </Link>

@@ -105,8 +105,8 @@ export function Footer({ businessId }: FooterProps) {
 
   return (
     <footer className="bg-card/30 border-t border-border pt-16 pb-8 px-4">
-      <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 mb-12">
-        <div className="md:col-span-1 space-y-6">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+        <div className="sm:col-span-2 lg:col-span-1 space-y-6">
           {hasLogoContent && (
             <Link href="/" className="flex items-center gap-2">
               {logoUrl && (
@@ -123,7 +123,7 @@ export function Footer({ businessId }: FooterProps) {
                 </div>
               )}
               {(logoText || logoAccentText) && (
-                <div className="flex items-center text-lg md:text-xl font-bold gap-2">
+                <div className="flex flex-wrap items-center text-lg md:text-xl font-bold gap-x-2">
                   <span className="text-foreground">{logoText}</span>
                   <span className="text-primary">{logoAccentText}</span>
                 </div>
