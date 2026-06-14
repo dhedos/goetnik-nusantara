@@ -223,7 +223,8 @@ export default function AdminDashboard() {
           const canvas = document.createElement('canvas');
           let width = img.width;
           let height = img.height;
-          const maxWidth = isLogo ? 512 : 1920; // Lower resolution for logo favicons
+          // Favicons should be small for performance and browser compatibility
+          const maxWidth = isLogo ? 256 : 1920; 
           
           if (width > maxWidth) {
             height = (maxWidth / width) * height;
@@ -238,8 +239,9 @@ export default function AdminDashboard() {
           ctx.clearRect(0, 0, width, height);
           ctx.drawImage(img, 0, 0, width, height);
           
+          // Use PNG for logos to preserve transparency if available
           const format = isLogo ? 'image/png' : 'image/webp';
-          const quality = isLogo ? 1.0 : 0.7;
+          const quality = isLogo ? 0.9 : 0.7;
           
           const dataUrl = canvas.toDataURL(format, quality);
           resolve(dataUrl);
@@ -261,9 +263,9 @@ export default function AdminDashboard() {
       
       if (isLogo) {
         setBusinessInfo(prev => ({ ...prev, logoUrl: dataUrl }));
-        // Save logo immediately to sync favicon
+        // Save logo immediately to database for favicon sync
         const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'settings', 'profile');
-        await updateDoc(docRef, { logoUrl: dataUrl });
+        await setDoc(docRef, { logoUrl: dataUrl }, { merge: true });
       } else if (target === 'hero') {
         setBusinessInfo(prev => ({ ...prev, heroImageUrl: dataUrl }));
       } else {

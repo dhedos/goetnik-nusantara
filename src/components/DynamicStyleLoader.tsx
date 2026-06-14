@@ -79,20 +79,23 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
       
       // Update Favicon with a more robust method to force browser refresh
       const updateFavicons = (url: string) => {
-        const iconIds = ['dynamic-favicon', 'dynamic-shortcut-icon', 'dynamic-apple-icon'];
+        const rels = ['icon', 'shortcut icon', 'apple-touch-icon'];
         
-        iconIds.forEach(id => {
-          const oldLink = document.getElementById(id) as HTMLLinkElement;
-          const newLink = document.createElement('link');
-          newLink.id = id;
-          newLink.rel = id === 'dynamic-apple-icon' ? 'apple-touch-icon' : (id === 'dynamic-shortcut-icon' ? 'shortcut icon' : 'icon');
-          newLink.href = url;
-          if (id === 'dynamic-favicon') newLink.type = 'image/png';
-          
-          if (oldLink) {
-            document.head.removeChild(oldLink);
+        rels.forEach(rel => {
+          // Remove existing link elements for this relation
+          const existing = document.querySelectorAll(`link[rel*="${rel.split(' ')[0]}"]`);
+          existing.forEach(el => el.parentNode?.removeChild(el));
+
+          // Create a new fresh link element
+          const link = document.createElement('link');
+          link.rel = rel;
+          link.href = url;
+          // Most browsers support PNG/DataURI for favicons without explicit type
+          if (url.startsWith('data:image/png')) {
+            link.type = 'image/png';
           }
-          document.head.appendChild(newLink);
+          
+          document.head.appendChild(link);
         });
       };
 
