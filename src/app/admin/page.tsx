@@ -18,7 +18,8 @@ import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
-  Settings, ShoppingBag, ExternalLink as ExternalLinkIcon, MapPin, Instagram, Facebook, Youtube, CheckCircle2, Type, Grid3X3, UploadCloud, Link as LinkIcon, ImageIcon, X
+  Settings, ShoppingBag, ExternalLink as ExternalLinkIcon, MapPin, Instagram, Facebook, Youtube, CheckCircle2, Type, Grid3X3, UploadCloud, Link as LinkIcon, ImageIcon, X,
+  Menu, Palette
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -208,7 +209,7 @@ export default function AdminDashboard() {
           ctx.drawImage(img, 0, 0, width, height);
           
           const format = isLogo ? 'image/png' : 'image/webp';
-          const quality = isLogo ? 1.0 : 0.7; // 0.7 quality to target 200-300kb
+          const quality = isLogo ? 1.0 : 0.6; // Menurunkan sedikit ke 0.6 untuk keamanan kuota Firestore
           
           const dataUrl = canvas.toDataURL(format, quality);
           resolve(dataUrl);
@@ -236,7 +237,7 @@ export default function AdminDashboard() {
         const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'services', target);
         await updateDoc(docRef, { imageUrl: dataUrl });
       }
-      toast({ title: "Berhasil", description: "Gambar telah dioptimalkan dan disiapkan." });
+      toast({ title: "Berhasil", description: "Gambar telah dioptimalkan." });
     } catch (err: any) {
       toast({ variant: "destructive", title: "Gagal Mengunggah", description: err.message || "Gagal memproses gambar." });
     } finally {
