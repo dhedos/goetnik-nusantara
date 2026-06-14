@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from 'react';
@@ -73,9 +74,9 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
                 className="w-full h-full z-10"
                 plugins={[plugin.current]}
               >
-                <CarouselContent className="h-72">
+                <CarouselContent className="h-full">
                   {allImages.map((img, index) => (
-                    <CarouselItem key={index} className="h-72">
+                    <CarouselItem key={index} className="h-full">
                       <div className="relative w-full h-full">
                         <Image 
                           src={img}
@@ -160,13 +161,13 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
         
         <ScrollArea className="flex-1">
           <div className="p-0">
-            <div className="relative h-[60vh] sm:h-[80vh] bg-background/95 flex items-center justify-center border-b border-border/10">
+            <div className="relative h-[60vh] sm:h-[80vh] bg-black/40 flex items-center justify-center border-b border-border/10">
                {allImages.length > 0 ? (
                   <Carousel className="w-full h-full">
                     <CarouselContent className="h-full">
                       {allImages.map((img, index) => (
                         <CarouselItem key={index} className="h-full flex items-center justify-center">
-                          <div className="relative w-full h-full p-2 sm:p-10">
+                          <div className="relative w-full h-full">
                             <Image 
                               src={img}
                               alt={`${name} - ${index + 1}`}
