@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -47,7 +48,7 @@ export function Navbar({ businessId }: NavbarProps) {
 
   return (
     <nav className={cn(
-      "fixed top-0 left-0 right-0 z-[100] transition-all duration-300 px-4 md:px-8 py-4",
+      "fixed top-0 left-0 right-0 z-40 transition-all duration-300 px-4 md:px-8 py-4",
       (scrolled && !isOpen) ? "bg-background/90 backdrop-blur-xl border-b border-white/5 py-3 shadow-xl" : "bg-transparent"
     )}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -95,7 +96,7 @@ export function Navbar({ businessId }: NavbarProps) {
 
         {/* Mobile Toggle */}
         <button 
-          className="md:hidden text-white p-2 shrink-0 z-[101]"
+          className="md:hidden text-white p-2 shrink-0 z-50"
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -104,7 +105,7 @@ export function Navbar({ businessId }: NavbarProps) {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden fixed inset-0 bg-transparent backdrop-blur-3xl p-8 pt-24 flex flex-col gap-2 animate-in fade-in slide-in-from-top-4 duration-300 z-[99] h-screen overflow-y-auto">
+        <div className="md:hidden fixed inset-0 bg-transparent backdrop-blur-3xl p-8 pt-24 flex flex-col gap-2 animate-in fade-in slide-in-from-top-4 duration-300 z-[49] h-screen overflow-y-auto">
           {NAV_LINKS.map((link) => (
             <Link 
               key={link.name} 

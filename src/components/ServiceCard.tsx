@@ -155,18 +155,18 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
         </CardFooter>
       </Card>
 
-      <DialogContent className="max-w-4xl w-[95vw] h-[90vh] rounded-3xl border-border bg-card p-0 overflow-hidden shadow-2xl outline-none flex flex-col">
+      <DialogContent className="max-w-5xl w-[95vw] h-[90vh] rounded-3xl border-border bg-card p-0 overflow-hidden shadow-2xl outline-none flex flex-col z-[60]">
         <DialogTitle className="sr-only">{name}</DialogTitle>
         <DialogDescription className="sr-only">Rincian lengkap paket layanan {name}</DialogDescription>
         
         <ScrollArea className="flex-1">
           <div className="p-0">
-            <div className="relative h-[60vh] sm:h-[80vh] bg-black/40 flex items-center justify-center border-b border-border/10">
+            <div className="relative min-h-[400px] h-[60vh] sm:h-[75vh] bg-black/40 flex items-center justify-center border-b border-border/10 overflow-hidden">
                {allImages.length > 0 ? (
                   <Carousel className="w-full h-full">
                     <CarouselContent className="h-full">
                       {allImages.map((img, index) => (
-                        <CarouselItem key={index} className="h-full flex items-center justify-center">
+                        <CarouselItem key={index} className="h-full flex items-center justify-center p-2 sm:p-4">
                           <div className="relative w-full h-full">
                             <Image 
                               src={img}
@@ -182,8 +182,8 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
                     </CarouselContent>
                     {allImages.length > 1 && (
                       <>
-                        <CarouselPrevious className="left-4 bg-black/60 border-none text-white hover:bg-black/80 z-30 h-10 w-10 rounded-full" />
-                        <CarouselNext className="right-4 bg-black/60 border-none text-white hover:bg-black/80 z-30 h-10 w-10 rounded-full" />
+                        <CarouselPrevious className="left-4 bg-black/60 border-none text-white hover:bg-black/80 z-30 h-10 w-10 rounded-full sm:flex hidden" />
+                        <CarouselNext className="right-4 bg-black/60 border-none text-white hover:bg-black/80 z-30 h-10 w-10 rounded-full sm:flex hidden" />
                       </>
                     )}
                   </Carousel>
