@@ -48,7 +48,7 @@ export function Navbar({ businessId }: NavbarProps) {
   return (
     <nav className={cn(
       "fixed top-0 left-0 right-0 z-[100] transition-all duration-300 px-4 md:px-8 py-4",
-      scrolled ? "bg-background/90 backdrop-blur-xl border-b border-white/5 py-3 shadow-xl" : "bg-transparent"
+      (scrolled && !isOpen) ? "bg-background/90 backdrop-blur-xl border-b border-white/5 py-3 shadow-xl" : "bg-transparent"
     )}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {hasLogoContent ? (
@@ -95,7 +95,7 @@ export function Navbar({ businessId }: NavbarProps) {
 
         {/* Mobile Toggle */}
         <button 
-          className="md:hidden text-white p-2 shrink-0"
+          className="md:hidden text-white p-2 shrink-0 z-[101]"
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -104,7 +104,7 @@ export function Navbar({ businessId }: NavbarProps) {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden fixed inset-x-0 top-[60px] bg-background/98 backdrop-blur-2xl border-b border-white/5 p-8 flex flex-col gap-2 animate-in slide-in-from-top-4 duration-300 z-[99] h-[calc(100vh-60px)] overflow-y-auto">
+        <div className="md:hidden fixed inset-0 bg-transparent backdrop-blur-3xl p-8 pt-24 flex flex-col gap-2 animate-in fade-in slide-in-from-top-4 duration-300 z-[99] h-screen overflow-y-auto">
           {NAV_LINKS.map((link) => (
             <Link 
               key={link.name} 
