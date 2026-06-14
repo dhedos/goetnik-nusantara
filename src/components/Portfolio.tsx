@@ -5,7 +5,7 @@ import * as React from 'react';
 import Image from 'next/image';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
-import { Loader2, Maximize2, X, ExternalLink } from 'lucide-react';
+import { Loader2, Maximize2, X, ExternalLink, Link as LinkIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -39,7 +39,7 @@ export function Portfolio({ businessId }: PortfolioProps) {
   if (!portfolio || portfolio.length === 0) return null;
 
   return (
-    <section id="portofolio" className="py-24 px-4 bg-background relative overflow-hidden">
+    <section id="portofolio" className="py-24 px-4 bg-background relative overflow-hidden border-b border-border/10">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16 space-y-4">
           <h2 className="text-3xl md:text-5xl font-bold text-foreground uppercase tracking-tight">Portofolio Kami</h2>
@@ -64,6 +64,14 @@ export function Portfolio({ businessId }: PortfolioProps) {
                       style={{ width: '100%', height: 'auto' }}
                       className="object-contain transition-transform duration-700 group-hover:scale-105" 
                     />
+                    
+                    {/* Link Indicator in Grid - Bottom Edge */}
+                    {item.externalLink && (item.showLink ?? true) && (
+                      <div className="absolute bottom-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity bg-primary/90 text-primary-foreground p-2 rounded-xl shadow-lg">
+                        <LinkIcon size={14} />
+                      </div>
+                    )}
+
                     <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-8">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground shadow-lg">
@@ -75,7 +83,7 @@ export function Portfolio({ businessId }: PortfolioProps) {
                   </div>
                 </div>
               </DialogTrigger>
-              <DialogContent className="max-w-5xl w-[95vw] h-[90vh] p-0 border-none bg-black/95 overflow-hidden flex flex-col rounded-3xl">
+              <DialogContent className="max-w-5xl w-[95vw] h-[90vh] p-0 border-none bg-black/95 overflow-hidden flex flex-col rounded-3xl z-[70]">
                 <DialogTitle className="sr-only">Detail Portofolio</DialogTitle>
                 <DialogDescription className="sr-only">Tampilan penuh gambar portofolio</DialogDescription>
                 
@@ -92,8 +100,8 @@ export function Portfolio({ businessId }: PortfolioProps) {
                   </div>
                 </div>
                 
-                <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
-                  {item.externalLink && (
+                <div className="absolute top-4 right-4 z-[80] flex items-center gap-2">
+                  {item.externalLink && (item.showLink ?? true) && (
                     <Button asChild size="sm" className="rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border-none text-white font-bold h-10 px-6">
                       <a href={item.externalLink.startsWith('http') ? item.externalLink : `https://${item.externalLink}`} target="_blank">
                         <ExternalLink size={16} className="mr-2" /> Lihat Karya Lainnya
@@ -109,6 +117,11 @@ export function Portfolio({ businessId }: PortfolioProps) {
               </DialogContent>
             </Dialog>
           ))}
+        </div>
+
+        {/* Portfolio End Indicator */}
+        <div className="mt-16 pt-8 border-t border-border/5 flex flex-col items-center">
+          <div className="w-1 h-12 bg-gradient-to-b from-primary/20 to-transparent rounded-full" />
         </div>
       </div>
     </section>

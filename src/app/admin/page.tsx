@@ -234,9 +234,8 @@ export default function AdminDashboard() {
           ctx.clearRect(0, 0, width, height);
           ctx.drawImage(img, 0, 0, width, height);
           
-          // Menggunakan WebP untuk kompresi maksimal, PNG untuk logo
           const format = isLogo ? 'image/png' : 'image/webp';
-          const quality = isLogo ? 1.0 : 0.7; // Kualitas 0.7 memberikan rasio 200-300kb untuk 1920px
+          const quality = isLogo ? 1.0 : 0.7;
           
           const dataUrl = canvas.toDataURL(format, quality);
           resolve(dataUrl);
@@ -316,6 +315,7 @@ export default function AdminDashboard() {
         await addDoc(colRef, {
           imageUrl: dataUrl,
           externalLink: '',
+          showLink: true,
           createdAt: serverTimestamp(),
           ownerId: user.uid
         });
@@ -541,16 +541,23 @@ export default function AdminDashboard() {
                            <Button variant="destructive" size="icon" className="rounded-full h-8 w-8 shadow-lg" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'portfolio', item.id))}><Trash2 size={14} /></Button>
                         </div>
                       </div>
-                      <div className="p-4 space-y-2 border-t border-border">
-                        <Label className="text-[10px] font-black uppercase opacity-60">Tautan Detail (Contoh: Pinterest/Behance)</Label>
-                        <div className="flex gap-2">
-                          <Input 
-                            placeholder="https://..." 
-                            defaultValue={item.externalLink || ''} 
-                            onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'portfolio', item.id), { externalLink: e.target.value })}
-                            className="h-9 text-xs rounded-xl"
-                          />
+                      <div className="p-4 space-y-4 border-t border-border">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-[10px] font-black uppercase opacity-60">Tautan Detail</Label>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[9px] font-bold uppercase opacity-40">Tampilkan Link?</span>
+                            <Switch 
+                              checked={item.showLink ?? true} 
+                              onCheckedChange={(val) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'portfolio', item.id), { showLink: val })}
+                            />
+                          </div>
                         </div>
+                        <Input 
+                          placeholder="https://..." 
+                          defaultValue={item.externalLink || ''} 
+                          onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'portfolio', item.id), { externalLink: e.target.value })}
+                          className="h-9 text-xs rounded-xl"
+                        />
                       </div>
                     </div>
                   ))}
