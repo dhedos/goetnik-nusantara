@@ -49,7 +49,7 @@ export function Portfolio({ businessId }: PortfolioProps) {
   if (!portfolio || portfolio.length === 0) return null;
 
   return (
-    <section id="portofolio" className="py-24 px-4 bg-background relative overflow-hidden border-b border-border/10">
+    <section id="portofolio" className="py-24 px-4 bg-background relative overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16 space-y-4">
           <h2 className="text-3xl md:text-5xl font-bold text-foreground uppercase tracking-tight">Portofolio Kami</h2>
@@ -117,24 +117,20 @@ export function Portfolio({ businessId }: PortfolioProps) {
 
         {/* Portfolio External Link Button */}
         {showGlobalLink && globalUrl && (
-          <div className="mt-16 flex justify-center animate-fade-in">
+          <div className="mt-12 flex justify-center animate-fade-in">
             <Button 
               asChild
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 sm:px-12 py-7 sm:py-8 rounded-2xl sm:rounded-[2rem] text-sm sm:text-xl font-black uppercase tracking-widest shadow-[0_20px_50px_rgba(var(--primary),0.3)] hover:scale-[1.03] transition-all group h-auto"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 sm:px-8 py-4 sm:py-5 rounded-xl sm:rounded-2xl text-[10px] sm:text-xs font-black uppercase tracking-widest shadow-xl hover:scale-[1.02] transition-all group h-auto"
             >
-              <a href={globalUrl.startsWith('http') ? globalUrl : `https://${globalUrl}`} target="_blank" className="flex items-center gap-4">
+              <a href={globalUrl.startsWith('http') ? globalUrl : `https://${globalUrl}`} target="_blank" className="flex items-center gap-3">
                 Portofolio Kami Selengkapnya 
-                <ArrowRight className="h-5 w-5 sm:h-7 sm:w-7 group-hover:translate-x-2 transition-transform" />
+                <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
               </a>
             </Button>
           </div>
         )}
-
-        {/* Portfolio End Indicator */}
-        <div className="mt-16 pt-8 border-t border-border/5 flex flex-col items-center">
-          <div className="w-1 h-12 bg-gradient-to-b from-primary/20 to-transparent rounded-full" />
-        </div>
       </div>
     </section>
   );
 }
+
