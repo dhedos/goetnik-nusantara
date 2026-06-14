@@ -19,7 +19,7 @@ import {
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
   Settings, ShoppingBag, ExternalLink as ExternalLinkIcon, MapPin, Instagram, Facebook, Youtube, CheckCircle2, Type, Grid3X3, UploadCloud, Link as LinkIcon, ImageIcon, X,
-  Menu, Palette
+  Menu, Palette, Link as LinkSimpleIcon
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -40,6 +40,8 @@ const ETHNIC_FONTS = [
   { name: 'Inter', label: 'Inter (Modern Standar)' }
 ];
 
+const PLATFORM_OPTIONS = ["Shopee", "Tokopedia", "Lazada", "Website", "Lainnya"];
+
 export default function AdminDashboard() {
   const { user, loading: authLoading } = useUser();
   const auth = useAuth();
@@ -53,6 +55,9 @@ export default function AdminDashboard() {
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const hasLoadedSettings = useRef(false);
+
+  // Form states for new items
+  const [newLink, setNewLink] = useState({ title: '', url: '', platform: 'Website' });
   
   const canFetchData = !!(firestore && user);
 
@@ -73,6 +78,12 @@ export default function AdminDashboard() {
     [canFetchData, firestore]
   );
   const { data: bookings } = useCollection(bookingsQuery);
+
+  const linksQuery = useMemoFirebase(() => 
+    canFetchData ? query(collection(firestore!, 'businesses', MAIN_BUSINESS_ID, 'external-links'), orderBy('createdAt', 'desc')) : null, 
+    [canFetchData, firestore]
+  );
+  const { data: externalLinks } = useCollection(linksQuery);
 
   const settingsRef = useMemoFirebase(() => 
     canFetchData ? doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'settings', 'profile') : null, 
@@ -209,7 +220,7 @@ export default function AdminDashboard() {
           ctx.drawImage(img, 0, 0, width, height);
           
           const format = isLogo ? 'image/png' : 'image/webp';
-          const quality = isLogo ? 1.0 : 0.6; // Menurunkan sedikit ke 0.6 untuk keamanan kuota Firestore
+          const quality = isLogo ? 1.0 : 0.6;
           
           const dataUrl = canvas.toDataURL(format, quality);
           resolve(dataUrl);
@@ -318,6 +329,22 @@ export default function AdminDashboard() {
     });
   };
 
+  const handleAddLink = async () => {
+    if (!firestore || !user || !newLink.title || !newLink.url) return;
+    try {
+      const colRef = collection(firestore, 'businesses', MAIN_BUSINESS_ID, 'external-links');
+      await addDoc(colRef, {
+        ...newLink,
+        ownerId: user.uid,
+        createdAt: serverTimestamp()
+      });
+      setNewLink({ title: '', url: '', platform: 'Website' });
+      toast({ title: "Berhasil", description: "Tautan telah ditambahkan." });
+    } catch (e) {
+      toast({ variant: "destructive", title: "Gagal", description: "Gagal menambahkan tautan." });
+    }
+  };
+
   if (authLoading || !isMounted) return <div className="flex h-screen items-center justify-center bg-background"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   if (!user) return null;
 
@@ -325,6 +352,7 @@ export default function AdminDashboard() {
     { id: 'bookings', label: 'Pesanan', icon: ShoppingBag },
     { id: 'services', label: 'Layanan', icon: Settings },
     { id: 'portfolio', label: 'Portofolio', icon: Grid3X3 },
+    { id: 'links', label: 'Tautan Luar', icon: LinkSimpleIcon },
     { id: 'branding', label: 'Logo & Tema', icon: Layout },
     { id: 'hero', label: 'Banner Utama', icon: Globe },
     { id: 'about', label: 'Tentang Kami', icon: Info },
@@ -379,7 +407,7 @@ export default function AdminDashboard() {
       <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-background/50">
         <div className="max-w-4xl mx-auto space-y-8">
           <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-            <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-foreground">{activeSection}</h1>
+            <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-foreground">{navItems.find(n => n.id === activeSection)?.label}</h1>
             <div className="flex flex-col items-end gap-2">
               <Button onClick={handleSaveBusinessInfo} size="lg" className="w-full md:w-auto rounded-xl px-10 h-14 font-bold shadow-2xl transition-all active:scale-95" disabled={isSaving}>
                 {isSaving ? <Loader2 className="animate-spin mr-2" /> : <Save className="mr-2" size={20} />}
@@ -413,6 +441,54 @@ export default function AdminDashboard() {
                 {bookings?.length === 0 && <p className="text-center text-muted-foreground py-16 font-medium">Belum ada pesanan terbaru.</p>}
               </CardContent>
             </Card>
+          )}
+
+          {activeSection === 'links' && (
+            <div className="space-y-6">
+              <Card className="rounded-3xl border-border bg-card shadow-xl overflow-hidden">
+                <CardHeader className="p-6 border-b border-border"><CardTitle>Tambah Tautan Baru</CardTitle></CardHeader>
+                <CardContent className="p-6 space-y-4">
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-black uppercase">Judul Tautan</Label>
+                      <Input placeholder="Contoh: Toko Shopee" value={newLink.title} onChange={(e) => setNewLink({...newLink, title: e.target.value})} className="rounded-xl" />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-black uppercase">URL Lengkap</Label>
+                      <Input placeholder="https://..." value={newLink.url} onChange={(e) => setNewLink({...newLink, url: e.target.value})} className="rounded-xl" />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-[10px] font-black uppercase">Platform</Label>
+                      <Select value={newLink.platform} onValueChange={(val) => setNewLink({...newLink, platform: val})}>
+                        <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {PLATFORM_OPTIONS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <Button onClick={handleAddLink} className="w-full rounded-xl font-bold"><Plus className="mr-2" size={16} /> Tambahkan Tautan</Button>
+                </CardContent>
+              </Card>
+
+              <div className="grid gap-4">
+                {externalLinks?.map((link: any) => (
+                  <div key={link.id} className="flex justify-between items-center p-4 bg-card border border-border rounded-2xl shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary"><LinkSimpleIcon size={18} /></div>
+                      <div>
+                        <p className="font-bold text-sm">{link.title}</p>
+                        <p className="text-[10px] text-muted-foreground truncate max-w-[200px] md:max-w-md">{link.url}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-secondary rounded-full opacity-60">{link.platform}</span>
+                      <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'external-links', link.id))}><Trash2 size={16} /></Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
 
           {activeSection === 'portfolio' && (
