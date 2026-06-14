@@ -47,7 +47,7 @@ export function DynamicStyleLoader({ businessId }: { businessId: string }) {
       root.style.setProperty('--border', '217 19% 27% / 0.15');
     }
 
-    // 3. Favicon & Logo Cache Sync
+    // 3. Favicon & Logo Cache Sync - Safe update (no removeChild error)
     const logoUrl = settings.logoUrl || '';
     if (logoUrl) {
       const updateFavicon = (url: string) => {

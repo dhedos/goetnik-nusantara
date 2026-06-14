@@ -44,6 +44,7 @@ export default function RootLayout({
                     if (theme.fontFamily) root.style.setProperty('--selected-font', theme.fontFamily);
                     
                     if (theme.logoUrl) {
+                      const logoUrl = theme.logoUrl;
                       const updateIcon = (url) => {
                         const existingIcons = document.querySelectorAll("link[rel*='icon']");
                         if (existingIcons.length > 0) {
@@ -59,7 +60,7 @@ export default function RootLayout({
                           document.head.appendChild(icon);
                         }
                       };
-                      updateIcon(theme.logoUrl);
+                      updateIcon(logoUrl);
                     }
                   }
                 } catch (e) {}
