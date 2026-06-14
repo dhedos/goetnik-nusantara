@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Instagram, Facebook, Youtube, Fingerprint, Globe, Link as LinkIcon, ShoppingCart, Github, Linkedin, Image as ImageIcon, Code2 } from 'lucide-react';
@@ -185,7 +184,7 @@ export function Footer({ businessId }: FooterProps) {
         </div>
 
         <div>
-          <h4 className="font-bold text-base mb-6 uppercase tracking-wider text-foreground">Marketplace & Partner</h4>
+          <h4 className="font-bold text-base mb-6 uppercase tracking-wider text-foreground">Pasar & Partner</h4>
           <ul className="space-y-4 text-muted-foreground text-sm font-medium">
              {externalLinks && externalLinks.length > 0 ? (
                externalLinks.map((link: any) => (
@@ -236,7 +235,7 @@ export function Footer({ businessId }: FooterProps) {
 
       <div className="max-w-7xl mx-auto pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground/40 text-[10px] font-bold uppercase tracking-widest">
         <div className="flex items-center gap-4">
-          <p>{footerCopyright || `© ${currentYear} ${businessName}. All Rights Reserved.`}</p>
+          <p>{footerCopyright || `© ${currentYear} ${businessName}. Seluruh Hak Cipta Dilindungi.`}</p>
           <Link href="/login" className="opacity-30 hover:opacity-100 transition-opacity p-2" title="Admin Access">
             <Fingerprint size={12} />
           </Link>

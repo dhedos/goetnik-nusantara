@@ -35,7 +35,7 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
     root.style.setProperty('--accent', selectedTheme.accent);
     root.style.setProperty('--background', selectedTheme.background);
     
-    // Automatic Foreground & Card Color calculation
+    // Perhitungan otomatis warna kontras (Foreground & Card)
     const bgParts = selectedTheme.background.split(' ');
     const lValue = parseInt(bgParts[2]);
     const isLight = lValue > 60;
@@ -53,24 +53,25 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
       root.style.setProperty('--border', '217 19% 27% / 0.15');
     }
 
-    // 3. Logo & Favicon Sync
+    // 3. Sinkronisasi Logo & Favicon Browser
     if (settings.logoUrl) {
-      // Update Favicons Dynamicly
       const updateFavicon = (url: string) => {
         ['icon', 'shortcut icon', 'apple-touch-icon'].forEach(rel => {
           let link = document.querySelector(`link[rel*="${rel}"]`) as HTMLLinkElement;
-          if (!link) {
-            link = document.createElement('link');
-            link.rel = rel;
-            document.head.appendChild(link);
+          if (link) {
+            link.parentNode?.removeChild(link);
           }
-          link.href = url;
+          const newLink = document.createElement('link');
+          newLink.rel = rel;
+          // Tambahkan query string unik untuk memaksa browser refresh ikon
+          newLink.href = `${url}?v=${Date.now()}`;
+          document.head.appendChild(newLink);
         });
       };
       updateFavicon(settings.logoUrl);
     }
 
-    // Cache current theme for fast hydration script in layout.tsx
+    // Simpan cache untuk hidrasi cepat di layout.tsx
     try {
       localStorage.setItem('goetnik-theme-cache', JSON.stringify({
         primary: selectedTheme.primary,

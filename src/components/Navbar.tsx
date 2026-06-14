@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from 'next/link';
@@ -78,7 +77,6 @@ export function Navbar({ businessId }: NavbarProps) {
           <div className="w-1" /> 
         )}
 
-        {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-6 lg:gap-8 shrink-0">
           {NAV_LINKS.map((link) => (
             <Link 
@@ -94,7 +92,6 @@ export function Navbar({ businessId }: NavbarProps) {
           </Button>
         </div>
 
-        {/* Mobile Toggle */}
         <button 
           className="md:hidden text-white p-2 shrink-0 z-50"
           onClick={() => setIsOpen(!isOpen)}
@@ -103,7 +100,6 @@ export function Navbar({ businessId }: NavbarProps) {
         </button>
       </div>
 
-      {/* Mobile Menu */}
       {isOpen && (
         <div className="md:hidden fixed inset-0 bg-transparent backdrop-blur-3xl p-8 pt-24 flex flex-col gap-2 animate-in fade-in slide-in-from-top-4 duration-300 z-[49] h-screen overflow-y-auto">
           {NAV_LINKS.map((link) => (

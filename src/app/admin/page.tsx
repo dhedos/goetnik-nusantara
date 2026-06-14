@@ -231,7 +231,8 @@ export default function AdminDashboard() {
     try {
       const isLogo = target === 'logo';
       const isHero = target === 'hero';
-      const dataUrl = await resizeAndCompressImage(file, isLogo ? 0.9 : 0.7, isLogo ? 512 : 1200);
+      // Logo & Favicon membutuhkan resolusi lebih rendah namun kualitas tinggi
+      const dataUrl = await resizeAndCompressImage(file, isLogo ? 0.9 : 0.7, isLogo ? 256 : 1200);
       
       if (isLogo) {
         setBusinessInfo(prev => ({ ...prev, logoUrl: dataUrl }));
@@ -541,7 +542,7 @@ export default function AdminDashboard() {
               <CardContent className="p-8 space-y-8">
                 <div className="p-6 bg-primary/5 rounded-2xl border border-primary/10 space-y-4">
                   <div className="flex items-center justify-between">
-                    <Label className="text-xs font-bold uppercase">Tautan Portofolio Luar (Link Global)</Label>
+                    <Label className="text-xs font-bold uppercase">Tautan Portofolio Global</Label>
                     <Switch checked={businessInfo.showPortfolioExternalUrl} onCheckedChange={(val) => setBusinessInfo({...businessInfo, showPortfolioExternalUrl: val})} />
                   </div>
                   <Input 
@@ -550,7 +551,7 @@ export default function AdminDashboard() {
                     onChange={(e) => setBusinessInfo({...businessInfo, portfolioExternalUrl: e.target.value})}
                     className="rounded-xl h-12 bg-background border-border"
                   />
-                  <p className="text-[10px] text-muted-foreground italic uppercase">Link ini muncul sebagai tombol "SELENGKAPNYA" di bawah daftar foto.</p>
+                  <p className="text-[10px] text-muted-foreground italic uppercase">Link ini akan muncul sebagai tombol di bawah daftar foto.</p>
                 </div>
 
                 <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-border rounded-3xl bg-primary/5 hover:bg-primary/10 transition-all cursor-pointer">
@@ -573,7 +574,7 @@ export default function AdminDashboard() {
                     <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                       {isUploading === 'portfolio' ? <Loader2 className="animate-spin" size={32} /> : <UploadCloud size={32} />}
                     </div>
-                    <p className="font-bold">Klik untuk Unggah Banyak Foto Portofolio</p>
+                    <p className="font-bold">Klik untuk Unggah Foto Portofolio</p>
                   </label>
                 </div>
 
@@ -613,7 +614,7 @@ export default function AdminDashboard() {
                 <CardContent className="p-8 space-y-8">
                   <div className="grid md:grid-cols-2 gap-6 p-6 bg-primary/5 rounded-2xl border border-primary/10">
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase">Teks Logo (Putih)</Label>
+                      <Label className="text-[10px] font-black uppercase">Teks Logo (Kiri)</Label>
                       <Input 
                         value={businessInfo.logoText} 
                         onChange={(e) => setBusinessInfo({...businessInfo, logoText: e.target.value})} 
@@ -622,7 +623,7 @@ export default function AdminDashboard() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase">Teks Logo (Warna Aksen)</Label>
+                      <Label className="text-[10px] font-black uppercase">Teks Logo (Aksen)</Label>
                       <Input 
                         value={businessInfo.logoAccentText} 
                         onChange={(e) => setBusinessInfo({...businessInfo, logoAccentText: e.target.value})} 
@@ -640,7 +641,7 @@ export default function AdminDashboard() {
                   </div>
 
                   <div className="space-y-4">
-                    <Label className="text-foreground uppercase font-black text-xs">Logo Utama & Ikon Tab Browser</Label>
+                    <Label className="text-foreground uppercase font-black text-xs">Logo & Favicon Tab</Label>
                     <div className="flex flex-col items-center gap-8 p-8 border-2 border-dashed border-border rounded-3xl bg-background/20">
                       <div className="relative h-32 w-32 rounded-2xl overflow-hidden border border-border flex items-center justify-center bg-transparent">
                         {businessInfo.logoUrl ? <img src={businessInfo.logoUrl} alt="Logo" className="object-contain max-h-full max-w-full" /> : <div className="text-[10px] opacity-20 uppercase font-bold">Belum Ada Logo</div>}
@@ -649,7 +650,7 @@ export default function AdminDashboard() {
                         <input type="file" className="hidden" id="logo-up" accept="image/*" onChange={(e) => handleImageUpload(e, 'logo')} />
                         <Button asChild variant="secondary" className="w-full h-12 rounded-xl font-bold"><label htmlFor="logo-up">{isUploading === 'logo' ? <Loader2 className="animate-spin" /> : 'Unggah Logo Baru'}</label></Button>
                         <div className="space-y-3">
-                          <div className="flex justify-between text-[10px] font-bold uppercase"><span>Tinggi Logo</span><span>{businessInfo.logoHeight}px</span></div>
+                          <div className="flex justify-between text-[10px] font-bold uppercase"><span>Tinggi Logo Header</span><span>{businessInfo.logoHeight}px</span></div>
                           <Slider value={[parseInt(businessInfo.logoHeight) || 36]} min={20} max={100} onValueChange={(v) => setBusinessInfo({...businessInfo, logoHeight: v[0].toString()})} />
                         </div>
                       </div>
@@ -721,15 +722,15 @@ export default function AdminDashboard() {
             <Card className="rounded-3xl border-border bg-card shadow-xl">
               <CardContent className="p-8 space-y-8">
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Nama Bisnis</Label><Input value={businessInfo.name} onChange={(e) => setBusinessInfo({...businessInfo, name: e.target.value})} className="rounded-xl h-12 font-bold" /></div>
+                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Nama Bisnis Utama</Label><Input value={businessInfo.name} onChange={(e) => setBusinessInfo({...businessInfo, name: e.target.value})} className="rounded-xl h-12 font-bold" /></div>
                   <div className="space-y-2"><Label className="text-xs font-bold uppercase">WhatsApp Admin</Label><Input value={businessInfo.whatsapp} onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})} className="rounded-xl h-12 font-bold" /></div>
                 </div>
                 <div className="space-y-2 pt-4 border-t border-border">
-                  <Label className="text-xs font-bold uppercase">Teks Hak Cipta (Footer Copyright)</Label>
-                  <Input value={businessInfo.footerCopyright} onChange={(e) => setBusinessInfo({...businessInfo, footerCopyright: e.target.value})} placeholder="Contoh: © 2024 Goetnik Nusantara. All Rights Reserved." className="rounded-xl h-12" />
+                  <Label className="text-xs font-bold uppercase">Teks Copyright (Footer)</Label>
+                  <Input value={businessInfo.footerCopyright} onChange={(e) => setBusinessInfo({...businessInfo, footerCopyright: e.target.value})} placeholder="Contoh: © 2024 Goetnik Nusantara. Seluruh Hak Cipta Dilindungi." className="rounded-xl h-12" />
                   <p className="text-[10px] text-muted-foreground italic">Kosongkan untuk menggunakan format otomatis.</p>
                 </div>
-                <div className="space-y-2"><Label className="text-xs font-bold uppercase">Email Kontak</Label><Input value={businessInfo.email} onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})} className="rounded-xl h-12" /></div>
+                <div className="space-y-2"><Label className="text-xs font-bold uppercase">Email Bisnis</Label><Input value={businessInfo.email} onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})} className="rounded-xl h-12" /></div>
                 <div className="space-y-2"><Label className="text-xs font-bold uppercase">Alamat Bisnis</Label><Textarea value={businessInfo.address} onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})} className="rounded-xl min-h-[100px]" /></div>
               </CardContent>
             </Card>
