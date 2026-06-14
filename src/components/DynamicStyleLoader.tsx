@@ -53,9 +53,7 @@ export function DynamicStyleLoader({ businessId }: { businessId: string }) {
       const updateFavicon = (url: string) => {
         const existingIcons = document.querySelectorAll("link[rel*='icon']");
         existingIcons.forEach(el => {
-          if (el && el.parentNode) {
-            el.parentNode.removeChild(el);
-          }
+          if (el) el.remove();
         });
 
         ['icon', 'apple-touch-icon'].forEach(rel => {

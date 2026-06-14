@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from 'next/image';
@@ -22,10 +21,13 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ICON_MAP, MAIN_BUSINESS_ID } from '@/lib/constants';
 
 function LoadingScreen({ logoUrl }: { logoUrl?: string }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background text-center p-4">
       <div className="relative z-10 flex flex-col items-center">
-        {logoUrl && (
+        {mounted && logoUrl && (
           <div className="w-32 h-32 md:w-48 md:h-48 flex items-center justify-center animate-pulse transition-all duration-700">
             <img 
               src={logoUrl} 
@@ -72,7 +74,6 @@ function HomeContent() {
 
   useEffect(() => {
     if (settings !== undefined && !settingsLoading) {
-      // Menghilangkan jeda waktu agar terasa lebih instan
       setIsReady(true);
     }
   }, [settings, settingsLoading]);
@@ -84,7 +85,6 @@ function HomeContent() {
 
   const heroPlaceholder = PlaceHolderImages.find(img => img.id === 'hero-tech');
   const heroDisplayImage = settings?.heroImageUrl || heroPlaceholder?.imageUrl;
-  const isBase64Hero = heroDisplayImage?.startsWith('data:');
   
   const heroTitle = settings?.heroTitle || 'Solusi Digital Kreatif & Terpercaya';
   const heroSubtitle = settings?.heroSubtitle || 'Kami membantu mewujudkan visi bisnis Anda melalui teknologi dan desain berkualitas tinggi.';
@@ -103,25 +103,12 @@ function HomeContent() {
           <section className="relative min-h-[85vh] md:min-h-screen flex items-center pt-24 md:pt-28 pb-20 px-4 md:px-8 overflow-hidden">
             <div className="absolute inset-0 -z-20">
               {heroDisplayImage && (
-                isBase64Hero ? (
-                  <img 
-                    src={heroDisplayImage} 
-                    alt="Banner Utama" 
-                    className="absolute inset-0 w-full h-full object-cover opacity-25" 
-                    style={{ objectPosition: `center ${heroImagePos}` }}
-                  />
-                ) : (
-                  <Image 
-                    src={heroDisplayImage} 
-                    alt="Banner Utama" 
-                    fill 
-                    className="object-cover opacity-25" 
-                    style={{ objectPosition: `center ${heroImagePos}` }}
-                    sizes="100vw"
-                    priority
-                    unoptimized
-                  />
-                )
+                <img 
+                  src={heroDisplayImage} 
+                  alt="Banner Utama" 
+                  className="absolute inset-0 w-full h-full object-cover opacity-25" 
+                  style={{ objectPosition: `center ${heroImagePos}` }}
+                />
               )}
               <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/80 to-background" />
             </div>
