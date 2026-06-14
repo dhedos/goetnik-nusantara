@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Instagram, Facebook, Youtube, Fingerprint, Globe, Link as LinkIcon, ShoppingCart } from 'lucide-react';
+import { Instagram, Facebook, Youtube, Fingerprint, Globe, Link as LinkIcon, ShoppingCart, Github, Linkedin, Image as ImageIcon, Code2 } from 'lucide-react';
 import Link from 'next/link';
 import { useFirestore, useDoc, useMemoFirebase, useCollection } from '@/firebase';
 import { doc, collection, query, orderBy } from 'firebase/firestore';
@@ -65,7 +65,20 @@ export function Footer({ businessId }: FooterProps) {
       case 'Shopee':
       case 'Tokopedia':
       case 'Lazada':
+      case 'TikTok Shop':
         return <ShoppingCart size={14} className="mr-2" />;
+      case 'Pinterest':
+      case 'Behance':
+      case 'Dribbble':
+        return <ImageIcon size={14} className="mr-2" />;
+      case 'GitHub':
+        return <Github size={14} className="mr-2" />;
+      case 'LinkedIn':
+        return <Linkedin size={14} className="mr-2" />;
+      case 'Vercel':
+      case 'Netlify':
+      case 'CodePen':
+        return <Code2 size={14} className="mr-2" />;
       case 'Website':
         return <Globe size={14} className="mr-2" />;
       default:
@@ -202,7 +215,6 @@ export function Footer({ businessId }: FooterProps) {
                     <button className="hover:text-primary transition-colors text-left">Kebijakan Privasi</button>
                   </DialogTrigger>
                   <DialogContent className="max-w-2xl max-h-[80vh] rounded-2xl border-border bg-card">
-                    {/* Accessibility headers */}
                     <DialogTitle className="sr-only">Kebijakan Privasi</DialogTitle>
                     <DialogDescription className="sr-only">Halaman kebijakan privasi lengkap untuk {businessName}</DialogDescription>
                     

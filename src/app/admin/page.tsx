@@ -40,7 +40,22 @@ const ETHNIC_FONTS = [
   { name: 'Inter', label: 'Inter (Modern Standar)' }
 ];
 
-const PLATFORM_OPTIONS = ["Shopee", "Tokopedia", "Lazada", "Website", "Lainnya"];
+const PLATFORM_OPTIONS = [
+  "Shopee", 
+  "Tokopedia", 
+  "Lazada", 
+  "TikTok Shop", 
+  "Pinterest", 
+  "Behance", 
+  "Dribbble", 
+  "GitHub", 
+  "Vercel", 
+  "Netlify", 
+  "CodePen", 
+  "LinkedIn", 
+  "Website", 
+  "Lainnya"
+];
 
 export default function AdminDashboard() {
   const { user, loading: authLoading } = useUser();
@@ -219,8 +234,9 @@ export default function AdminDashboard() {
           ctx.clearRect(0, 0, width, height);
           ctx.drawImage(img, 0, 0, width, height);
           
+          // Menggunakan WebP untuk kompresi maksimal, PNG untuk logo
           const format = isLogo ? 'image/png' : 'image/webp';
-          const quality = isLogo ? 1.0 : 0.6;
+          const quality = isLogo ? 1.0 : 0.7; // Kualitas 0.7 memberikan rasio 200-300kb untuk 1920px
           
           const dataUrl = canvas.toDataURL(format, quality);
           resolve(dataUrl);
