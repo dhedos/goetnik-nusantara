@@ -157,8 +157,8 @@ export function Footer({ businessId }: FooterProps) {
         </div>
 
         <div>
-          <h4 className="font-black text-xs md:text-sm mb-8 uppercase tracking-[0.2em] text-foreground opacity-90">Navigasi Utama</h4>
-          <ul className="space-y-5 text-muted-foreground text-sm font-bold uppercase tracking-wider">
+          <h4 className="font-bold text-sm mb-6 text-foreground/90">Navigasi Utama</h4>
+          <ul className="space-y-4 text-muted-foreground text-sm font-medium">
             <li><Link href="/" className="hover:text-primary transition-colors">Beranda</Link></li>
             <li><Link href="#layanan" className="hover:text-primary transition-colors">Layanan Unggulan</Link></li>
             <li><Link href="#tentang" className="hover:text-primary transition-colors">Tentang Kami</Link></li>
@@ -167,8 +167,8 @@ export function Footer({ businessId }: FooterProps) {
         </div>
 
         <div>
-          <h4 className="font-black text-xs md:text-sm mb-8 uppercase tracking-[0.2em] text-foreground opacity-90">Pasar & Portofolio</h4>
-          <ul className="space-y-5 text-muted-foreground text-sm font-bold uppercase tracking-wider">
+          <h4 className="font-bold text-sm mb-6 text-foreground/90">Pasar & Portofolio</h4>
+          <ul className="space-y-4 text-muted-foreground text-sm font-medium">
              {externalLinks && externalLinks.length > 0 ? (
                externalLinks.map((link: any) => (
                  <li key={link.id}>
@@ -189,13 +189,13 @@ export function Footer({ businessId }: FooterProps) {
         </div>
 
         <div>
-          <h4 className="font-black text-xs md:text-sm mb-8 uppercase tracking-[0.2em] text-foreground opacity-90">Pusat Informasi</h4>
-          <ul className="space-y-5 text-muted-foreground text-sm font-bold uppercase tracking-wider">
+          <h4 className="font-bold text-sm mb-6 text-foreground/90">Pusat Informasi</h4>
+          <ul className="space-y-4 text-muted-foreground text-sm font-medium">
              <li><Link href="#pesan" className="hover:text-primary transition-colors">Form Pemesanan</Link></li>
              <li>
                 <Dialog>
                   <DialogTrigger asChild>
-                    <button className="hover:text-primary transition-colors text-left uppercase">Kebijakan Privasi</button>
+                    <button className="hover:text-primary transition-colors text-left">Kebijakan Privasi</button>
                   </DialogTrigger>
                   <DialogContent className="max-w-2xl max-h-[85vh] rounded-[2rem] border-white/10 bg-card p-10 shadow-2xl z-[80]">
                     <DialogTitle className="sr-only">Kebijakan Privasi</DialogTitle>
@@ -216,13 +216,13 @@ export function Footer({ businessId }: FooterProps) {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-muted-foreground/40 text-[10px] font-black uppercase tracking-[0.25em]">
+      <div className="max-w-7xl mx-auto pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-muted-foreground/50 text-[11px] font-medium">
         <div className="flex flex-col md:flex-row items-center gap-6">
           <p className="text-center md:text-left">{footerCopyright || `© ${currentYear} ${businessName}. Seluruh Hak Cipta Dilindungi.`}</p>
           <div className="flex items-center gap-4">
              <span className="h-1 w-1 rounded-full bg-white/10 hidden md:block" />
              <Link href="/login" className="opacity-30 hover:opacity-100 hover:text-primary transition-all p-2 flex items-center gap-2" title="Admin Login">
-                <Fingerprint size={14} />
+                <Fingerprint size={16} />
              </Link>
           </div>
         </div>
