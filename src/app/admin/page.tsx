@@ -134,6 +134,7 @@ export default function AdminDashboard() {
     portfolioExternalUrl: '',
     showPortfolioExternalUrl: false,
     privacyPolicy: PRIVACY_POLICY_DEFAULT,
+    footerCopyright: '',
     socialInstagram: '',
     socialFacebook: '',
     socialYoutube: '',
@@ -160,7 +161,8 @@ export default function AdminDashboard() {
         fontFamily: settings.fontFamily || 'Inter',
         themeId: settings.themeId || 'heritage-red',
         showPhoneNumber: settings.showPhoneNumber ?? false,
-        showPortfolioExternalUrl: settings.showPortfolioExternalUrl ?? false
+        showPortfolioExternalUrl: settings.showPortfolioExternalUrl ?? false,
+        footerCopyright: settings.footerCopyright || ''
       }));
       hasLoadedSettings.current = true;
     }
@@ -749,6 +751,18 @@ export default function AdminDashboard() {
                     <div className="flex items-center justify-between"><Label className="text-xs font-bold uppercase">No Telp</Label><Switch checked={businessInfo.showPhoneNumber} onCheckedChange={(val) => setBusinessInfo({...businessInfo, showPhoneNumber: val})} /></div>
                     <Input value={businessInfo.phoneNumber} onChange={(e) => setBusinessInfo({...businessInfo, phoneNumber: e.target.value})} className="rounded-xl h-12 bg-background border-border" disabled={!businessInfo.showPhoneNumber} />
                   </div>
+                </div>
+                <div className="pt-4 border-t border-border space-y-4">
+                   <div className="space-y-2">
+                     <Label className="text-xs font-bold uppercase">Teks Hak Cipta (Footer Copyright)</Label>
+                     <Input 
+                       value={businessInfo.footerCopyright} 
+                       onChange={(e) => setBusinessInfo({...businessInfo, footerCopyright: e.target.value})} 
+                       placeholder="Contoh: © 2024 Goetnik Nusantara. All Rights Reserved." 
+                       className="rounded-xl h-12 bg-background border-border" 
+                     />
+                     <p className="text-[10px] text-muted-foreground italic uppercase">Kosongkan jika ingin menggunakan format otomatis.</p>
+                   </div>
                 </div>
               </CardContent>
             </Card>

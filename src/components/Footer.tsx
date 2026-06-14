@@ -51,6 +51,7 @@ export function Footer({ businessId }: FooterProps) {
   const aboutSubtitle = settings?.heroSubtitle || '';
   const privacyPolicyContent = settings?.privacyPolicy || 'Kebijakan privasi belum diatur oleh admin.';
   const logoH = parseInt(settings?.logoHeight) || 32;
+  const footerCopyright = settings?.footerCopyright;
 
   const hasLogoContent = logoUrl || logoText || logoAccentText;
 
@@ -235,7 +236,7 @@ export function Footer({ businessId }: FooterProps) {
 
       <div className="max-w-7xl mx-auto pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4 text-muted-foreground/40 text-[10px] font-bold uppercase tracking-widest">
         <div className="flex items-center gap-4">
-          <p>© {currentYear} {businessName}. All Rights Reserved.</p>
+          <p>{footerCopyright || `© ${currentYear} ${businessName}. All Rights Reserved.`}</p>
           <Link href="/login" className="opacity-30 hover:opacity-100 transition-opacity p-2" title="Admin Access">
             <Fingerprint size={12} />
           </Link>
