@@ -31,7 +31,6 @@ export function DynamicStyleLoader({ businessId }: { businessId: string }) {
     root.style.setProperty('--accent', selectedTheme.accent);
     root.style.setProperty('--background', selectedTheme.background);
     
-    // Foreground & Card contrast calculation
     const bgParts = selectedTheme.background.split(' ');
     const lValue = parseInt(bgParts[2]);
     const isLight = lValue > 60;
@@ -53,7 +52,11 @@ export function DynamicStyleLoader({ businessId }: { businessId: string }) {
     if (logoUrl) {
       const updateFavicon = (url: string) => {
         const existingIcons = document.querySelectorAll("link[rel*='icon']");
-        existingIcons.forEach(el => el.parentNode?.removeChild(el));
+        existingIcons.forEach(el => {
+          if (el && el.parentNode) {
+            el.parentNode.removeChild(el);
+          }
+        });
 
         ['icon', 'apple-touch-icon'].forEach(rel => {
           const newLink = document.createElement('link');
@@ -65,7 +68,7 @@ export function DynamicStyleLoader({ businessId }: { businessId: string }) {
       updateFavicon(logoUrl);
     }
 
-    // Update Local Cache for the layout head script
+    // Update Local Cache
     try {
       localStorage.setItem('goetnik-theme-cache', JSON.stringify({
         primary: selectedTheme.primary,

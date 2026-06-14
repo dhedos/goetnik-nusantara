@@ -38,17 +38,19 @@ export default function RootLayout({
                     const theme = JSON.parse(cache);
                     const root = document.documentElement;
                     
-                    // Apply dynamic variables
                     if (theme.primary) root.style.setProperty('--primary', theme.primary);
                     if (theme.accent) root.style.setProperty('--accent', theme.accent);
                     if (theme.background) root.style.setProperty('--background', theme.background);
                     if (theme.fontFamily) root.style.setProperty('--selected-font', theme.fontFamily);
                     
-                    // Aggressive Favicon Sync to prevent default flicker
                     if (theme.logoUrl) {
                       const updateIcon = (url) => {
                         const links = document.querySelectorAll("link[rel*='icon']");
-                        links.forEach(l => l.parentNode.removeChild(l));
+                        links.forEach(l => {
+                          if (l && l.parentNode) {
+                            l.parentNode.removeChild(l);
+                          }
+                        });
                         
                         const icon = document.createElement('link');
                         icon.rel = 'icon';
