@@ -23,15 +23,20 @@ import { ICON_MAP, MAIN_BUSINESS_ID } from '@/lib/constants';
 function LoadingScreen({ logoUrl }: { logoUrl?: string }) {
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background text-center p-4">
-      <div className="relative z-10 flex flex-col items-center">
-        {logoUrl && (
-          <div className="w-24 h-24 md:w-32 md:h-32 flex items-center justify-center animate-pulse transition-all duration-700">
+      <div className="relative z-10 flex flex-col items-center gap-6">
+        {logoUrl ? (
+          <div className="w-32 h-32 md:w-48 md:h-48 flex items-center justify-center animate-pulse transition-all duration-700">
             <img 
               src={logoUrl} 
               alt="Loading Logo" 
-              className="object-contain brightness-110 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+              className="object-contain brightness-110 drop-shadow-[0_0_20px_rgba(255,255,255,0.15)]"
               style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '100%' }}
             />
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-12 w-12 animate-spin text-primary opacity-50" />
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30">Menyiapkan Pengalaman Digital</p>
           </div>
         )}
       </div>
@@ -57,19 +62,24 @@ function HomeContent() {
   const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
 
   useEffect(() => {
-    const safetyTimer = setTimeout(() => {
-      setIsReady(true);
-    }, 800);
-
-    if (settings && !settingsLoading) {
-      setIsReady(true);
+    // Pastikan kita sudah memiliki data settings sebelum menampilkan konten
+    if (settings !== undefined && !settingsLoading) {
+      // Memberikan sedikit waktu buffer untuk kelancaran visual
+      const timer = setTimeout(() => setIsReady(true), 300);
+      return () => clearTimeout(timer);
     }
-
-    return () => clearTimeout(safetyTimer);
   }, [settings, settingsLoading]);
 
   if (!isReady) {
-    return <LoadingScreen logoUrl={settings?.logoUrl} />;
+    // Mencoba mengambil logo dari localStorage untuk layar pemuatan yang lebih cepat
+    let cachedLogo = settings?.logoUrl;
+    if (typeof window !== 'undefined' && !cachedLogo) {
+      try {
+        const cache = localStorage.getItem('goetnik-theme-cache');
+        if (cache) cachedLogo = JSON.parse(cache).logoUrl;
+      } catch (e) {}
+    }
+    return <LoadingScreen logoUrl={cachedLogo} />;
   }
 
   const heroPlaceholder = PlaceHolderImages.find(img => img.id === 'hero-tech');
