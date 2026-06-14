@@ -1,4 +1,4 @@
-
+npm
 # Go Etnik Nusantara - Portal Layanan Digital
 
 Aplikasi website profesional dengan fitur:
