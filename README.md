@@ -5,7 +5,7 @@ Aplikasi website profesional dengan fitur:
 - **Admin Dashboard**: Kelola konten, layanan, portofolio, dan pesanan secara real-time.
 - **AI Assistant**: Rekomendasi layanan otomatis menggunakan Gemini AI.
 - **Dynamic Themes**: 8 pilihan tema (Heritage & Modern) yang dapat diubah dari panel Admin.
-- **Image Auto-Compression**: Unggah banyak gambar tanpa khawatir batas ukuran Firestore.
+- **Image Auto-Compression**: Unggah banyak gambar tanpa khawatir batas ukuran Firestore (Optimasi Base64).
 
 ## Cara Deploy ke Vercel
 
@@ -23,7 +23,6 @@ Masuk ke dashboard Vercel, pilih proyek Anda, dan tambahkan variabel berikut di 
 | `NEXT_PUBLIC_FIREBASE_API_KEY` | [API_KEY] |
 | `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | [PROJECT_ID].firebaseapp.com |
 | `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | [PROJECT_ID] |
-| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | [PROJECT_ID].firebasestorage.app |
 | `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | [SENDER_ID] |
 | `NEXT_PUBLIC_FIREBASE_APP_ID` | [APP_ID] |
 | `GEMINI_API_KEY` | [API_KEY_GEMINI_UNTUK_AI] |

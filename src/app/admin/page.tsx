@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
-import { useUser, useFirestore, useCollection, useDoc, useAuth, useMemoFirebase, useStorage } from '@/firebase';
+import { useUser, useFirestore, useCollection, useDoc, useAuth, useMemoFirebase } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,12 +14,11 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc, serverTimestamp, query, orderBy, arrayUnion, arrayRemove } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
-  Settings, ShoppingBag, ExternalLink as ExternalLinkIcon, Cpu, MapPin, Mail, Instagram, Facebook, Youtube, Music2, CheckCircle2, Type, Grid3X3, UploadCloud, Link as LinkIcon, ShoppingCart, Search, Map as MapIcon, Palette, Menu, Image as ImageIcon, X
+  Settings, ShoppingBag, ExternalLink as ExternalLinkIcon, MapPin, Instagram, Facebook, Youtube, CheckCircle2, Type, Grid3X3, UploadCloud, Link as LinkIcon, ImageIcon, X
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -44,7 +43,6 @@ export default function AdminDashboard() {
   const { user, loading: authLoading } = useUser();
   const auth = useAuth();
   const firestore = useFirestore();
-  const storage = useStorage();
   const router = useRouter();
   const isMobile = useIsMobile();
   const [activeSection, setActiveSection] = useState<AdminSection>('bookings');
@@ -54,7 +52,6 @@ export default function AdminDashboard() {
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const hasLoadedSettings = useRef(false);
-  const [searchLocation, setSearchLocation] = useState('');
   
   const canFetchData = !!(firestore && user);
 
@@ -69,12 +66,6 @@ export default function AdminDashboard() {
     [canFetchData, firestore]
   );
   const { data: portfolio } = useCollection(portfolioQuery);
-
-  const linksQuery = useMemoFirebase(() => 
-    canFetchData ? query(collection(firestore!, 'businesses', MAIN_BUSINESS_ID, 'external-links'), orderBy('createdAt', 'desc')) : null, 
-    [canFetchData, firestore]
-  );
-  const { data: externalLinks } = useCollection(linksQuery);
 
   const bookingsQuery = useMemoFirebase(() => 
     canFetchData ? query(collection(firestore!, 'businesses', MAIN_BUSINESS_ID, 'bookings'), orderBy('createdAt', 'desc')) : null, 
@@ -190,7 +181,7 @@ export default function AdminDashboard() {
       });
   };
 
-  const resizeAndCompressImage = (file: File, isLogo: boolean = false): Promise<Blob> => {
+  const resizeAndCompressImage = (file: File, isLogo: boolean = false): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -199,9 +190,9 @@ export default function AdminDashboard() {
         img.src = event.target?.result as string;
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          const maxWidth = 1920;
           let width = img.width;
           let height = img.height;
+          const maxWidth = 1920;
           
           if (width > maxWidth) {
             height = (maxWidth / width) * height;
@@ -217,52 +208,35 @@ export default function AdminDashboard() {
           ctx.drawImage(img, 0, 0, width, height);
           
           const format = isLogo ? 'image/png' : 'image/webp';
-          const quality = isLogo ? 1.0 : 0.8;
+          const quality = isLogo ? 1.0 : 0.7; // 0.7 quality to target 200-300kb
           
-          canvas.toBlob((blob) => {
-            if (blob) resolve(blob);
-            else reject(new Error('Konversi gambar gagal.'));
-          }, format, quality);
+          const dataUrl = canvas.toDataURL(format, quality);
+          resolve(dataUrl);
         };
-        img.onerror = () => reject(new Error('Gagal memuat gambar untuk diproses.'));
+        img.onerror = () => reject(new Error('Gagal memuat gambar.'));
       };
-      reader.onerror = () => reject(new Error('Gagal membaca file gambar.'));
+      reader.onerror = () => reject(new Error('Gagal membaca file.'));
     });
-  };
-
-  const uploadToStorage = async (blob: Blob, path: string) => {
-    if (!storage) throw new Error('Firebase Storage tidak aktif atau konfigurasi bucket (Storage Bucket) belum diisi di Vercel/Environment Variables.');
-    const storageRef = ref(storage, path);
-    await uploadBytes(storageRef, blob);
-    return getDownloadURL(storageRef);
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: string) => {
     const file = e.target.files?.[0];
     if (!file || !user || !firestore) return;
     
-    if (!storage) {
-      toast({ variant: "destructive", title: "Storage Tidak Aktif", description: "Firebase Storage belum dikonfigurasi. Pastikan bucket sudah diaktifkan di Firebase Console." });
-      return;
-    }
-
     setIsUploading(target);
     try {
       const isLogo = target === 'logo';
-      const optimizedBlob = await resizeAndCompressImage(file, isLogo);
-      const extension = isLogo ? 'png' : 'webp';
-      const fileName = `${target}_${Date.now()}.${extension}`;
-      const url = await uploadToStorage(optimizedBlob, `businesses/${MAIN_BUSINESS_ID}/${fileName}`);
+      const dataUrl = await resizeAndCompressImage(file, isLogo);
       
       if (isLogo) {
-        setBusinessInfo(prev => ({ ...prev, logoUrl: url }));
+        setBusinessInfo(prev => ({ ...prev, logoUrl: dataUrl }));
       } else if (target === 'hero') {
-        setBusinessInfo(prev => ({ ...prev, heroImageUrl: url }));
+        setBusinessInfo(prev => ({ ...prev, heroImageUrl: dataUrl }));
       } else {
         const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'services', target);
-        updateDoc(docRef, { imageUrl: url });
+        await updateDoc(docRef, { imageUrl: dataUrl });
       }
-      toast({ title: "Berhasil", description: "Gambar telah dioptimalkan dan diunggah." });
+      toast({ title: "Berhasil", description: "Gambar telah dioptimalkan dan disiapkan." });
     } catch (err: any) {
       toast({ variant: "destructive", title: "Gagal Mengunggah", description: err.message || "Gagal memproses gambar." });
     } finally {
@@ -274,20 +248,12 @@ export default function AdminDashboard() {
     const files = Array.from(e.target.files || []);
     if (files.length === 0 || !user || !firestore) return;
 
-    if (!storage) {
-      toast({ variant: "destructive", title: "Storage Tidak Aktif", description: "Firebase Storage belum dikonfigurasi." });
-      return;
-    }
-
     setIsUploading(`gallery-${serviceId}`);
     try {
       for (const file of files) {
-        const optimizedBlob = await resizeAndCompressImage(file);
-        const fileName = `service_${serviceId}_gallery_${Date.now()}_${Math.random().toString(36).substr(2, 5)}.webp`;
-        const url = await uploadToStorage(optimizedBlob, `businesses/${MAIN_BUSINESS_ID}/services/${serviceId}/${fileName}`);
-        
+        const dataUrl = await resizeAndCompressImage(file);
         const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'services', serviceId);
-        await updateDoc(docRef, { galleryUrls: arrayUnion(url) });
+        await updateDoc(docRef, { galleryUrls: arrayUnion(dataUrl) });
       }
       toast({ title: "Berhasil", description: "Foto galeri telah ditambahkan." });
     } catch (err: any) {
@@ -313,22 +279,14 @@ export default function AdminDashboard() {
     const files = Array.from(e.target.files || []);
     if (files.length === 0 || !user || !firestore) return;
 
-    if (!storage) {
-      toast({ variant: "destructive", title: "Storage Tidak Aktif", description: "Firebase Storage belum dikonfigurasi." });
-      return;
-    }
-
     setIsUploading('portfolio');
     let count = 0;
     try {
       for (const file of files) {
-        const optimizedBlob = await resizeAndCompressImage(file);
-        const fileName = `portfolio_${Date.now()}_${Math.random().toString(36).substr(2, 5)}.webp`;
-        const url = await uploadToStorage(optimizedBlob, `businesses/${MAIN_BUSINESS_ID}/portfolio/${fileName}`);
-        
+        const dataUrl = await resizeAndCompressImage(file);
         const colRef = collection(firestore, 'businesses', MAIN_BUSINESS_ID, 'portfolio');
         await addDoc(colRef, {
-          imageUrl: url,
+          imageUrl: dataUrl,
           createdAt: serverTimestamp(),
           ownerId: user.uid
         });
@@ -359,26 +317,6 @@ export default function AdminDashboard() {
     });
   };
 
-  const handleAddExternalLink = () => {
-    if (!firestore || !user) return;
-    const colRef = collection(firestore, 'businesses', MAIN_BUSINESS_ID, 'external-links');
-    addDoc(colRef, {
-      title: 'Tautan Baru',
-      url: 'https://',
-      platform: 'Website',
-      ownerId: user.uid,
-      createdAt: serverTimestamp()
-    });
-  };
-
-  const handleAutoSearchMap = () => {
-    if (!searchLocation.trim()) return;
-    const embedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(searchLocation)}&output=embed`;
-    const directUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchLocation)}`;
-    setBusinessInfo({ ...businessInfo, mapEmbedUrl: embedUrl, mapDirectUrl: directUrl, address: searchLocation });
-    toast({ title: "Lokasi Ditemukan", description: "Peta pratinjau dan alamat telah diperbarui." });
-  };
-
   if (authLoading || !isMounted) return <div className="flex h-screen items-center justify-center bg-background"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   if (!user) return null;
 
@@ -386,12 +324,10 @@ export default function AdminDashboard() {
     { id: 'bookings', label: 'Pesanan', icon: ShoppingBag },
     { id: 'services', label: 'Layanan', icon: Settings },
     { id: 'portfolio', label: 'Portofolio', icon: Grid3X3 },
-    { id: 'links', label: 'Tautan Eksternal', icon: LinkIcon },
     { id: 'branding', label: 'Logo & Tema', icon: Layout },
     { id: 'hero', label: 'Banner Utama', icon: Globe },
     { id: 'about', label: 'Tentang Kami', icon: Info },
     { id: 'contact', label: 'Alamat & Kontak', icon: MapPin },
-    { id: 'social', label: 'Media Sosial', icon: Instagram },
     { id: 'privacy', label: 'Privasi', icon: Shield },
   ];
 
