@@ -229,17 +229,18 @@ export default function AdminDashboard() {
     
     setIsUploading(target);
     try {
-      // Logo & Favicon optimized specifically
       const isLogo = target === 'logo';
+      const isHero = target === 'hero';
       const dataUrl = await resizeAndCompressImage(file, isLogo ? 0.9 : 0.7, isLogo ? 512 : 1200);
       
       if (isLogo) {
         setBusinessInfo(prev => ({ ...prev, logoUrl: dataUrl }));
-        // Instantly save logo to firestore for fast favicon syncing
         const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'settings', 'profile');
         await setDoc(docRef, { logoUrl: dataUrl }, { merge: true });
-      } else if (target === 'hero') {
+      } else if (isHero) {
         setBusinessInfo(prev => ({ ...prev, heroImageUrl: dataUrl }));
+        const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'settings', 'profile');
+        await setDoc(docRef, { heroImageUrl: dataUrl }, { merge: true });
       } else {
         const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'services', target);
         await updateDoc(docRef, { imageUrl: dataUrl });
@@ -385,6 +386,96 @@ export default function AdminDashboard() {
             </Card>
           )}
 
+          {activeSection === 'hero' && (
+            <Card className="rounded-3xl border-border bg-card shadow-xl overflow-hidden">
+              <CardHeader className="p-8 border-b border-border">
+                <CardTitle className="flex items-center gap-2"><Globe size={20} className="text-primary" /> Pengaturan Banner Utama</CardTitle>
+              </CardHeader>
+              <CardContent className="p-8 space-y-8">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-xs font-bold uppercase">Judul Utama (Hero Title)</Label>
+                    <Textarea 
+                      value={businessInfo.heroTitle} 
+                      onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})} 
+                      className="rounded-xl h-24 text-lg font-bold"
+                      placeholder="Contoh: Solusi Digital Nusantara"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-bold uppercase">Sub-judul (Hero Subtitle)</Label>
+                    <Textarea 
+                      value={businessInfo.heroSubtitle} 
+                      onChange={(e) => setBusinessInfo({...businessInfo, heroSubtitle: e.target.value})} 
+                      className="rounded-xl h-24"
+                      placeholder="Deskripsi singkat layanan Anda..."
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <Label className="text-xs font-bold uppercase">Gambar Latar Belakang Banner</Label>
+                  <div className="flex flex-col items-center gap-6 p-8 border-2 border-dashed border-border rounded-3xl bg-background/20">
+                    <div className="relative h-48 w-full rounded-2xl overflow-hidden border border-border bg-muted flex items-center justify-center">
+                      {businessInfo.heroImageUrl ? (
+                        <Image src={businessInfo.heroImageUrl} alt="Hero Preview" fill className="object-cover" />
+                      ) : (
+                        <div className="text-[10px] opacity-20 uppercase font-bold text-center p-4">Belum Ada Gambar Latar</div>
+                      )}
+                    </div>
+                    <div className="w-full space-y-4">
+                      <input type="file" className="hidden" id="hero-up" accept="image/*" onChange={(e) => handleImageUpload(e, 'hero')} />
+                      <Button asChild variant="secondary" className="w-full h-12 rounded-xl font-bold">
+                        <label htmlFor="hero-up">
+                          {isUploading === 'hero' ? <Loader2 className="animate-spin" /> : 'Unggah Gambar Banner'}
+                        </label>
+                      </Button>
+                      <div className="space-y-3">
+                        <div className="flex justify-between text-[10px] font-bold uppercase">
+                          <span>Posisi Gambar (Vertikal)</span>
+                          <span>{businessInfo.heroImagePosition}</span>
+                        </div>
+                        <Slider 
+                          value={[parseInt(businessInfo.heroImagePosition) || 50]} 
+                          min={0} 
+                          max={100} 
+                          onValueChange={(v) => setBusinessInfo({...businessInfo, heroImagePosition: `${v[0]}%`})} 
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {activeSection === 'about' && (
+            <Card className="rounded-3xl border-border bg-card shadow-xl overflow-hidden">
+              <CardHeader className="p-8 border-b border-border">
+                <CardTitle className="flex items-center gap-2"><Info size={20} className="text-primary" /> Pengaturan Tentang Kami</CardTitle>
+              </CardHeader>
+              <CardContent className="p-8 space-y-6">
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold uppercase">Judul Seksi</Label>
+                  <Input 
+                    value={businessInfo.aboutTitle} 
+                    onChange={(e) => setBusinessInfo({...businessInfo, aboutTitle: e.target.value})} 
+                    className="rounded-xl h-12 font-bold"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-bold uppercase">Konten Tentang Kami</Label>
+                  <Textarea 
+                    value={businessInfo.aboutContent} 
+                    onChange={(e) => setBusinessInfo({...businessInfo, aboutContent: e.target.value})} 
+                    className="rounded-xl min-h-[300px]"
+                    placeholder="Ceritakan sejarah atau visi misi bisnis Anda..."
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {activeSection === 'links' && (
             <div className="space-y-6">
               <Card className="rounded-3xl border-border bg-card shadow-xl overflow-hidden">
@@ -520,6 +611,27 @@ export default function AdminDashboard() {
 
               <Card className="rounded-3xl border-border bg-card shadow-xl">
                 <CardContent className="p-8 space-y-8">
+                  <div className="grid md:grid-cols-2 gap-6 p-6 bg-primary/5 rounded-2xl border border-primary/10">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase">Teks Logo (Putih)</Label>
+                      <Input 
+                        value={businessInfo.logoText} 
+                        onChange={(e) => setBusinessInfo({...businessInfo, logoText: e.target.value})} 
+                        placeholder="Contoh: GOETNIK" 
+                        className="rounded-xl h-12 font-bold"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase">Teks Logo (Warna Aksen)</Label>
+                      <Input 
+                        value={businessInfo.logoAccentText} 
+                        onChange={(e) => setBusinessInfo({...businessInfo, logoAccentText: e.target.value})} 
+                        placeholder="Contoh: NUSANTARA" 
+                        className="rounded-xl h-12 font-bold text-primary"
+                      />
+                    </div>
+                  </div>
+
                   <div className="space-y-4 p-6 bg-primary/5 rounded-2xl border border-primary/10">
                     <Label className="text-foreground uppercase font-black text-xs">Gaya Huruf (Font)</Label>
                     <select value={businessInfo.fontFamily} onChange={(e) => setBusinessInfo({...businessInfo, fontFamily: e.target.value})} className="w-full rounded-xl h-12 bg-background/50 border-border font-bold px-3">
