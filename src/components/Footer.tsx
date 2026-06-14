@@ -1,7 +1,6 @@
-
 "use client";
 
-import { Instagram, Facebook, Youtube, Fingerprint, Globe, Link as LinkIcon, ShoppingCart, Github, Linkedin, Image as ImageIcon, Code2 } from 'lucide-react';
+import { Instagram, Facebook, Youtube, Fingerprint, Globe, Link as LinkIcon, ShoppingCart, Github, Linkedin, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useFirestore, useDoc, useMemoFirebase, useCollection } from '@/firebase';
 import { doc, collection, query, orderBy } from 'firebase/firestore';
@@ -85,7 +84,6 @@ export function Footer({ businessId }: FooterProps) {
         return <Github size={14} className="mr-2" />;
       case 'LinkedIn':
         return <Linkedin size={14} className="mr-2" />;
-      case 'Vercel':
       case 'Website':
         return <Globe size={14} className="mr-2" />;
       default:
@@ -128,7 +126,7 @@ export function Footer({ businessId }: FooterProps) {
                 />
               </div>
             )}
-            <div className="flex flex-wrap items-center text-xl md:text-2xl font-black gap-x-2 tracking-tighter">
+            <div className="flex flex-wrap items-center text-xl md:text-2xl font-bold gap-x-2 tracking-tighter">
               <span className="text-foreground">{logoText}</span>
               <span className="text-primary">{logoAccentText}</span>
             </div>

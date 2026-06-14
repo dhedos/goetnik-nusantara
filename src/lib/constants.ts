@@ -1,10 +1,10 @@
 import { Monitor, HardDrive, Palette, Globe, CheckCircle, Clock, ShieldCheck, Laptop, Phone, Wrench, Mail, Smartphone, Cpu, Settings, PenTool } from 'lucide-react';
 
 export const MAIN_BUSINESS_ID = "main";
-export const BUSINESS_NAME_DEFAULT = "";
+export const BUSINESS_NAME_DEFAULT = "Go Etnik Nusantara";
 export const OWNER_WHATSAPP_DEFAULT = "628123456789";
-export const BUSINESS_ADDRESS_DEFAULT = "";
-export const BUSINESS_EMAIL_DEFAULT = "";
+export const BUSINESS_ADDRESS_DEFAULT = "Jl. Contoh Alamat No. 123, Jakarta";
+export const BUSINESS_EMAIL_DEFAULT = "info@goetnik.id";
 
 export const PRIVACY_POLICY_DEFAULT = `Kebijakan Privasi
 

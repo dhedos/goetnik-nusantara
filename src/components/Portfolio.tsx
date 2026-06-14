@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from 'react';
@@ -82,6 +81,7 @@ export function Portfolio({ businessId }: PortfolioProps) {
                           height={400}
                           style={{ width: '100%', height: 'auto' }}
                           className="object-contain transition-transform duration-700 group-hover:scale-105" 
+                          unoptimized
                         />
                       )}
                       

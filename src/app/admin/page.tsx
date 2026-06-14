@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
@@ -224,7 +223,7 @@ export default function AdminDashboard() {
     try {
       const isLogo = target === 'logo';
       const isHero = target === 'hero';
-      const dataUrl = await resizeAndCompressImage(file, isLogo ? 0.9 : 0.7, isLogo ? 256 : 1200);
+      const dataUrl = await resizeAndCompressImage(file, isLogo ? 0.9 : 0.7, isLogo ? 128 : 1200);
       
       if (isLogo) {
         setBusinessInfo(prev => ({ ...prev, logoUrl: dataUrl }));

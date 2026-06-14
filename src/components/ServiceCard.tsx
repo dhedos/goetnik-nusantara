@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from 'react';
@@ -86,7 +85,7 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
                             alt={name} 
                             fill 
                             className="object-cover" 
-                            sizes="100vw"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                             unoptimized
                           />
                         )}
@@ -108,7 +107,7 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
                       alt={name} 
                       fill 
                       className="object-cover transition-transform duration-1000 group-hover:scale-110" 
-                      sizes="100vw"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       unoptimized
                     />
                   )
