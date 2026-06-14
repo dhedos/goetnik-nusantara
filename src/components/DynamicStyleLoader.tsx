@@ -52,16 +52,20 @@ export function DynamicStyleLoader({ businessId }: { businessId: string }) {
     if (logoUrl) {
       const updateFavicon = (url: string) => {
         const existingIcons = document.querySelectorAll("link[rel*='icon']");
-        existingIcons.forEach(el => {
-          if (el) el.remove();
-        });
-
-        ['icon', 'apple-touch-icon'].forEach(rel => {
-          const newLink = document.createElement('link');
-          newLink.rel = rel;
-          newLink.href = url;
-          document.head.appendChild(newLink);
-        });
+        if (existingIcons.length > 0) {
+          existingIcons.forEach(el => {
+            if (el instanceof HTMLLinkElement) {
+              el.href = url;
+            }
+          });
+        } else {
+          ['icon', 'apple-touch-icon'].forEach(rel => {
+            const newLink = document.createElement('link');
+            newLink.rel = rel;
+            newLink.href = url;
+            document.head.appendChild(newLink);
+          });
+        }
       };
       updateFavicon(logoUrl);
     }

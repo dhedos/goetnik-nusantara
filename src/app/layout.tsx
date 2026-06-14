@@ -46,19 +46,16 @@ export default function RootLayout({
                     if (theme.logoUrl) {
                       const updateIcon = (url) => {
                         const links = document.querySelectorAll("link[rel*='icon']");
-                        links.forEach(l => {
-                          if (l) l.remove();
-                        });
-                        
-                        const icon = document.createElement('link');
-                        icon.rel = 'icon';
-                        icon.href = url;
-                        document.head.appendChild(icon);
-                        
-                        const appleIcon = document.createElement('link');
-                        appleIcon.rel = 'apple-touch-icon';
-                        appleIcon.href = url;
-                        document.head.appendChild(appleIcon);
+                        if (links.length > 0) {
+                          for (var i = 0; i < links.length; i++) {
+                            links[i].href = url;
+                          }
+                        } else {
+                          const icon = document.createElement('link');
+                          icon.rel = 'icon';
+                          icon.href = url;
+                          document.head.appendChild(icon);
+                        }
                       };
                       updateIcon(theme.logoUrl);
                     }

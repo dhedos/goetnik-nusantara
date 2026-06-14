@@ -24,10 +24,12 @@ function LoadingScreen({ logoUrl }: { logoUrl?: string }) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
+  if (!mounted) return <div className="fixed inset-0 bg-background" />;
+
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background text-center p-4">
       <div className="relative z-10 flex flex-col items-center">
-        {mounted && logoUrl && (
+        {logoUrl && (
           <div className="w-32 h-32 md:w-48 md:h-48 flex items-center justify-center animate-pulse transition-all duration-700">
             <img 
               src={logoUrl} 
