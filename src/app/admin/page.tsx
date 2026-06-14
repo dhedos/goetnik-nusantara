@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
@@ -224,7 +223,7 @@ export default function AdminDashboard() {
           const canvas = document.createElement('canvas');
           let width = img.width;
           let height = img.height;
-          const maxWidth = 1920;
+          const maxWidth = isLogo ? 512 : 1920; // Lower resolution for logo favicons
           
           if (width > maxWidth) {
             height = (maxWidth / width) * height;
@@ -262,6 +261,9 @@ export default function AdminDashboard() {
       
       if (isLogo) {
         setBusinessInfo(prev => ({ ...prev, logoUrl: dataUrl }));
+        // Save logo immediately to sync favicon
+        const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'settings', 'profile');
+        await updateDoc(docRef, { logoUrl: dataUrl });
       } else if (target === 'hero') {
         setBusinessInfo(prev => ({ ...prev, heroImageUrl: dataUrl }));
       } else {

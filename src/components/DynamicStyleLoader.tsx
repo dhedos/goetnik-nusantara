@@ -77,14 +77,26 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
       root.style.setProperty('--loading-logo', `url(${settings.logoUrl})`);
       root.classList.add('has-loading-logo');
       
-      const updateIcon = (id: string, url: string) => {
-        const el = document.getElementById(id) as HTMLLinkElement;
-        if (el) el.href = url;
+      // Update Favicon with a more robust method to force browser refresh
+      const updateFavicons = (url: string) => {
+        const iconIds = ['dynamic-favicon', 'dynamic-shortcut-icon', 'dynamic-apple-icon'];
+        
+        iconIds.forEach(id => {
+          const oldLink = document.getElementById(id) as HTMLLinkElement;
+          const newLink = document.createElement('link');
+          newLink.id = id;
+          newLink.rel = id === 'dynamic-apple-icon' ? 'apple-touch-icon' : (id === 'dynamic-shortcut-icon' ? 'shortcut icon' : 'icon');
+          newLink.href = url;
+          if (id === 'dynamic-favicon') newLink.type = 'image/png';
+          
+          if (oldLink) {
+            document.head.removeChild(oldLink);
+          }
+          document.head.appendChild(newLink);
+        });
       };
 
-      updateIcon('dynamic-favicon', settings.logoUrl);
-      updateIcon('dynamic-shortcut-icon', settings.logoUrl);
-      updateIcon('dynamic-apple-icon', settings.logoUrl);
+      updateFavicons(settings.logoUrl);
     }
 
     // Cache untuk rendering instan saat reload (Head Script)
