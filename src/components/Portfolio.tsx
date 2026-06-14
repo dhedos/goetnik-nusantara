@@ -63,7 +63,7 @@ export function Portfolio({ businessId }: PortfolioProps) {
               <Dialog key={item.id}>
                 <DialogTrigger asChild>
                   <div 
-                    className="relative group rounded-3xl overflow-hidden border border-border/10 shadow-xl bg-card/40 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 animate-fade-in break-inside-avoid cursor-pointer"
+                    className="relative group rounded-xl overflow-hidden border border-border/10 shadow-xl bg-card/40 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 animate-fade-in break-inside-avoid cursor-pointer"
                     style={{ animationDelay: `${i * 100}ms` }}
                   >
                     <div className="relative w-full h-auto">
@@ -96,7 +96,7 @@ export function Portfolio({ businessId }: PortfolioProps) {
                     </div>
                   </div>
                 </DialogTrigger>
-                <DialogContent className="max-w-5xl w-[95vw] h-[90vh] p-0 border-none bg-black/95 overflow-hidden flex flex-col rounded-3xl z-[70]">
+                <DialogContent className="max-w-5xl w-[95vw] h-[90vh] p-0 border-none bg-black/95 overflow-hidden flex flex-col rounded-xl z-[70]">
                   <DialogTitle className="sr-only">Detail Portofolio</DialogTitle>
                   <DialogDescription className="sr-only">Tampilan penuh gambar portofolio</DialogDescription>
                   
@@ -127,7 +127,7 @@ export function Portfolio({ businessId }: PortfolioProps) {
           <div className="mt-12 flex justify-center animate-fade-in">
             <Button 
               asChild
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 sm:px-8 py-4 sm:py-5 rounded-xl sm:rounded-2xl text-[10px] sm:text-xs font-black uppercase tracking-widest shadow-xl hover:scale-[1.02] transition-all group h-auto"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 sm:px-8 py-4 sm:py-5 rounded-lg text-[10px] sm:text-xs font-black uppercase tracking-widest shadow-xl hover:scale-[1.02] transition-all group h-auto"
             >
               <a href={globalUrl.startsWith('http') ? globalUrl : `https://${globalUrl}`} target="_blank" className="flex items-center gap-3">
                 Portofolio Kami Selengkapnya 
