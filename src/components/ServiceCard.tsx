@@ -2,7 +2,6 @@
 "use client";
 
 import * as React from 'react';
-import Image from 'next/image';
 import { LucideIcon, Check, ArrowRight, Info, ShoppingCart } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -25,6 +24,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Autoplay from "embla-carousel-autoplay";
+import Image from 'next/image';
 
 interface ServiceCardProps {
   name: string;
@@ -73,7 +73,7 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
                 <Carousel className="w-full h-full" plugins={[plugin.current]}>
                   <CarouselContent className="h-full">
                     {allImages.map((img, index) => (
-                      <CarouselItem key={index} className="h-full">
+                      <CarouselItem key={index} className="h-full relative">
                         {img.startsWith('data:') ? (
                           <img 
                             src={img} 
@@ -86,6 +86,8 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
                             alt={name} 
                             fill 
                             className="object-cover" 
+                            sizes="100vw"
+                            unoptimized
                           />
                         )}
                       </CarouselItem>
@@ -106,6 +108,8 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
                       alt={name} 
                       fill 
                       className="object-cover transition-transform duration-1000 group-hover:scale-110" 
+                      sizes="100vw"
+                      unoptimized
                     />
                   )
                 )
@@ -174,7 +178,7 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
                   <Carousel className="w-full h-full flex items-center justify-center">
                     <CarouselContent className="h-full">
                       {allImages.map((img, index) => (
-                        <CarouselItem key={index} className="h-full flex items-center justify-center">
+                        <CarouselItem key={index} className="h-full flex items-center justify-center relative">
                           <div className="relative w-full h-full flex items-center justify-center p-4">
                             <img 
                               src={img} 

@@ -108,7 +108,9 @@ function HomeContent() {
                     fill 
                     className="object-cover opacity-25" 
                     style={{ objectPosition: `center ${heroImagePos}` }}
+                    sizes="100vw"
                     priority
+                    unoptimized
                   />
                 )
               )}
