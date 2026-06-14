@@ -28,6 +28,7 @@
       "properties": {
         "imageUrl": { "type": "string" },
         "title": { "type": "string" },
+        "externalLink": { "type": "string", "description": "Link to external portfolio or detailed project page." },
         "createdAt": { "type": "string", "format": "date-time" },
         "ownerId": { "type": "string" }
       },

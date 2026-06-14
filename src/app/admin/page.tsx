@@ -315,6 +315,7 @@ export default function AdminDashboard() {
         const colRef = collection(firestore, 'businesses', MAIN_BUSINESS_ID, 'portfolio');
         await addDoc(colRef, {
           imageUrl: dataUrl,
+          externalLink: '',
           createdAt: serverTimestamp(),
           ownerId: user.uid
         });
@@ -525,20 +526,31 @@ export default function AdminDashboard() {
                     </div>
                   </label>
                 </div>
-                <div className="columns-2 md:columns-3 gap-4 space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {portfolio?.map((item: any) => (
-                    <div key={item.id} className="relative rounded-2xl overflow-hidden border border-border group shadow-lg bg-card break-inside-avoid">
-                      <Image 
-                        src={item.imageUrl} 
-                        alt="Portfolio" 
-                        width={0}
-                        height={0}
-                        sizes="100vw"
-                        style={{ width: '100%', height: 'auto' }}
-                        className="object-contain transition-transform group-hover:scale-105" 
-                      />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <Button variant="destructive" size="icon" className="rounded-full h-10 w-10" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'portfolio', item.id))}><Trash2 size={18} /></Button>
+                    <div key={item.id} className="relative rounded-2xl overflow-hidden border border-border group shadow-lg bg-card flex flex-col">
+                      <div className="relative h-48 w-full">
+                        <Image 
+                          src={item.imageUrl} 
+                          alt="Portfolio" 
+                          fill
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          className="object-contain transition-transform group-hover:scale-105" 
+                        />
+                        <div className="absolute top-2 right-2">
+                           <Button variant="destructive" size="icon" className="rounded-full h-8 w-8 shadow-lg" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'portfolio', item.id))}><Trash2 size={14} /></Button>
+                        </div>
+                      </div>
+                      <div className="p-4 space-y-2 border-t border-border">
+                        <Label className="text-[10px] font-black uppercase opacity-60">Tautan Detail (Contoh: Pinterest/Behance)</Label>
+                        <div className="flex gap-2">
+                          <Input 
+                            placeholder="https://..." 
+                            defaultValue={item.externalLink || ''} 
+                            onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'portfolio', item.id), { externalLink: e.target.value })}
+                            className="h-9 text-xs rounded-xl"
+                          />
+                        </div>
                       </div>
                     </div>
                   ))}

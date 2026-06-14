@@ -1,10 +1,12 @@
+
 "use client";
 
 import * as React from 'react';
 import Image from 'next/image';
 import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
-import { Loader2, Maximize2, X } from 'lucide-react';
+import { Loader2, Maximize2, X, ExternalLink } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -13,7 +15,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface PortfolioProps {
   businessId: string;
@@ -21,7 +22,6 @@ interface PortfolioProps {
 
 export function Portfolio({ businessId }: PortfolioProps) {
   const firestore = useFirestore();
-  const [selectedItem, setSelectedItem] = React.useState<any>(null);
   
   const portfolioQueryFixed = useMemoFirebase(() => 
     firestore ? query(collection(firestore, 'businesses', businessId, 'portfolio'), orderBy('createdAt', 'desc')) : null, 
@@ -92,7 +92,14 @@ export function Portfolio({ businessId }: PortfolioProps) {
                   </div>
                 </div>
                 
-                <div className="absolute top-4 right-4 z-50">
+                <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+                  {item.externalLink && (
+                    <Button asChild size="sm" className="rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border-none text-white font-bold h-10 px-6">
+                      <a href={item.externalLink.startsWith('http') ? item.externalLink : `https://${item.externalLink}`} target="_blank">
+                        <ExternalLink size={16} className="mr-2" /> Lihat Karya Lainnya
+                      </a>
+                    </Button>
+                  )}
                   <DialogTrigger asChild>
                     <button className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors backdrop-blur-md">
                       <X size={20} />
