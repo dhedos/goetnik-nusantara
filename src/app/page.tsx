@@ -75,6 +75,7 @@ function HomeContent() {
 
   const heroPlaceholder = PlaceHolderImages.find(img => img.id === 'hero-tech');
   const heroDisplayImage = settings?.heroImageUrl || heroPlaceholder?.imageUrl;
+  const isBase64Hero = heroDisplayImage?.startsWith('data:');
   
   const heroTitle = settings?.heroTitle || 'Solusi Digital Kreatif & Terpercaya';
   const heroSubtitle = settings?.heroSubtitle || 'Kami membantu mewujudkan visi bisnis Anda melalui teknologi dan desain berkualitas tinggi.';
@@ -93,16 +94,23 @@ function HomeContent() {
           <section className="relative min-h-[85vh] md:min-h-screen flex items-center pt-24 md:pt-28 pb-20 px-4 md:px-8 overflow-hidden">
             <div className="absolute inset-0 -z-20">
               {heroDisplayImage && (
-                <Image 
-                  src={heroDisplayImage} 
-                  alt="Banner Utama" 
-                  fill 
-                  unoptimized={heroDisplayImage.startsWith('data:')}
-                  sizes="100vw"
-                  className="object-cover opacity-25" 
-                  style={{ objectPosition: `center ${heroImagePos}` }}
-                  priority
-                />
+                isBase64Hero ? (
+                  <img 
+                    src={heroDisplayImage} 
+                    alt="Banner Utama" 
+                    className="absolute inset-0 w-full h-full object-cover opacity-25" 
+                    style={{ objectPosition: `center ${heroImagePos}` }}
+                  />
+                ) : (
+                  <Image 
+                    src={heroDisplayImage} 
+                    alt="Banner Utama" 
+                    fill 
+                    className="object-cover opacity-25" 
+                    style={{ objectPosition: `center ${heroImagePos}` }}
+                    priority
+                  />
+                )
               )}
               <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/80 to-background" />
             </div>

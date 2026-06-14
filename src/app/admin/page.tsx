@@ -13,7 +13,7 @@ import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc, serverTimestamp, query, orderBy, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { doc, setDoc, updateDoc, collection, addDoc, deleteDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
@@ -26,7 +26,6 @@ import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { cn } from '@/lib/utils';
 import { MAIN_BUSINESS_ID, THEMES, ICON_OPTIONS, BUSINESS_NAME_DEFAULT, OWNER_WHATSAPP_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, PRIVACY_POLICY_DEFAULT } from '@/lib/constants';
-import Image from 'next/image';
 
 type AdminSection = 'bookings' | 'services' | 'portfolio' | 'links' | 'branding' | 'hero' | 'about' | 'contact' | 'privacy';
 
@@ -374,7 +373,7 @@ export default function AdminDashboard() {
                   <div className="flex flex-col items-center gap-6 p-8 border-2 border-dashed border-border rounded-3xl bg-background/20">
                     <div className="relative h-48 w-full rounded-2xl overflow-hidden border border-border bg-muted flex items-center justify-center">
                       {businessInfo.heroImageUrl ? (
-                        <Image src={businessInfo.heroImageUrl} alt="Hero Preview" fill className="object-cover" />
+                        <img src={businessInfo.heroImageUrl} alt="Hero Preview" className="absolute inset-0 w-full h-full object-cover" />
                       ) : (
                         <div className="text-[10px] opacity-20 uppercase font-bold text-center p-4">Klik Unggah untuk Gambar Banner</div>
                       )}
@@ -546,7 +545,7 @@ export default function AdminDashboard() {
                 <div className="grid grid-cols-2 gap-4">
                   {portfolio?.map((item: any) => (
                     <div key={item.id} className="relative rounded-2xl overflow-hidden border border-border group aspect-square">
-                      <Image src={item.imageUrl} alt="Portfolio" fill className="object-cover" />
+                      <img src={item.imageUrl} alt="Portfolio" className="absolute inset-0 w-full h-full object-cover" />
                       <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button variant="destructive" size="icon" className="rounded-full h-8 w-8" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'portfolio', item.id))}><Trash2 size={14} /></Button>
                       </div>
@@ -607,7 +606,7 @@ export default function AdminDashboard() {
                   {services?.map((s: any) => (
                     <Card key={s.id} className="bg-card rounded-3xl border-border overflow-hidden shadow-lg group">
                       <div className="h-56 bg-muted/20 relative flex items-center justify-center overflow-hidden">
-                        {s.imageUrl ? <Image src={s.imageUrl} alt={s.name} fill className="object-contain" /> : <ImageIcon size={48} className="opacity-10" />}
+                        {s.imageUrl ? <img src={s.imageUrl} alt={s.name} className="absolute inset-0 w-full h-full object-contain" /> : <ImageIcon size={48} className="opacity-10" />}
                         <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <input type="file" className="hidden" id={`s-main-${s.id}`} accept="image/*" onChange={(e) => handleImageUpload(e, s.id)} />
                           <Button variant="secondary" size="sm" asChild><label htmlFor={`s-main-${s.id}`}>Ubah Gambar</label></Button>

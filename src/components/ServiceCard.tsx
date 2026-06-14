@@ -74,26 +74,40 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
                   <CarouselContent className="h-full">
                     {allImages.map((img, index) => (
                       <CarouselItem key={index} className="h-full">
-                        <Image 
-                          src={img} 
-                          alt={name} 
-                          fill 
-                          unoptimized={img.startsWith('data:')}
-                          className="object-cover" 
-                        />
+                        {img.startsWith('data:') ? (
+                          <img 
+                            src={img} 
+                            alt={name} 
+                            className="w-full h-full object-cover" 
+                          />
+                        ) : (
+                          <Image 
+                            src={img} 
+                            alt={name} 
+                            fill 
+                            className="object-cover" 
+                          />
+                        )}
                       </CarouselItem>
                     ))}
                   </CarouselContent>
                 </Carousel>
               ) : (
                 allImages.length > 0 && (
-                  <Image 
-                    src={allImages[0]} 
-                    alt={name} 
-                    fill 
-                    unoptimized={allImages[0].startsWith('data:')}
-                    className="object-cover transition-transform duration-1000 group-hover:scale-110" 
-                  />
+                  allImages[0].startsWith('data:') ? (
+                    <img 
+                      src={allImages[0]} 
+                      alt={name} 
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+                    />
+                  ) : (
+                    <Image 
+                      src={allImages[0]} 
+                      alt={name} 
+                      fill 
+                      className="object-cover transition-transform duration-1000 group-hover:scale-110" 
+                    />
+                  )
                 )
               )}
             </div>
@@ -162,13 +176,10 @@ export function ServiceCard({ name, icon: Icon, price, description, features, im
                       {allImages.map((img, index) => (
                         <CarouselItem key={index} className="h-full flex items-center justify-center">
                           <div className="relative w-full h-full flex items-center justify-center p-4">
-                            <Image 
+                            <img 
                               src={img} 
                               alt={name} 
-                              fill 
-                              unoptimized={img.startsWith('data:')}
-                              className="object-contain" 
-                              priority 
+                              className="max-w-full max-h-full object-contain" 
                             />
                           </div>
                         </CarouselItem>
