@@ -5,11 +5,7 @@ import { useDoc, useMemoFirebase, useFirestore } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { THEMES, MAIN_BUSINESS_ID } from '@/lib/constants';
 
-interface DynamicStyleLoaderProps {
-  businessId: string;
-}
-
-export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
+export function DynamicStyleLoader({ businessId }: { businessId: string }) {
   const firestore = useFirestore();
   const settingsRef = useMemoFirebase(() => 
     firestore ? doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'settings', 'profile') : null, 
@@ -35,11 +31,10 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
     root.style.setProperty('--accent', selectedTheme.accent);
     root.style.setProperty('--background', selectedTheme.background);
     
-    // Perhitungan otomatis warna kontras (Foreground & Card)
+    // Foreground & Card contrast calculation
     const bgParts = selectedTheme.background.split(' ');
     const lValue = parseInt(bgParts[2]);
     const isLight = lValue > 60;
-    
     const h = bgParts[0];
     const s = bgParts[1];
 
@@ -53,25 +48,25 @@ export function DynamicStyleLoader({ businessId }: DynamicStyleLoaderProps) {
       root.style.setProperty('--border', '217 19% 27% / 0.15');
     }
 
-    // 3. Sinkronisasi Logo & Favicon Browser
+    // 3. Favicon Browser Sync (Aggressive Replacement)
     if (settings.logoUrl) {
       const updateFavicon = (url: string) => {
+        // Remove all current icon tags
+        const existingIcons = document.querySelectorAll("link[rel*='icon']");
+        existingIcons.forEach(el => el.parentNode?.removeChild(el));
+
+        // Create new tags
         ['icon', 'shortcut icon', 'apple-touch-icon'].forEach(rel => {
-          let link = document.querySelector(`link[rel*="${rel}"]`) as HTMLLinkElement;
-          if (link) {
-            link.parentNode?.removeChild(link);
-          }
           const newLink = document.createElement('link');
           newLink.rel = rel;
-          // Tambahkan query string unik untuk memaksa browser refresh ikon
-          newLink.href = `${url}?v=${Date.now()}`;
+          newLink.href = url;
           document.head.appendChild(newLink);
         });
       };
       updateFavicon(settings.logoUrl);
     }
 
-    // Simpan cache untuk hidrasi cepat di layout.tsx
+    // Update Local Cache for layout script
     try {
       localStorage.setItem('goetnik-theme-cache', JSON.stringify({
         primary: selectedTheme.primary,

@@ -33,8 +33,9 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
-                  const theme = JSON.parse(localStorage.getItem('goetnik-theme-cache'));
-                  if (theme) {
+                  const cache = localStorage.getItem('goetnik-theme-cache');
+                  if (cache) {
+                    const theme = JSON.parse(cache);
                     const root = document.documentElement;
                     if (theme.primary) root.style.setProperty('--primary', theme.primary);
                     if (theme.accent) root.style.setProperty('--accent', theme.accent);
@@ -42,18 +43,20 @@ export default function RootLayout({
                     if (theme.fontFamily) root.style.setProperty('--selected-font', theme.fontFamily);
                     
                     if (theme.logoUrl) {
-                      const updateIcon = (url) => {
-                        ['icon', 'shortcut icon', 'apple-touch-icon'].forEach(rel => {
-                          let link = document.querySelector('link[rel*="' + rel + '"]');
-                          if (!link) {
-                            link = document.createElement('link');
-                            link.rel = rel;
-                            document.head.appendChild(link);
-                          }
-                          link.href = url;
-                        });
+                      const setFavicon = (url) => {
+                        const existingLinks = document.querySelectorAll("link[rel*='icon']");
+                        existingLinks.forEach(l => l.parentNode.removeChild(l));
+                        const link = document.createElement('link');
+                        link.rel = 'icon';
+                        link.href = url;
+                        document.head.appendChild(link);
+                        
+                        const appleLink = document.createElement('link');
+                        appleLink.rel = 'apple-touch-icon';
+                        appleLink.href = url;
+                        document.head.appendChild(appleLink);
                       };
-                      updateIcon(theme.logoUrl);
+                      setFavicon(theme.logoUrl);
                     }
                   }
                 } catch (e) {}
