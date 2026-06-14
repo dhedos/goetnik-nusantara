@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
@@ -220,17 +221,17 @@ export default function AdminDashboard() {
           
           canvas.toBlob((blob) => {
             if (blob) resolve(blob);
-            else reject(new Error('Canvas conversion failed'));
+            else reject(new Error('Konversi gambar gagal.'));
           }, format, quality);
         };
-        img.onerror = reject;
+        img.onerror = () => reject(new Error('Gagal memuat gambar untuk diproses.'));
       };
-      reader.onerror = reject;
+      reader.onerror = () => reject(new Error('Gagal membaca file gambar.'));
     });
   };
 
   const uploadToStorage = async (blob: Blob, path: string) => {
-    if (!storage) throw new Error('Storage not available');
+    if (!storage) throw new Error('Firebase Storage tidak aktif atau konfigurasi bucket (Storage Bucket) belum diisi di Vercel/Environment Variables.');
     const storageRef = ref(storage, path);
     await uploadBytes(storageRef, blob);
     return getDownloadURL(storageRef);
@@ -238,7 +239,13 @@ export default function AdminDashboard() {
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, target: string) => {
     const file = e.target.files?.[0];
-    if (!file || !user || !firestore || !storage) return;
+    if (!file || !user || !firestore) return;
+    
+    if (!storage) {
+      toast({ variant: "destructive", title: "Storage Tidak Aktif", description: "Firebase Storage belum dikonfigurasi. Pastikan bucket sudah diaktifkan di Firebase Console." });
+      return;
+    }
+
     setIsUploading(target);
     try {
       const isLogo = target === 'logo';
@@ -256,8 +263,8 @@ export default function AdminDashboard() {
         updateDoc(docRef, { imageUrl: url });
       }
       toast({ title: "Berhasil", description: "Gambar telah dioptimalkan dan diunggah." });
-    } catch (err) {
-      toast({ variant: "destructive", title: "Gagal", description: "Gagal memproses gambar." });
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Gagal Mengunggah", description: err.message || "Gagal memproses gambar." });
     } finally {
       setIsUploading(null);
     }
@@ -265,7 +272,13 @@ export default function AdminDashboard() {
 
   const handleServiceGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>, serviceId: string) => {
     const files = Array.from(e.target.files || []);
-    if (files.length === 0 || !user || !firestore || !storage) return;
+    if (files.length === 0 || !user || !firestore) return;
+
+    if (!storage) {
+      toast({ variant: "destructive", title: "Storage Tidak Aktif", description: "Firebase Storage belum dikonfigurasi." });
+      return;
+    }
+
     setIsUploading(`gallery-${serviceId}`);
     try {
       for (const file of files) {
@@ -277,8 +290,8 @@ export default function AdminDashboard() {
         await updateDoc(docRef, { galleryUrls: arrayUnion(url) });
       }
       toast({ title: "Berhasil", description: "Foto galeri telah ditambahkan." });
-    } catch (err) {
-      toast({ variant: "destructive", title: "Gagal", description: "Gagal mengunggah foto galeri." });
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Gagal", description: err.message || "Gagal mengunggah foto galeri." });
     } finally {
       setIsUploading(null);
       e.target.value = '';
@@ -298,7 +311,13 @@ export default function AdminDashboard() {
 
   const handleMultiplePortfolioUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    if (files.length === 0 || !user || !firestore || !storage) return;
+    if (files.length === 0 || !user || !firestore) return;
+
+    if (!storage) {
+      toast({ variant: "destructive", title: "Storage Tidak Aktif", description: "Firebase Storage belum dikonfigurasi." });
+      return;
+    }
+
     setIsUploading('portfolio');
     let count = 0;
     try {
@@ -316,8 +335,8 @@ export default function AdminDashboard() {
         count++;
       }
       toast({ title: "Berhasil", description: `${count} foto portofolio telah diunggah.` });
-    } catch (err) {
-      toast({ variant: "destructive", title: "Gagal", description: "Gagal mengunggah foto." });
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Gagal", description: err.message || "Gagal mengunggah foto." });
     } finally {
       setIsUploading(null);
       e.target.value = '';
