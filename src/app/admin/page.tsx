@@ -113,6 +113,8 @@ export default function AdminDashboard() {
     aboutContent: 'Go Etnik Nusantara adalah mitra strategis Anda dalam menghadapi era transformasi digital. Kami percaya bahwa setiap bisnis memiliki cerita unik yang layak dipresentasikan dengan cara yang istimewa.',
     servicesSectionTitle: 'Layanan Kami',
     servicesSectionSubtitle: 'Pilih paket layanan yang paling sesuai dengan kebutuhan bisnis atau kendala teknis Anda.',
+    portfolioSectionTitle: 'Portofolio Kami',
+    portfolioSectionSubtitle: 'Beberapa contoh hasil kerja nyata yang telah kami selesaikan dengan sepenuh hati.',
     portfolioExternalUrl: '',
     showPortfolioExternalUrl: false,
     privacyPolicy: PRIVACY_POLICY_DEFAULT,
@@ -548,7 +550,23 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent className="p-8 space-y-8">
                 <div className="p-6 bg-primary/5 rounded-none border border-primary/10 space-y-4">
-                  <div className="flex items-center justify-between">
+                  <div className="space-y-2">
+                    <Label className="text-xs font-bold uppercase">Judul Seksi Portofolio</Label>
+                    <Input 
+                      value={businessInfo.portfolioSectionTitle} 
+                      onChange={(e) => setBusinessInfo({...businessInfo, portfolioSectionTitle: e.target.value})} 
+                      className="rounded-none h-12 font-bold"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-bold uppercase">Deskripsi Seksi Portofolio</Label>
+                    <Textarea 
+                      value={businessInfo.portfolioSectionSubtitle} 
+                      onChange={(e) => setBusinessInfo({...businessInfo, portfolioSectionSubtitle: e.target.value})} 
+                      className="rounded-none h-24"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between pt-4 border-t border-primary/10">
                     <Label className="text-xs font-bold uppercase">Tombol Tautan Portofolio Luar</Label>
                     <Switch checked={businessInfo.showPortfolioExternalUrl} onCheckedChange={(val) => setBusinessInfo({...businessInfo, showPortfolioExternalUrl: val})} />
                   </div>
