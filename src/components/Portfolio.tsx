@@ -70,6 +70,7 @@ export function Portfolio({ businessId }: PortfolioProps) {
                       alt="Hasil Karya" 
                       width={0}
                       height={0}
+                      unoptimized={item.imageUrl.startsWith('data:')}
                       sizes="(max-width: 768px) 50vw, 33vw"
                       style={{ width: '100%', height: 'auto' }}
                       className="object-contain transition-transform duration-700 group-hover:scale-105" 
@@ -96,6 +97,7 @@ export function Portfolio({ businessId }: PortfolioProps) {
                       src={item.imageUrl} 
                       alt="Full View" 
                       fill
+                      unoptimized={item.imageUrl.startsWith('data:')}
                       sizes="95vw"
                       className="object-contain"
                       priority
@@ -115,7 +117,6 @@ export function Portfolio({ businessId }: PortfolioProps) {
           ))}
         </div>
 
-        {/* Portfolio External Link Button */}
         {showGlobalLink && globalUrl && (
           <div className="mt-12 flex justify-center animate-fade-in">
             <Button 
@@ -133,4 +134,3 @@ export function Portfolio({ businessId }: PortfolioProps) {
     </section>
   );
 }
-

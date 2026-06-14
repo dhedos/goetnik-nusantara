@@ -17,7 +17,7 @@ import { useFirestore, useCollection, useDoc, useMemoFirebase } from '@/firebase
 import { collection, doc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2, ImageIcon } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ICON_MAP, MAIN_BUSINESS_ID } from '@/lib/constants';
 
@@ -97,6 +97,7 @@ function HomeContent() {
                   src={heroDisplayImage} 
                   alt="Banner Utama" 
                   fill 
+                  unoptimized={heroDisplayImage.startsWith('data:')}
                   sizes="100vw"
                   className="object-cover opacity-25" 
                   style={{ objectPosition: `center ${heroImagePos}` }}
