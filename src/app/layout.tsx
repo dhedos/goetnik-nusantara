@@ -47,9 +47,7 @@ export default function RootLayout({
                       const updateIcon = (url) => {
                         const links = document.querySelectorAll("link[rel*='icon']");
                         if (links.length > 0) {
-                          for (var i = 0; i < links.length; i++) {
-                            links[i].href = url;
-                          }
+                          links.forEach(link => link.setAttribute('href', url));
                         } else {
                           const icon = document.createElement('link');
                           icon.rel = 'icon';

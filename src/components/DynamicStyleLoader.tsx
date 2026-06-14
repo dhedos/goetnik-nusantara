@@ -54,9 +54,7 @@ export function DynamicStyleLoader({ businessId }: { businessId: string }) {
         const existingIcons = document.querySelectorAll("link[rel*='icon']");
         if (existingIcons.length > 0) {
           existingIcons.forEach(el => {
-            if (el instanceof HTMLLinkElement) {
-              el.href = url;
-            }
+            el.setAttribute('href', url);
           });
         } else {
           ['icon', 'apple-touch-icon'].forEach(rel => {

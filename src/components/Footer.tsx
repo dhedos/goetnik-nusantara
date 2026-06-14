@@ -222,11 +222,10 @@ export function Footer({ businessId }: FooterProps) {
           <div className="flex items-center gap-4">
              <span className="h-1 w-1 rounded-full bg-white/10 hidden md:block" />
              <Link href="/login" className="opacity-30 hover:opacity-100 hover:text-primary transition-all p-2 flex items-center gap-2" title="Admin Login">
-                <Fingerprint size={14} /> <span>Admin</span>
+                <Fingerprint size={14} />
              </Link>
           </div>
         </div>
-        <p className="opacity-30">Handcrafted with Pride by {businessName}</p>
       </div>
     </footer>
   );
