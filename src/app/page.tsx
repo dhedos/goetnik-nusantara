@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from 'next/image';
@@ -48,6 +49,7 @@ function HomeContent() {
   const businessId = MAIN_BUSINESS_ID;
   const firestore = useFirestore();
   const [isReady, setIsReady] = useState(false);
+  const [cachedLogo, setCachedLogo] = useState<string | undefined>(undefined);
 
   const servicesQuery = useMemoFirebase(() => 
     firestore ? collection(firestore, 'businesses', businessId, 'services') : null, 
@@ -62,6 +64,20 @@ function HomeContent() {
   const { data: settings, loading: settingsLoading } = useDoc(settingsRef);
 
   useEffect(() => {
+    // Ambil logo dari cache localStorage setelah komponen terpasang di browser
+    // untuk menghindari kesalahan hidrasi.
+    try {
+      const cache = localStorage.getItem('goetnik-theme-cache');
+      if (cache) {
+        const theme = JSON.parse(cache);
+        if (theme.logoUrl) {
+          setCachedLogo(theme.logoUrl);
+        }
+      }
+    } catch (e) {}
+  }, []);
+
+  useEffect(() => {
     // Pastikan kita sudah memiliki data settings sebelum menampilkan konten
     if (settings !== undefined && !settingsLoading) {
       // Memberikan sedikit waktu buffer untuk kelancaran visual
@@ -71,15 +87,9 @@ function HomeContent() {
   }, [settings, settingsLoading]);
 
   if (!isReady) {
-    // Mencoba mengambil logo dari localStorage untuk layar pemuatan yang lebih cepat
-    let cachedLogo = settings?.logoUrl;
-    if (typeof window !== 'undefined' && !cachedLogo) {
-      try {
-        const cache = localStorage.getItem('goetnik-theme-cache');
-        if (cache) cachedLogo = JSON.parse(cache).logoUrl;
-      } catch (e) {}
-    }
-    return <LoadingScreen logoUrl={cachedLogo} />;
+    // Prioritaskan logo dari Firestore, jika belum ada gunakan dari cache
+    const logoToDisplay = settings?.logoUrl || cachedLogo;
+    return <LoadingScreen logoUrl={logoToDisplay} />;
   }
 
   const heroPlaceholder = PlaceHolderImages.find(img => img.id === 'hero-tech');
