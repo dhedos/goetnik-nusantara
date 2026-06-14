@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
@@ -17,16 +18,15 @@ import { signOut } from 'firebase/auth';
 import { 
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
-  Settings, ShoppingBag, ExternalLink as ExternalLinkIcon, MapPin, CheckCircle2, Type, Grid3X3, UploadCloud, ImageIcon, X,
+  Settings, ShoppingBag, ExternalLink as ExternalLinkIcon, MapPin, CheckCircle2, Grid3X3, UploadCloud, ImageIcon, X,
   Menu, Palette, Link as LinkSimpleIcon
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { MAIN_BUSINESS_ID, THEMES, ICON_OPTIONS, BUSINESS_NAME_DEFAULT, OWNER_WHATSAPP_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, PRIVACY_POLICY_DEFAULT } from '@/lib/constants';
 import Image from 'next/image';
-import { PRIVACY_POLICY_DEFAULT, BUSINESS_NAME_DEFAULT, BUSINESS_ADDRESS_DEFAULT, BUSINESS_EMAIL_DEFAULT, OWNER_WHATSAPP_DEFAULT, MAIN_BUSINESS_ID, THEMES, ICON_OPTIONS } from '@/lib/constants';
 
 type AdminSection = 'bookings' | 'services' | 'portfolio' | 'links' | 'branding' | 'hero' | 'about' | 'contact' | 'privacy';
 
@@ -42,8 +42,7 @@ const ETHNIC_FONTS = [
 const PLATFORM_OPTIONS = [
   "Shopee", "Tokopedia", "Lazada", "TikTok Shop", 
   "Pinterest", "Behance", "Dribbble", 
-  "GitHub", "Vercel", "Netlify", "CodePen", 
-  "LinkedIn", "Website", "Lainnya"
+  "GitHub", "LinkedIn", "Website", "Lainnya"
 ];
 
 export default function AdminDashboard() {
@@ -51,7 +50,6 @@ export default function AdminDashboard() {
   const auth = useAuth();
   const firestore = useFirestore();
   const router = useRouter();
-  const isMobile = useIsMobile();
   const [activeSection, setActiveSection] = useState<AdminSection>('bookings');
   const [isUploading, setIsUploading] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -101,24 +99,21 @@ export default function AdminDashboard() {
     showPhoneNumber: false,
     address: BUSINESS_ADDRESS_DEFAULT,
     email: BUSINESS_EMAIL_DEFAULT,
-    mapEmbedUrl: '',
-    mapDirectUrl: '',
-    logoText: '',
-    logoAccentText: '',
+    logoText: 'GOETNIK',
+    logoAccentText: 'NUSANTARA',
     logoUrl: '',
     logoHeight: '36',
-    fontFamily: 'Inter',
+    fontFamily: 'Cinzel',
     themeId: 'heritage-red',
-    heroBadge: '',
-    heroTitle: '',
-    heroSubtitle: '',
+    heroBadge: 'Layanan Profesional',
+    heroTitle: 'Solusi Digital Nusantara Terbaik',
+    heroSubtitle: 'Kami menghadirkan layanan teknologi dan desain kreatif dengan sentuhan kearifan lokal untuk bisnis Anda.',
     heroImageUrl: '',
     heroImagePosition: '50%',
-    aboutTitle: 'Tentang Bisnis Kami',
-    aboutContent: '',
-    servicesSectionBadge: '',
-    servicesSectionTitle: 'Layanan Unggulan',
-    servicesSectionSubtitle: '',
+    aboutTitle: 'Membangun Masa Depan Digital',
+    aboutContent: 'Go Etnik Nusantara adalah mitra strategis Anda dalam menghadapi era transformasi digital. Kami percaya bahwa setiap bisnis memiliki cerita unik yang layak dipresentasikan dengan cara yang istimewa.',
+    servicesSectionTitle: 'Layanan Kami',
+    servicesSectionSubtitle: 'Pilih paket layanan yang paling sesuai dengan kebutuhan bisnis atau kendala teknis Anda.',
     portfolioExternalUrl: '',
     showPortfolioExternalUrl: false,
     privacyPolicy: PRIVACY_POLICY_DEFAULT,
@@ -146,11 +141,10 @@ export default function AdminDashboard() {
         ...settings,
         heroImagePosition: settings.heroImagePosition || '50%',
         logoHeight: settings.logoHeight || '36',
-        fontFamily: settings.fontFamily || 'Inter',
+        fontFamily: settings.fontFamily || 'Cinzel',
         themeId: settings.themeId || 'heritage-red',
         showPhoneNumber: settings.showPhoneNumber ?? false,
-        showPortfolioExternalUrl: settings.showPortfolioExternalUrl ?? false,
-        footerCopyright: settings.footerCopyright || ''
+        showPortfolioExternalUrl: settings.showPortfolioExternalUrl ?? false
       }));
       hasLoadedSettings.current = true;
     }
@@ -231,20 +225,16 @@ export default function AdminDashboard() {
     try {
       const isLogo = target === 'logo';
       const isHero = target === 'hero';
-      // Logo & Favicon membutuhkan resolusi lebih rendah namun kualitas tinggi
       const dataUrl = await resizeAndCompressImage(file, isLogo ? 0.9 : 0.7, isLogo ? 256 : 1200);
       
       if (isLogo) {
         setBusinessInfo(prev => ({ ...prev, logoUrl: dataUrl }));
-        const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'settings', 'profile');
-        await setDoc(docRef, { logoUrl: dataUrl }, { merge: true });
+        await setDoc(doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'settings', 'profile'), { logoUrl: dataUrl }, { merge: true });
       } else if (isHero) {
         setBusinessInfo(prev => ({ ...prev, heroImageUrl: dataUrl }));
-        const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'settings', 'profile');
-        await setDoc(docRef, { heroImageUrl: dataUrl }, { merge: true });
+        await setDoc(doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'settings', 'profile'), { heroImageUrl: dataUrl }, { merge: true });
       } else {
-        const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'services', target);
-        await updateDoc(docRef, { imageUrl: dataUrl });
+        await updateDoc(doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'services', target), { imageUrl: dataUrl });
       }
       toast({ title: "Berhasil", description: "Gambar telah diperbarui." });
     } catch (err: any) {
@@ -252,41 +242,6 @@ export default function AdminDashboard() {
     } finally {
       setIsUploading(null);
     }
-  };
-
-  const handleServiceGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>, serviceId: string) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0 || !user || !firestore) return;
-
-    setIsUploading(`gallery-${serviceId}`);
-    try {
-      for (const file of files) {
-        const dataUrl = await resizeAndCompressImage(file);
-        const docRef = doc(firestore, 'businesses', MAIN_BUSINESS_ID, 'services', serviceId);
-        await updateDoc(docRef, { galleryUrls: arrayUnion(dataUrl) });
-      }
-      toast({ title: "Berhasil", description: "Foto galeri ditambahkan." });
-    } catch (err: any) {
-      toast({ variant: "destructive", title: "Gagal", description: "Gagal mengunggah foto." });
-    } finally {
-      setIsUploading(null);
-    }
-  };
-
-  const handleAddService = () => {
-    if (!firestore || !user) return;
-    const colRef = collection(firestore, 'businesses', MAIN_BUSINESS_ID, 'services');
-    addDoc(colRef, {
-      name: 'Layanan Baru',
-      price: 'Rp 0',
-      description: 'Deskripsi layanan...',
-      iconName: 'Laptop',
-      imageUrl: '',
-      galleryUrls: [],
-      features: ['Fitur Layanan'],
-      ownerId: user.uid,
-      createdAt: serverTimestamp()
-    });
   };
 
   if (authLoading || !isMounted) return <div className="flex h-screen items-center justify-center bg-background"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -331,7 +286,7 @@ export default function AdminDashboard() {
   );
 
   return (
-    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-background text-foreground" style={{ fontFamily: 'var(--selected-font)' }}>
+    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-background text-foreground">
       <div className="md:hidden flex items-center justify-between p-4 border-b border-border bg-card">
         <h2 className="text-lg font-black text-primary tracking-tighter uppercase">ADMIN</h2>
         <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
@@ -400,7 +355,7 @@ export default function AdminDashboard() {
                       value={businessInfo.heroTitle} 
                       onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})} 
                       className="rounded-xl h-24 text-lg font-bold"
-                      placeholder="Contoh: Solusi Digital Nusantara"
+                      placeholder="Judul banner anda..."
                     />
                   </div>
                   <div className="space-y-2">
@@ -409,19 +364,19 @@ export default function AdminDashboard() {
                       value={businessInfo.heroSubtitle} 
                       onChange={(e) => setBusinessInfo({...businessInfo, heroSubtitle: e.target.value})} 
                       className="rounded-xl h-24"
-                      placeholder="Deskripsi singkat layanan Anda..."
+                      placeholder="Deskripsi singkat dibawah judul..."
                     />
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <Label className="text-xs font-bold uppercase">Gambar Latar Belakang Banner</Label>
+                  <Label className="text-xs font-bold uppercase">Gambar Latar Banner</Label>
                   <div className="flex flex-col items-center gap-6 p-8 border-2 border-dashed border-border rounded-3xl bg-background/20">
                     <div className="relative h-48 w-full rounded-2xl overflow-hidden border border-border bg-muted flex items-center justify-center">
                       {businessInfo.heroImageUrl ? (
                         <Image src={businessInfo.heroImageUrl} alt="Hero Preview" fill className="object-cover" />
                       ) : (
-                        <div className="text-[10px] opacity-20 uppercase font-bold text-center p-4">Belum Ada Gambar Latar</div>
+                        <div className="text-[10px] opacity-20 uppercase font-bold text-center p-4">Klik Unggah untuk Gambar Banner</div>
                       )}
                     </div>
                     <div className="w-full space-y-4">
@@ -433,7 +388,7 @@ export default function AdminDashboard() {
                       </Button>
                       <div className="space-y-3">
                         <div className="flex justify-between text-[10px] font-bold uppercase">
-                          <span>Posisi Gambar (Vertikal)</span>
+                          <span>Posisi Gambar Vertikal</span>
                           <span>{businessInfo.heroImagePosition}</span>
                         </div>
                         <Slider 
@@ -457,7 +412,7 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent className="p-8 space-y-6">
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold uppercase">Judul Seksi</Label>
+                  <Label className="text-xs font-bold uppercase">Judul Tentang Kami</Label>
                   <Input 
                     value={businessInfo.aboutTitle} 
                     onChange={(e) => setBusinessInfo({...businessInfo, aboutTitle: e.target.value})} 
@@ -465,72 +420,82 @@ export default function AdminDashboard() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold uppercase">Konten Tentang Kami</Label>
+                  <Label className="text-xs font-bold uppercase">Deskripsi / Konten</Label>
                   <Textarea 
                     value={businessInfo.aboutContent} 
                     onChange={(e) => setBusinessInfo({...businessInfo, aboutContent: e.target.value})} 
-                    className="rounded-xl min-h-[300px]"
-                    placeholder="Ceritakan sejarah atau visi misi bisnis Anda..."
+                    className="rounded-xl min-h-[250px]"
+                    placeholder="Ceritakan sejarah atau visi misi anda..."
                   />
                 </div>
               </CardContent>
             </Card>
           )}
 
-          {activeSection === 'links' && (
-            <div className="space-y-6">
-              <Card className="rounded-3xl border-border bg-card shadow-xl overflow-hidden">
-                <CardHeader className="p-6 border-b border-border"><CardTitle>Tambah Tautan Baru</CardTitle></CardHeader>
-                <CardContent className="p-6 space-y-4">
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <div className="space-y-1">
-                      <Label className="text-[10px] font-black uppercase">Judul Tautan</Label>
-                      <Input placeholder="Contoh: Toko Shopee" value={newLink.title} onChange={(e) => setNewLink({...newLink, title: e.target.value})} className="rounded-xl" />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-[10px] font-black uppercase">URL Lengkap</Label>
-                      <Input placeholder="https://..." value={newLink.url} onChange={(e) => setNewLink({...newLink, url: e.target.value})} className="rounded-xl" />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-[10px] font-black uppercase">Platform</Label>
-                      <Select value={newLink.platform} onValueChange={(val) => setNewLink({...newLink, platform: val})}>
-                        <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          {PLATFORM_OPTIONS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-                    </div>
+          {activeSection === 'branding' && (
+            <div className="space-y-8">
+              <Card className="rounded-3xl border-border bg-card shadow-xl">
+                <CardHeader><CardTitle className="flex items-center gap-2"><Palette size={20} className="text-primary" /> Pilih Tema Website</CardTitle></CardHeader>
+                <CardContent className="p-8">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {THEMES.map((theme) => (
+                      <button key={theme.id} onClick={() => setBusinessInfo({...businessInfo, themeId: theme.id})} className={cn("relative flex flex-col gap-3 p-4 rounded-2xl border transition-all", businessInfo.themeId === theme.id ? "border-primary bg-primary/10 ring-2 ring-primary/20" : "border-border bg-background/40")}>
+                        <div className="flex gap-1 h-14 w-full rounded-lg overflow-hidden border border-border">
+                          <div className="flex-1" style={{ backgroundColor: `hsl(${theme.background})` }} /><div className="w-1/3" style={{ backgroundColor: `hsl(${theme.primary})` }} /><div className="w-1/3" style={{ backgroundColor: `hsl(${theme.accent})` }} />
+                        </div>
+                        <span className="text-[10px] font-bold uppercase text-center">{theme.label}</span>
+                      </button>
+                    ))}
                   </div>
-                  <Button onClick={async () => {
-                    if (!firestore || !user || !newLink.title || !newLink.url) return;
-                    await addDoc(collection(firestore, 'businesses', MAIN_BUSINESS_ID, 'external-links'), {
-                      ...newLink,
-                      ownerId: user.uid,
-                      createdAt: serverTimestamp()
-                    });
-                    setNewLink({ title: '', url: '', platform: 'Website' });
-                    toast({ title: "Berhasil", description: "Tautan ditambahkan." });
-                  }} className="w-full rounded-xl font-bold"><Plus className="mr-2" size={16} /> Tambahkan Tautan</Button>
                 </CardContent>
               </Card>
 
-              <div className="grid gap-4">
-                {externalLinks?.map((link: any) => (
-                  <div key={link.id} className="flex justify-between items-center p-4 bg-card border border-border rounded-2xl shadow-sm">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary"><LinkSimpleIcon size={18} /></div>
-                      <div>
-                        <p className="font-bold text-sm">{link.title}</p>
-                        <p className="text-[10px] text-muted-foreground truncate max-w-[200px]">{link.url}</p>
-                      </div>
+              <Card className="rounded-3xl border-border bg-card shadow-xl">
+                <CardContent className="p-8 space-y-8">
+                  <div className="grid md:grid-cols-2 gap-6 p-6 bg-primary/5 rounded-2xl border border-primary/10">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase">Teks Logo Header (Kiri)</Label>
+                      <Input 
+                        value={businessInfo.logoText} 
+                        onChange={(e) => setBusinessInfo({...businessInfo, logoText: e.target.value})} 
+                        className="rounded-xl h-12 font-bold"
+                      />
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-black uppercase px-3 py-1 bg-secondary rounded-full opacity-60">{link.platform}</span>
-                      <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'external-links', link.id))}><Trash2 size={16} /></Button>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase">Teks Logo Header (Aksen)</Label>
+                      <Input 
+                        value={businessInfo.logoAccentText} 
+                        onChange={(e) => setBusinessInfo({...businessInfo, logoAccentText: e.target.value})} 
+                        className="rounded-xl h-12 font-bold text-primary"
+                      />
                     </div>
                   </div>
-                ))}
-              </div>
+
+                  <div className="space-y-4 p-6 bg-primary/5 rounded-2xl border border-primary/10">
+                    <Label className="text-foreground uppercase font-black text-xs">Pilih Gaya Huruf (Font)</Label>
+                    <select value={businessInfo.fontFamily} onChange={(e) => setBusinessInfo({...businessInfo, fontFamily: e.target.value})} className="w-full rounded-xl h-12 bg-background/50 border-border font-bold px-3">
+                      {ETHNIC_FONTS.map((font) => (<option key={font.name} value={font.name}>{font.label}</option>))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-4">
+                    <Label className="text-foreground uppercase font-black text-xs">Logo Bisnis & Ikon Tab Browser</Label>
+                    <div className="flex flex-col items-center gap-8 p-8 border-2 border-dashed border-border rounded-3xl bg-background/20">
+                      <div className="relative h-32 w-32 rounded-2xl overflow-hidden border border-border flex items-center justify-center bg-transparent">
+                        {businessInfo.logoUrl ? <img src={businessInfo.logoUrl} alt="Logo" className="object-contain max-h-full max-w-full" /> : <div className="text-[10px] opacity-20 uppercase font-bold text-center">Logo Belum Diunggah</div>}
+                      </div>
+                      <div className="w-full space-y-4">
+                        <input type="file" className="hidden" id="logo-up" accept="image/*" onChange={(e) => handleImageUpload(e, 'logo')} />
+                        <Button asChild variant="secondary" className="w-full h-12 rounded-xl font-bold"><label htmlFor="logo-up">{isUploading === 'logo' ? <Loader2 className="animate-spin" /> : 'Unggah Logo Baru'}</label></Button>
+                        <div className="space-y-3">
+                          <div className="flex justify-between text-[10px] font-bold uppercase"><span>Ukuran Logo Header</span><span>{businessInfo.logoHeight}px</span></div>
+                          <Slider value={[parseInt(businessInfo.logoHeight) || 36]} min={20} max={100} onValueChange={(v) => setBusinessInfo({...businessInfo, logoHeight: v[0].toString()})} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           )}
 
@@ -542,16 +507,16 @@ export default function AdminDashboard() {
               <CardContent className="p-8 space-y-8">
                 <div className="p-6 bg-primary/5 rounded-2xl border border-primary/10 space-y-4">
                   <div className="flex items-center justify-between">
-                    <Label className="text-xs font-bold uppercase">Tautan Portofolio Global</Label>
+                    <Label className="text-xs font-bold uppercase">Tombol Tautan Portofolio Luar</Label>
                     <Switch checked={businessInfo.showPortfolioExternalUrl} onCheckedChange={(val) => setBusinessInfo({...businessInfo, showPortfolioExternalUrl: val})} />
                   </div>
                   <Input 
-                    placeholder="Contoh: pinterest.com/profilanda" 
+                    placeholder="Contoh: pinterest.com/anda" 
                     value={businessInfo.portfolioExternalUrl} 
                     onChange={(e) => setBusinessInfo({...businessInfo, portfolioExternalUrl: e.target.value})}
                     className="rounded-xl h-12 bg-background border-border"
                   />
-                  <p className="text-[10px] text-muted-foreground italic uppercase">Link ini akan muncul sebagai tombol di bawah daftar foto.</p>
+                  <p className="text-[10px] text-muted-foreground italic uppercase">Link ini akan tampil di tombol "Selengkapnya" di bawah daftar foto.</p>
                 </div>
 
                 <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-border rounded-3xl bg-primary/5 hover:bg-primary/10 transition-all cursor-pointer">
@@ -592,73 +557,22 @@ export default function AdminDashboard() {
             </Card>
           )}
 
-          {activeSection === 'branding' && (
-            <div className="space-y-8">
-              <Card className="rounded-3xl border-border bg-card shadow-xl">
-                <CardHeader><CardTitle className="flex items-center gap-2"><Palette size={20} className="text-primary" /> Pilih Tema Website</CardTitle></CardHeader>
-                <CardContent className="p-8">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {THEMES.map((theme) => (
-                      <button key={theme.id} onClick={() => setBusinessInfo({...businessInfo, themeId: theme.id})} className={cn("relative flex flex-col gap-3 p-4 rounded-2xl border transition-all", businessInfo.themeId === theme.id ? "border-primary bg-primary/10 ring-2 ring-primary/20" : "border-border bg-background/40")}>
-                        <div className="flex gap-1 h-14 w-full rounded-lg overflow-hidden border border-border">
-                          <div className="flex-1" style={{ backgroundColor: `hsl(${theme.background})` }} /><div className="w-1/3" style={{ backgroundColor: `hsl(${theme.primary})` }} /><div className="w-1/3" style={{ backgroundColor: `hsl(${theme.accent})` }} />
-                        </div>
-                        <span className="text-[10px] font-bold uppercase text-center">{theme.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="rounded-3xl border-border bg-card shadow-xl">
-                <CardContent className="p-8 space-y-8">
-                  <div className="grid md:grid-cols-2 gap-6 p-6 bg-primary/5 rounded-2xl border border-primary/10">
-                    <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase">Teks Logo (Kiri)</Label>
-                      <Input 
-                        value={businessInfo.logoText} 
-                        onChange={(e) => setBusinessInfo({...businessInfo, logoText: e.target.value})} 
-                        placeholder="Contoh: GOETNIK" 
-                        className="rounded-xl h-12 font-bold"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-[10px] font-black uppercase">Teks Logo (Aksen)</Label>
-                      <Input 
-                        value={businessInfo.logoAccentText} 
-                        onChange={(e) => setBusinessInfo({...businessInfo, logoAccentText: e.target.value})} 
-                        placeholder="Contoh: NUSANTARA" 
-                        className="rounded-xl h-12 font-bold text-primary"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 p-6 bg-primary/5 rounded-2xl border border-primary/10">
-                    <Label className="text-foreground uppercase font-black text-xs">Gaya Huruf (Font)</Label>
-                    <select value={businessInfo.fontFamily} onChange={(e) => setBusinessInfo({...businessInfo, fontFamily: e.target.value})} className="w-full rounded-xl h-12 bg-background/50 border-border font-bold px-3">
-                      {ETHNIC_FONTS.map((font) => (<option key={font.name} value={font.name}>{font.label}</option>))}
-                    </select>
-                  </div>
-
-                  <div className="space-y-4">
-                    <Label className="text-foreground uppercase font-black text-xs">Logo & Favicon Tab</Label>
-                    <div className="flex flex-col items-center gap-8 p-8 border-2 border-dashed border-border rounded-3xl bg-background/20">
-                      <div className="relative h-32 w-32 rounded-2xl overflow-hidden border border-border flex items-center justify-center bg-transparent">
-                        {businessInfo.logoUrl ? <img src={businessInfo.logoUrl} alt="Logo" className="object-contain max-h-full max-w-full" /> : <div className="text-[10px] opacity-20 uppercase font-bold">Belum Ada Logo</div>}
-                      </div>
-                      <div className="w-full space-y-4">
-                        <input type="file" className="hidden" id="logo-up" accept="image/*" onChange={(e) => handleImageUpload(e, 'logo')} />
-                        <Button asChild variant="secondary" className="w-full h-12 rounded-xl font-bold"><label htmlFor="logo-up">{isUploading === 'logo' ? <Loader2 className="animate-spin" /> : 'Unggah Logo Baru'}</label></Button>
-                        <div className="space-y-3">
-                          <div className="flex justify-between text-[10px] font-bold uppercase"><span>Tinggi Logo Header</span><span>{businessInfo.logoHeight}px</span></div>
-                          <Slider value={[parseInt(businessInfo.logoHeight) || 36]} min={20} max={100} onValueChange={(v) => setBusinessInfo({...businessInfo, logoHeight: v[0].toString()})} />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+          {activeSection === 'contact' && (
+            <Card className="rounded-3xl border-border bg-card shadow-xl">
+              <CardContent className="p-8 space-y-8">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Nama Bisnis</Label><Input value={businessInfo.name} onChange={(e) => setBusinessInfo({...businessInfo, name: e.target.value})} className="rounded-xl h-12 font-bold" /></div>
+                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">WhatsApp Admin</Label><Input value={businessInfo.whatsapp} onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})} className="rounded-xl h-12 font-bold" /></div>
+                </div>
+                <div className="space-y-2 pt-4 border-t border-border">
+                  <Label className="text-xs font-bold uppercase">Teks Hak Cipta (Footer Copyright)</Label>
+                  <Input value={businessInfo.footerCopyright} onChange={(e) => setBusinessInfo({...businessInfo, footerCopyright: e.target.value})} placeholder="Contoh: © 2024 Goetnik Nusantara. Seluruh Hak Cipta Dilindungi." className="rounded-xl h-12" />
+                  <p className="text-[10px] text-muted-foreground italic">Kosongkan untuk menggunakan format otomatis berdasarkan nama bisnis.</p>
+                </div>
+                <div className="space-y-2"><Label className="text-xs font-bold uppercase">Email Bisnis</Label><Input value={businessInfo.email} onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})} className="rounded-xl h-12" /></div>
+                <div className="space-y-2"><Label className="text-xs font-bold uppercase">Alamat Kantor / Bisnis</Label><Textarea value={businessInfo.address} onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})} className="rounded-xl min-h-[100px]" /></div>
+              </CardContent>
+            </Card>
           )}
 
           {activeSection === 'services' && (
@@ -666,14 +580,27 @@ export default function AdminDashboard() {
                 <Card className="rounded-3xl border-border bg-card shadow-xl">
                   <CardHeader><CardTitle className="text-lg">Pengaturan Seksi Layanan</CardTitle></CardHeader>
                   <CardContent className="p-6 space-y-4">
-                    <div className="space-y-2"><Label className="text-xs font-bold uppercase">Judul Seksi</Label><Input value={businessInfo.servicesSectionTitle} onChange={(e) => setBusinessInfo({...businessInfo, servicesSectionTitle: e.target.value})} className="rounded-xl h-12 font-bold" /></div>
+                    <div className="space-y-2"><Label className="text-xs font-bold uppercase">Judul Seksi Layanan</Label><Input value={businessInfo.servicesSectionTitle} onChange={(e) => setBusinessInfo({...businessInfo, servicesSectionTitle: e.target.value})} className="rounded-xl h-12 font-bold" /></div>
                     <div className="space-y-2"><Label className="text-xs font-bold uppercase">Deskripsi Seksi</Label><Textarea value={businessInfo.servicesSectionSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, servicesSectionSubtitle: e.target.value})} className="rounded-xl h-24" /></div>
                   </CardContent>
                 </Card>
 
                 <div className="flex justify-between items-center">
                   <h3 className="text-xl font-bold uppercase">Daftar Layanan</h3>
-                  <Button onClick={handleAddService} className="rounded-2xl px-6 h-12 font-black uppercase"><Plus className="mr-2" size={18} /> Tambah Layanan</Button>
+                  <Button onClick={() => {
+                    if (!firestore || !user) return;
+                    addDoc(collection(firestore, 'businesses', MAIN_BUSINESS_ID, 'services'), {
+                      name: 'Layanan Baru',
+                      price: 'Rp 0',
+                      description: 'Rincian layanan anda...',
+                      iconName: 'Laptop',
+                      imageUrl: '',
+                      galleryUrls: [],
+                      features: ['Unggulan Layanan'],
+                      ownerId: user.uid,
+                      createdAt: serverTimestamp()
+                    });
+                  }} className="rounded-2xl px-6 h-12 font-black uppercase"><Plus className="mr-2" size={18} /> Tambah Layanan</Button>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
@@ -683,7 +610,7 @@ export default function AdminDashboard() {
                         {s.imageUrl ? <Image src={s.imageUrl} alt={s.name} fill className="object-contain" /> : <ImageIcon size={48} className="opacity-10" />}
                         <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <input type="file" className="hidden" id={`s-main-${s.id}`} accept="image/*" onChange={(e) => handleImageUpload(e, s.id)} />
-                          <Button variant="secondary" size="sm" asChild><label htmlFor={`s-main-${s.id}`}>Ganti Foto</label></Button>
+                          <Button variant="secondary" size="sm" asChild><label htmlFor={`s-main-${s.id}`}>Ubah Gambar</label></Button>
                           <Button variant="destructive" size="icon" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id))}><Trash2 size={16} /></Button>
                         </div>
                       </div>
@@ -691,24 +618,13 @@ export default function AdminDashboard() {
                       <CardContent className="p-6 space-y-6">
                         <div className="space-y-1"><Label className="text-[10px] font-black uppercase opacity-40">Nama Layanan</Label><Input defaultValue={s.name} className="rounded-xl h-12 font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { name: e.target.value })} /></div>
                         <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-1"><Label className="text-[10px] font-black uppercase opacity-40">Harga / Biaya</Label><Input defaultValue={s.price} className="rounded-xl h-12 font-bold text-primary" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { price: e.target.value })} /></div>
+                          <div className="space-y-1"><Label className="text-[10px] font-black uppercase opacity-40">Harga Layanan</Label><Input defaultValue={s.price} className="rounded-xl h-12 font-bold text-primary" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { price: e.target.value })} /></div>
                           <div className="space-y-1">
-                            <Label className="text-[10px] font-black uppercase opacity-40">Ikon Lucide</Label>
+                            <Label className="text-[10px] font-black uppercase opacity-40">Pilih Ikon</Label>
                             <Select defaultValue={s.iconName} onValueChange={(val) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { iconName: val })}>
                               <SelectTrigger className="rounded-xl h-12 font-bold"><SelectValue /></SelectTrigger>
                               <SelectContent>{ICON_OPTIONS.map((opt) => (<SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>))}</SelectContent>
                             </Select>
-                          </div>
-                        </div>
-                        <div className="space-y-4 pt-4 border-t border-border">
-                          <div className="flex justify-between items-center"><Label className="text-[10px] font-black uppercase opacity-40">Galeri Tambahan</Label><input type="file" className="hidden" id={`s-gal-${s.id}`} multiple accept="image/*" onChange={(e) => handleServiceGalleryUpload(e, s.id)} /><Button variant="outline" size="sm" asChild className="h-8"><label htmlFor={`s-gal-${s.id}`}>+ Tambah Foto</label></Button></div>
-                          <div className="grid grid-cols-4 gap-2">
-                             {s.galleryUrls?.map((img: string, i: number) => (
-                               <div key={i} className="relative aspect-square rounded-lg overflow-hidden border border-border group/gal">
-                                  <Image src={img} alt="Gallery" fill className="object-cover" />
-                                  <button onClick={() => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { galleryUrls: arrayRemove(img) })} className="absolute top-1 right-1 bg-destructive text-white rounded-full p-0.5 opacity-0 group-hover/gal:opacity-100"><X size={10} /></button>
-                               </div>
-                             ))}
                           </div>
                         </div>
                       </CardContent>
@@ -718,22 +634,47 @@ export default function AdminDashboard() {
              </div>
           )}
 
-          {activeSection === 'contact' && (
-            <Card className="rounded-3xl border-border bg-card shadow-xl">
-              <CardContent className="p-8 space-y-8">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Nama Bisnis Utama</Label><Input value={businessInfo.name} onChange={(e) => setBusinessInfo({...businessInfo, name: e.target.value})} className="rounded-xl h-12 font-bold" /></div>
-                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">WhatsApp Admin</Label><Input value={businessInfo.whatsapp} onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})} className="rounded-xl h-12 font-bold" /></div>
-                </div>
-                <div className="space-y-2 pt-4 border-t border-border">
-                  <Label className="text-xs font-bold uppercase">Teks Copyright (Footer)</Label>
-                  <Input value={businessInfo.footerCopyright} onChange={(e) => setBusinessInfo({...businessInfo, footerCopyright: e.target.value})} placeholder="Contoh: © 2024 Goetnik Nusantara. Seluruh Hak Cipta Dilindungi." className="rounded-xl h-12" />
-                  <p className="text-[10px] text-muted-foreground italic">Kosongkan untuk menggunakan format otomatis.</p>
-                </div>
-                <div className="space-y-2"><Label className="text-xs font-bold uppercase">Email Bisnis</Label><Input value={businessInfo.email} onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})} className="rounded-xl h-12" /></div>
-                <div className="space-y-2"><Label className="text-xs font-bold uppercase">Alamat Bisnis</Label><Textarea value={businessInfo.address} onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})} className="rounded-xl min-h-[100px]" /></div>
-              </CardContent>
-            </Card>
+          {activeSection === 'links' && (
+            <div className="space-y-6">
+              <Card className="rounded-3xl border-border bg-card shadow-xl overflow-hidden">
+                <CardHeader className="p-6 border-b border-border"><CardTitle>Kelola Tautan Partner</CardTitle></CardHeader>
+                <CardContent className="p-6 space-y-4">
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <Input placeholder="Nama Toko / Link" value={newLink.title} onChange={(e) => setNewLink({...newLink, title: e.target.value})} className="rounded-xl" />
+                    <Input placeholder="URL Lengkap (https://...)" value={newLink.url} onChange={(e) => setNewLink({...newLink, url: e.target.value})} className="rounded-xl" />
+                    <Select value={newLink.platform} onValueChange={(val) => setNewLink({...newLink, platform: val})}>
+                      <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
+                      <SelectContent>{PLATFORM_OPTIONS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  <Button onClick={async () => {
+                    if (!firestore || !user || !newLink.title || !newLink.url) return;
+                    await addDoc(collection(firestore, 'businesses', MAIN_BUSINESS_ID, 'external-links'), {
+                      ...newLink,
+                      ownerId: user.uid,
+                      createdAt: serverTimestamp()
+                    });
+                    setNewLink({ title: '', url: '', platform: 'Website' });
+                    toast({ title: "Berhasil", description: "Tautan ditambahkan." });
+                  }} className="w-full rounded-xl font-bold"><Plus className="mr-2" size={16} /> Tambahkan Tautan</Button>
+                </CardContent>
+              </Card>
+
+              <div className="grid gap-4">
+                {externalLinks?.map((link: any) => (
+                  <div key={link.id} className="flex justify-between items-center p-4 bg-card border border-border rounded-2xl">
+                    <div>
+                      <p className="font-bold text-sm">{link.title}</p>
+                      <p className="text-[10px] text-muted-foreground">{link.url}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-black uppercase px-3 py-1 bg-secondary rounded-full">{link.platform}</span>
+                      <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'external-links', link.id))}><Trash2 size={16} /></Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
 
           {activeSection === 'privacy' && (
