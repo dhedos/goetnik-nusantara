@@ -313,7 +313,7 @@ export default function AdminDashboard() {
             key={item.id} 
             onClick={() => { setActiveSection(item.id as AdminSection); setIsSidebarOpen(false); }} 
             className={cn(
-              "flex items-center w-full gap-3 px-4 py-3 rounded-none text-sm font-bold transition-all", 
+              "flex items-center w-full gap-3 px-4 py-3 rounded-lg text-sm font-bold transition-all", 
               activeSection === item.id ? "bg-primary text-primary-foreground shadow-lg" : "hover:bg-primary/10 text-foreground/70"
             )}
           >
@@ -322,8 +322,8 @@ export default function AdminDashboard() {
         ))}
       </nav>
       <div className="p-4 border-t border-border space-y-2">
-        <Button variant="outline" className="w-full gap-2 rounded-none text-xs font-bold border-border" onClick={() => window.open(window.location.origin, '_blank')}><ExternalLinkIcon size={14} /> Lihat Website</Button>
-        <Button variant="destructive" className="w-full gap-2 rounded-none text-xs font-bold" onClick={handleLogout}><LogOut size={14} /> Keluar</Button>
+        <Button variant="outline" className="w-full gap-2 rounded-md text-xs font-bold border-border" onClick={() => window.open(window.location.origin, '_blank')}><ExternalLinkIcon size={14} /> Lihat Website</Button>
+        <Button variant="destructive" className="w-full gap-2 rounded-md text-xs font-bold" onClick={handleLogout}><LogOut size={14} /> Keluar</Button>
       </div>
     </div>
   );
@@ -351,7 +351,7 @@ export default function AdminDashboard() {
           <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
             <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tighter text-foreground">{navItems.find(n => n.id === activeSection)?.label}</h1>
             <div className="flex flex-col items-end gap-2">
-              <Button onClick={handleSaveBusinessInfo} size="lg" className="w-full md:w-auto rounded-none px-10 h-14 font-bold shadow-2xl transition-all" disabled={isSaving}>
+              <Button onClick={handleSaveBusinessInfo} size="lg" className="w-full md:w-auto rounded-lg px-10 h-14 font-bold shadow-2xl transition-all" disabled={isSaving}>
                 {isSaving ? <Loader2 className="animate-spin mr-2" /> : <Save className="mr-2" size={20} />}
                 Simpan Perubahan
               </Button>
@@ -364,19 +364,19 @@ export default function AdminDashboard() {
           </div>
 
           {activeSection === 'bookings' && (
-            <Card className="rounded-none border-border bg-card shadow-xl overflow-hidden">
+            <Card className="rounded-lg border-border bg-card shadow-xl overflow-hidden">
               <CardHeader className="p-6 border-b border-border"><CardTitle>Pesanan Masuk</CardTitle></CardHeader>
               <CardContent className="p-6 space-y-4">
                 {bookings?.map((b: any) => (
-                  <div key={b.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 border border-border rounded-none bg-background/40 hover:bg-background/60 transition-colors gap-4">
+                  <div key={b.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 border border-border rounded-lg bg-background/40 hover:bg-background/60 transition-colors gap-4">
                     <div className="flex-1">
                       <p className="font-bold text-lg">{b.fullName}</p>
                       <p className="text-sm text-muted-foreground">{b.service} • {b.whatsapp}</p>
                       <p className="text-xs text-muted-foreground/60 mt-1 italic">{b.notes || 'Tanpa catatan'}</p>
                     </div>
                     <div className="flex gap-2 w-full sm:w-auto">
-                       <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none rounded-none h-10 px-4 font-bold"><a href={`https://wa.me/${b.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank">Chat WA</a></Button>
-                       <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 h-10 w-10 rounded-none" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'bookings', b.id))}><Trash2 size={18} /></Button>
+                       <Button variant="outline" size="sm" asChild className="flex-1 sm:flex-none rounded-md h-10 px-4 font-bold"><a href={`https://wa.me/${b.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank">Chat WA</a></Button>
+                       <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 h-10 w-10 rounded-md" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'bookings', b.id))}><Trash2 size={18} /></Button>
                     </div>
                   </div>
                 ))}
@@ -386,7 +386,7 @@ export default function AdminDashboard() {
           )}
 
           {activeSection === 'hero' && (
-            <Card className="rounded-none border-border bg-card shadow-xl overflow-hidden">
+            <Card className="rounded-lg border-border bg-card shadow-xl overflow-hidden">
               <CardHeader className="p-8 border-b border-border">
                 <CardTitle className="flex items-center gap-2"><Globe size={20} className="text-primary" /> Pengaturan Banner Utama</CardTitle>
               </CardHeader>
@@ -397,7 +397,7 @@ export default function AdminDashboard() {
                     <Textarea 
                       value={businessInfo.heroTitle} 
                       onChange={(e) => setBusinessInfo({...businessInfo, heroTitle: e.target.value})} 
-                      className="rounded-none h-24 text-lg font-bold"
+                      className="rounded-md h-24 text-lg font-bold"
                       placeholder="Judul banner anda..."
                     />
                   </div>
@@ -406,7 +406,7 @@ export default function AdminDashboard() {
                     <Textarea 
                       value={businessInfo.heroSubtitle} 
                       onChange={(e) => setBusinessInfo({...businessInfo, heroSubtitle: e.target.value})} 
-                      className="rounded-none h-24"
+                      className="rounded-md h-24"
                       placeholder="Deskripsi singkat dibawah judul..."
                     />
                   </div>
@@ -414,8 +414,8 @@ export default function AdminDashboard() {
 
                 <div className="space-y-4">
                   <Label className="text-xs font-bold uppercase">Gambar Latar Banner</Label>
-                  <div className="flex flex-col items-center gap-6 p-8 border-2 border-dashed border-border rounded-none bg-background/20">
-                    <div className="relative h-48 w-full rounded-none overflow-hidden border border-border bg-muted flex items-center justify-center">
+                  <div className="flex flex-col items-center gap-6 p-8 border-2 border-dashed border-border rounded-lg bg-background/20">
+                    <div className="relative h-48 w-full rounded-md overflow-hidden border border-border bg-muted flex items-center justify-center">
                       {businessInfo.heroImageUrl ? (
                         <img src={businessInfo.heroImageUrl} alt="Hero Preview" className="absolute inset-0 w-full h-full object-cover" />
                       ) : (
@@ -424,7 +424,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="w-full space-y-4">
                       <input type="file" className="hidden" id="hero-up" accept="image/*" onChange={(e) => handleImageUpload(e, 'hero')} />
-                      <Button asChild variant="secondary" className="w-full h-12 rounded-none font-bold">
+                      <Button asChild variant="secondary" className="w-full h-12 rounded-md font-bold">
                         <label htmlFor="hero-up">
                           {isUploading === 'hero' ? <Loader2 className="animate-spin" /> : 'Unggah Gambar Banner'}
                         </label>
@@ -449,7 +449,7 @@ export default function AdminDashboard() {
           )}
 
           {activeSection === 'about' && (
-            <Card className="rounded-none border-border bg-card shadow-xl overflow-hidden">
+            <Card className="rounded-lg border-border bg-card shadow-xl overflow-hidden">
               <CardHeader className="p-8 border-b border-border">
                 <CardTitle className="flex items-center gap-2"><Info size={20} className="text-primary" /> Pengaturan Tentang Kami</CardTitle>
               </CardHeader>
@@ -459,7 +459,7 @@ export default function AdminDashboard() {
                   <Input 
                     value={businessInfo.aboutTitle} 
                     onChange={(e) => setBusinessInfo({...businessInfo, aboutTitle: e.target.value})} 
-                    className="rounded-none h-12 font-bold"
+                    className="rounded-md h-12 font-bold"
                   />
                 </div>
                 <div className="space-y-2">
@@ -467,7 +467,7 @@ export default function AdminDashboard() {
                   <Textarea 
                     value={businessInfo.aboutContent} 
                     onChange={(e) => setBusinessInfo({...businessInfo, aboutContent: e.target.value})} 
-                    className="rounded-none min-h-[250px]"
+                    className="rounded-md min-h-[250px]"
                     placeholder="Ceritakan sejarah atau visi misi anda..."
                   />
                 </div>
@@ -477,13 +477,13 @@ export default function AdminDashboard() {
 
           {activeSection === 'branding' && (
             <div className="space-y-8">
-              <Card className="rounded-none border-border bg-card shadow-xl">
+              <Card className="rounded-lg border-border bg-card shadow-xl">
                 <CardHeader><CardTitle className="flex items-center gap-2"><Palette size={20} className="text-primary" /> Pilih Tema Website</CardTitle></CardHeader>
                 <CardContent className="p-8">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {THEMES.map((theme) => (
-                      <button key={theme.id} onClick={() => setBusinessInfo({...businessInfo, themeId: theme.id})} className={cn("relative flex flex-col gap-3 p-4 rounded-none border transition-all", businessInfo.themeId === theme.id ? "border-primary bg-primary/10 ring-2 ring-primary/20" : "border-border bg-background/40")}>
-                        <div className="flex gap-1 h-14 w-full rounded-none overflow-hidden border border-border">
+                      <button key={theme.id} onClick={() => setBusinessInfo({...businessInfo, themeId: theme.id})} className={cn("relative flex flex-col gap-3 p-4 rounded-lg border transition-all", businessInfo.themeId === theme.id ? "border-primary bg-primary/10 ring-2 ring-primary/20" : "border-border bg-background/40")}>
+                        <div className="flex gap-1 h-14 w-full rounded-md overflow-hidden border border-border">
                           <div className="flex-1" style={{ backgroundColor: `hsl(${theme.background})` }} /><div className="w-1/3" style={{ backgroundColor: `hsl(${theme.primary})` }} /><div className="w-1/3" style={{ backgroundColor: `hsl(${theme.accent})` }} />
                         </div>
                         <span className="text-[10px] font-bold uppercase text-center">{theme.label}</span>
@@ -493,15 +493,15 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="rounded-none border-border bg-card shadow-xl">
+              <Card className="rounded-lg border-border bg-card shadow-xl">
                 <CardContent className="p-8 space-y-8">
-                  <div className="grid md:grid-cols-2 gap-6 p-6 bg-primary/5 rounded-none border border-primary/10">
+                  <div className="grid md:grid-cols-2 gap-6 p-6 bg-primary/5 rounded-lg border border-primary/10">
                     <div className="space-y-2">
                       <Label className="text-[10px] font-black uppercase">Teks Logo Header (Kiri)</Label>
                       <Input 
                         value={businessInfo.logoText} 
                         onChange={(e) => setBusinessInfo({...businessInfo, logoText: e.target.value})} 
-                        className="rounded-none h-12 font-bold"
+                        className="rounded-md h-12 font-bold"
                       />
                     </div>
                     <div className="space-y-2">
@@ -509,27 +509,27 @@ export default function AdminDashboard() {
                       <Input 
                         value={businessInfo.logoAccentText} 
                         onChange={(e) => setBusinessInfo({...businessInfo, logoAccentText: e.target.value})} 
-                        className="rounded-none h-12 font-bold text-primary"
+                        className="rounded-md h-12 font-bold text-primary"
                       />
                     </div>
                   </div>
 
-                  <div className="space-y-4 p-6 bg-primary/5 rounded-none border border-primary/10">
+                  <div className="space-y-4 p-6 bg-primary/5 rounded-lg border border-primary/10">
                     <Label className="text-foreground uppercase font-black text-xs">Pilih Gaya Huruf (Font)</Label>
-                    <select value={businessInfo.fontFamily} onChange={(e) => setBusinessInfo({...businessInfo, fontFamily: e.target.value})} className="w-full rounded-none h-12 bg-background/50 border-border font-bold px-3">
+                    <select value={businessInfo.fontFamily} onChange={(e) => setBusinessInfo({...businessInfo, fontFamily: e.target.value})} className="w-full rounded-md h-12 bg-background/50 border-border font-bold px-3">
                       {ETHNIC_FONTS.map((font) => (<option key={font.name} value={font.name}>{font.label}</option>))}
                     </select>
                   </div>
 
                   <div className="space-y-4">
                     <Label className="text-foreground uppercase font-black text-xs">Logo Bisnis & Ikon Tab Browser</Label>
-                    <div className="flex flex-col items-center gap-8 p-8 border-2 border-dashed border-border rounded-none bg-background/20">
-                      <div className="relative h-32 w-32 rounded-none overflow-hidden border border-border flex items-center justify-center bg-transparent">
+                    <div className="flex flex-col items-center gap-8 p-8 border-2 border-dashed border-border rounded-lg bg-background/20">
+                      <div className="relative h-32 w-32 rounded-lg overflow-hidden border border-border flex items-center justify-center bg-transparent">
                         {businessInfo.logoUrl ? <img src={businessInfo.logoUrl} alt="Logo" className="object-contain max-h-full max-w-full" /> : <div className="text-[10px] opacity-20 uppercase font-bold text-center">Logo Belum Diunggah</div>}
                       </div>
                       <div className="w-full space-y-4">
                         <input type="file" className="hidden" id="logo-up" accept="image/*" onChange={(e) => handleImageUpload(e, 'logo')} />
-                        <Button asChild variant="secondary" className="w-full h-12 rounded-none font-bold"><label htmlFor="logo-up">{isUploading === 'logo' ? <Loader2 className="animate-spin" /> : 'Unggah Logo Baru'}</label></Button>
+                        <Button asChild variant="secondary" className="w-full h-12 rounded-md font-bold"><label htmlFor="logo-up">{isUploading === 'logo' ? <Loader2 className="animate-spin" /> : 'Unggah Logo Baru'}</label></Button>
                         <div className="space-y-3">
                           <div className="flex justify-between text-[10px] font-bold uppercase"><span>Ukuran Logo Header</span><span>{businessInfo.logoHeight}px</span></div>
                           <Slider value={[parseInt(businessInfo.logoHeight) || 36]} min={20} max={100} onValueChange={(v) => setBusinessInfo({...businessInfo, logoHeight: v[0].toString()})} />
@@ -543,18 +543,18 @@ export default function AdminDashboard() {
           )}
 
           {activeSection === 'portfolio' && (
-            <Card className="rounded-none border-border bg-card shadow-xl overflow-hidden">
+            <Card className="rounded-lg border-border bg-card shadow-xl overflow-hidden">
               <CardHeader className="p-8 border-b border-border">
                 <CardTitle className="flex items-center gap-2"><Grid3X3 size={20} className="text-primary" /> Galeri Portofolio</CardTitle>
               </CardHeader>
               <CardContent className="p-8 space-y-8">
-                <div className="p-6 bg-primary/5 rounded-none border border-primary/10 space-y-4">
+                <div className="p-6 bg-primary/5 rounded-lg border border-primary/10 space-y-4">
                   <div className="space-y-2">
                     <Label className="text-xs font-bold uppercase">Judul Seksi Portofolio</Label>
                     <Input 
                       value={businessInfo.portfolioSectionTitle} 
                       onChange={(e) => setBusinessInfo({...businessInfo, portfolioSectionTitle: e.target.value})} 
-                      className="rounded-none h-12 font-bold"
+                      className="rounded-md h-12 font-bold"
                     />
                   </div>
                   <div className="space-y-2">
@@ -562,7 +562,7 @@ export default function AdminDashboard() {
                     <Textarea 
                       value={businessInfo.portfolioSectionSubtitle} 
                       onChange={(e) => setBusinessInfo({...businessInfo, portfolioSectionSubtitle: e.target.value})} 
-                      className="rounded-none h-24"
+                      className="rounded-md h-24"
                     />
                   </div>
                   <div className="flex items-center justify-between pt-4 border-t border-primary/10">
@@ -573,12 +573,12 @@ export default function AdminDashboard() {
                     placeholder="Contoh: pinterest.com/anda" 
                     value={businessInfo.portfolioExternalUrl} 
                     onChange={(e) => setBusinessInfo({...businessInfo, portfolioExternalUrl: e.target.value})}
-                    className="rounded-none h-12 bg-background border-border"
+                    className="rounded-md h-12 bg-background border-border"
                   />
                   <p className="text-[10px] text-muted-foreground italic uppercase">Link ini akan tampil di tombol "Selengkapnya" di bawah daftar foto.</p>
                 </div>
 
-                <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-border rounded-none bg-primary/5 hover:bg-primary/10 transition-all cursor-pointer">
+                <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-border rounded-lg bg-primary/5 hover:bg-primary/10 transition-all cursor-pointer">
                   <input type="file" id="portfolio-up" className="hidden" multiple accept="image/*" onChange={async (e) => {
                     const files = Array.from(e.target.files || []);
                     if (files.length === 0 || !user || !firestore) return;
@@ -604,10 +604,10 @@ export default function AdminDashboard() {
 
                 <div className="grid grid-cols-2 gap-4">
                   {portfolio?.map((item: any) => (
-                    <div key={item.id} className="relative rounded-none overflow-hidden border border-border group aspect-square">
+                    <div key={item.id} className="relative rounded-lg overflow-hidden border border-border group aspect-square">
                       <img src={item.imageUrl} alt="Portfolio" className="absolute inset-0 w-full h-full object-cover" />
                       <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button variant="destructive" size="icon" className="rounded-none h-8 w-8" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'portfolio', item.id))}><Trash2 size={14} /></Button>
+                        <Button variant="destructive" size="icon" className="rounded-md h-8 w-8" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'portfolio', item.id))}><Trash2 size={14} /></Button>
                       </div>
                     </div>
                   ))}
@@ -618,19 +618,19 @@ export default function AdminDashboard() {
 
           {activeSection === 'contact' && (
             <div className="space-y-8">
-              <Card className="rounded-none border-border bg-card shadow-xl">
+              <Card className="rounded-lg border-border bg-card shadow-xl">
                 <CardHeader><CardTitle className="flex items-center gap-2"><MapPin size={20} className="text-primary" /> Kontak Bisnis</CardTitle></CardHeader>
                 <CardContent className="p-8 space-y-8">
                   <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-2"><Label className="text-xs font-bold uppercase">Nama Bisnis</Label><Input value={businessInfo.name} onChange={(e) => setBusinessInfo({...businessInfo, name: e.target.value})} className="rounded-none h-12 font-bold" /></div>
-                    <div className="space-y-2"><Label className="text-xs font-bold uppercase">WhatsApp Admin</Label><Input value={businessInfo.whatsapp} onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})} className="rounded-none h-12 font-bold" /></div>
+                    <div className="space-y-2"><Label className="text-xs font-bold uppercase">Nama Bisnis</Label><Input value={businessInfo.name} onChange={(e) => setBusinessInfo({...businessInfo, name: e.target.value})} className="rounded-md h-12 font-bold" /></div>
+                    <div className="space-y-2"><Label className="text-xs font-bold uppercase">WhatsApp Admin</Label><Input value={businessInfo.whatsapp} onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})} className="rounded-md h-12 font-bold" /></div>
                   </div>
-                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Email Bisnis</Label><Input value={businessInfo.email} onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})} className="rounded-none h-12" /></div>
-                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Alamat Kantor / Bisnis</Label><Textarea value={businessInfo.address} onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})} className="rounded-none min-h-[100px]" /></div>
+                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Email Bisnis</Label><Input value={businessInfo.email} onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})} className="rounded-md h-12" /></div>
+                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Alamat Kantor / Bisnis</Label><Textarea value={businessInfo.address} onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})} className="rounded-md min-h-[100px]" /></div>
                 </CardContent>
               </Card>
 
-              <Card className="rounded-none border-border bg-card shadow-xl">
+              <Card className="rounded-lg border-border bg-card shadow-xl">
                 <CardHeader><CardTitle className="flex items-center gap-2"><Share2 size={20} className="text-primary" /> Link Media Sosial</CardTitle></CardHeader>
                 <CardContent className="p-8 space-y-6">
                   <div className="grid md:grid-cols-2 gap-6">
@@ -640,7 +640,7 @@ export default function AdminDashboard() {
                         placeholder="Contoh: instagram.com/username" 
                         value={businessInfo.socialInstagram} 
                         onChange={(e) => setBusinessInfo({...businessInfo, socialInstagram: e.target.value})} 
-                        className="rounded-none h-12"
+                        className="rounded-md h-12"
                       />
                     </div>
                     <div className="space-y-2">
@@ -649,7 +649,7 @@ export default function AdminDashboard() {
                         placeholder="Contoh: facebook.com/page" 
                         value={businessInfo.socialFacebook} 
                         onChange={(e) => setBusinessInfo({...businessInfo, socialFacebook: e.target.value})} 
-                        className="rounded-none h-12"
+                        className="rounded-md h-12"
                       />
                     </div>
                     <div className="space-y-2">
@@ -658,7 +658,7 @@ export default function AdminDashboard() {
                         placeholder="Contoh: youtube.com/@channel" 
                         value={businessInfo.socialYoutube} 
                         onChange={(e) => setBusinessInfo({...businessInfo, socialYoutube: e.target.value})} 
-                        className="rounded-none h-12"
+                        className="rounded-md h-12"
                       />
                     </div>
                     <div className="space-y-2">
@@ -667,19 +667,19 @@ export default function AdminDashboard() {
                         placeholder="Contoh: tiktok.com/@username" 
                         value={businessInfo.socialTiktok} 
                         onChange={(e) => setBusinessInfo({...businessInfo, socialTiktok: e.target.value})} 
-                        className="rounded-none h-12"
+                        className="rounded-md h-12"
                       />
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="rounded-none border-border bg-card shadow-xl">
+              <Card className="rounded-lg border-border bg-card shadow-xl">
                 <CardHeader><CardTitle className="text-sm">Pengaturan Footer</CardTitle></CardHeader>
                 <CardContent className="p-8 space-y-4">
                   <div className="space-y-2 pt-4 border-t border-border">
                     <Label className="text-xs font-bold uppercase">Teks Hak Cipta (Footer Copyright)</Label>
-                    <Input value={businessInfo.footerCopyright} onChange={(e) => setBusinessInfo({...businessInfo, footerCopyright: e.target.value})} placeholder="Contoh: © 2024 Goetnik Nusantara. Seluruh Hak Cipta Dilindungi." className="rounded-none h-12" />
+                    <Input value={businessInfo.footerCopyright} onChange={(e) => setBusinessInfo({...businessInfo, footerCopyright: e.target.value})} placeholder="Contoh: © 2024 Goetnik Nusantara. Seluruh Hak Cipta Dilindungi." className="rounded-md h-12" />
                     <p className="text-[10px] text-muted-foreground italic">Kosongkan untuk menggunakan format otomatis berdasarkan nama bisnis.</p>
                   </div>
                 </CardContent>
@@ -689,11 +689,11 @@ export default function AdminDashboard() {
 
           {activeSection === 'services' && (
              <div className="space-y-8">
-                <Card className="rounded-none border-border bg-card shadow-xl">
+                <Card className="rounded-lg border-border bg-card shadow-xl">
                   <CardHeader><CardTitle className="text-lg">Pengaturan Seksi Layanan</CardTitle></CardHeader>
                   <CardContent className="p-6 space-y-4">
-                    <div className="space-y-2"><Label className="text-xs font-bold uppercase">Judul Seksi Layanan</Label><Input value={businessInfo.servicesSectionTitle} onChange={(e) => setBusinessInfo({...businessInfo, servicesSectionTitle: e.target.value})} className="rounded-none h-12 font-bold" /></div>
-                    <div className="space-y-2"><Label className="text-xs font-bold uppercase">Deskripsi Seksi</Label><Textarea value={businessInfo.servicesSectionSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, servicesSectionSubtitle: e.target.value})} className="rounded-none h-24" /></div>
+                    <div className="space-y-2"><Label className="text-xs font-bold uppercase">Judul Seksi Layanan</Label><Input value={businessInfo.servicesSectionTitle} onChange={(e) => setBusinessInfo({...businessInfo, servicesSectionTitle: e.target.value})} className="rounded-md h-12 font-bold" /></div>
+                    <div className="space-y-2"><Label className="text-xs font-bold uppercase">Deskripsi Seksi</Label><Textarea value={businessInfo.servicesSectionSubtitle} onChange={(e) => setBusinessInfo({...businessInfo, servicesSectionSubtitle: e.target.value})} className="rounded-md h-24" /></div>
                   </CardContent>
                 </Card>
 
@@ -712,30 +712,30 @@ export default function AdminDashboard() {
                       ownerId: user.uid,
                       createdAt: serverTimestamp()
                     });
-                  }} className="rounded-none px-6 h-12 font-black uppercase"><Plus className="mr-2" size={18} /> Tambah Layanan</Button>
+                  }} className="rounded-lg px-6 h-12 font-black uppercase"><Plus className="mr-2" size={18} /> Tambah Layanan</Button>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
                   {services?.map((s: any) => (
-                    <Card key={s.id} className="bg-card rounded-none border-border overflow-hidden shadow-lg group">
+                    <Card key={s.id} className="bg-card rounded-lg border-border overflow-hidden shadow-lg group">
                       <div className="h-56 bg-muted/20 relative flex items-center justify-center overflow-hidden">
                         {s.imageUrl ? <img src={s.imageUrl} alt={s.name} className="absolute inset-0 w-full h-full object-contain" /> : <ImageIcon size={48} className="opacity-10" />}
                         <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <input type="file" className="hidden" id={`s-main-${s.id}`} accept="image/*" onChange={(e) => handleImageUpload(e, s.id)} />
-                          <Button variant="secondary" size="sm" asChild className="rounded-none"><label htmlFor={`s-main-${s.id}`}>Ubah Gambar Utama</label></Button>
-                          <Button variant="destructive" size="icon" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id))} className="rounded-none"><Trash2 size={16} /></Button>
+                          <Button variant="secondary" size="sm" asChild className="rounded-md"><label htmlFor={`s-main-${s.id}`}>Ubah Gambar Utama</label></Button>
+                          <Button variant="destructive" size="icon" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id))} className="rounded-md"><Trash2 size={16} /></Button>
                         </div>
                       </div>
                       
                       <CardContent className="p-6 space-y-6">
-                        <div className="space-y-1"><Label className="text-[10px] font-black uppercase opacity-40">Nama Layanan</Label><Input defaultValue={s.name} className="rounded-none h-12 font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { name: e.target.value })} /></div>
+                        <div className="space-y-1"><Label className="text-[10px] font-black uppercase opacity-40">Nama Layanan</Label><Input defaultValue={s.name} className="rounded-md h-12 font-bold" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { name: e.target.value })} /></div>
                         <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-1"><Label className="text-[10px] font-black uppercase opacity-40">Harga Layanan</Label><Input defaultValue={s.price} className="rounded-none h-12 font-bold text-primary" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { price: e.target.value })} /></div>
+                          <div className="space-y-1"><Label className="text-[10px] font-black uppercase opacity-40">Harga Layanan</Label><Input defaultValue={s.price} className="rounded-md h-12 font-bold text-primary" onBlur={(e) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { price: e.target.value })} /></div>
                           <div className="space-y-1">
                             <Label className="text-[10px] font-black uppercase opacity-40">Pilih Ikon</Label>
                             <Select defaultValue={s.iconName} onValueChange={(val) => updateDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'services', s.id), { iconName: val })}>
-                              <SelectTrigger className="rounded-none h-12 font-bold"><SelectValue /></SelectTrigger>
-                              <SelectContent className="rounded-none">{ICON_OPTIONS.map((opt) => (<SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>))}</SelectContent>
+                              <SelectTrigger className="rounded-md h-12 font-bold"><SelectValue /></SelectTrigger>
+                              <SelectContent className="rounded-md">{ICON_OPTIONS.map((opt) => (<SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>))}</SelectContent>
                             </Select>
                           </div>
                         </div>
@@ -745,17 +745,17 @@ export default function AdminDashboard() {
                             <Label className="text-xs font-bold uppercase flex items-center gap-2"><Images size={14} /> Galeri Foto Layanan</Label>
                             <div className="flex gap-2">
                               <input type="file" className="hidden" id={`gallery-up-${s.id}`} multiple accept="image/*" onChange={(e) => handleGalleryUpload(e, s.id)} />
-                              <Button asChild variant="outline" size="sm" className="h-8 rounded-none text-[10px] font-bold"><label htmlFor={`gallery-up-${s.id}`}>{isUploading === `gallery-${s.id}` ? <Loader2 className="animate-spin h-3 w-3" /> : 'Tambah Foto'}</label></Button>
+                              <Button asChild variant="outline" size="sm" className="h-8 rounded-md text-[10px] font-bold"><label htmlFor={`gallery-up-${s.id}`}>{isUploading === `gallery-${s.id}` ? <Loader2 className="animate-spin h-3 w-3" /> : 'Tambah Foto'}</label></Button>
                             </div>
                           </div>
                           
                           <div className="grid grid-cols-4 gap-2">
                             {s.galleryUrls?.map((url: string, idx: number) => (
-                              <div key={idx} className="relative aspect-square border border-border group/gal rounded-none overflow-hidden">
+                              <div key={idx} className="relative aspect-square border border-border group/gal rounded-lg overflow-hidden">
                                 <img src={url} alt={`Gallery ${idx}`} className="absolute inset-0 w-full h-full object-cover" />
                                 <button 
                                   onClick={() => removeFromGallery(s.id, idx)}
-                                  className="absolute top-1 right-1 h-5 w-5 bg-destructive text-white rounded-none flex items-center justify-center opacity-0 group-hover/gal:opacity-100 transition-opacity"
+                                  className="absolute top-1 right-1 h-5 w-5 bg-destructive text-white rounded-full flex items-center justify-center opacity-0 group-hover/gal:opacity-100 transition-opacity"
                                 >
                                   <X size={10} />
                                 </button>
@@ -775,15 +775,15 @@ export default function AdminDashboard() {
 
           {activeSection === 'links' && (
             <div className="space-y-6">
-              <Card className="rounded-none border-border bg-card shadow-xl overflow-hidden">
+              <Card className="rounded-lg border-border bg-card shadow-xl overflow-hidden">
                 <CardHeader className="p-6 border-b border-border"><CardTitle>Kelola Tautan Partner</CardTitle></CardHeader>
                 <CardContent className="p-6 space-y-4">
                   <div className="grid md:grid-cols-3 gap-4">
-                    <Input placeholder="Nama Toko / Link" value={newLink.title} onChange={(e) => setNewLink({...newLink, title: e.target.value})} className="rounded-none" />
-                    <Input placeholder="URL Lengkap (https://...)" value={newLink.url} onChange={(e) => setNewLink({...newLink, url: e.target.value})} className="rounded-none" />
+                    <Input placeholder="Nama Toko / Link" value={newLink.title} onChange={(e) => setNewLink({...newLink, title: e.target.value})} className="rounded-md" />
+                    <Input placeholder="URL Lengkap (https://...)" value={newLink.url} onChange={(e) => setNewLink({...newLink, url: e.target.value})} className="rounded-md" />
                     <Select value={newLink.platform} onValueChange={(val) => setNewLink({...newLink, platform: val})}>
-                      <SelectTrigger className="rounded-none"><SelectValue /></SelectTrigger>
-                      <SelectContent className="rounded-none">{PLATFORM_OPTIONS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                      <SelectTrigger className="rounded-md"><SelectValue /></SelectTrigger>
+                      <SelectContent className="rounded-md">{PLATFORM_OPTIONS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
                   <Button onClick={async () => {
@@ -795,20 +795,20 @@ export default function AdminDashboard() {
                     });
                     setNewLink({ title: '', url: '', platform: 'Website' });
                     toast({ title: "Berhasil", description: "Tautan ditambahkan." });
-                  }} className="w-full rounded-none font-bold"><Plus className="mr-2" size={16} /> Tambahkan Tautan</Button>
+                  }} className="w-full rounded-lg font-bold"><Plus className="mr-2" size={16} /> Tambahkan Tautan</Button>
                 </CardContent>
               </Card>
 
               <div className="grid gap-4">
                 {externalLinks?.map((link: any) => (
-                  <div key={link.id} className="flex justify-between items-center p-4 bg-card border border-border rounded-none">
+                  <div key={link.id} className="flex justify-between items-center p-4 bg-card border border-border rounded-lg">
                     <div>
                       <p className="font-bold text-sm">{link.title}</p>
                       <p className="text-[10px] text-muted-foreground">{link.url}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-black uppercase px-3 py-1 bg-secondary rounded-none">{link.platform}</span>
-                      <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 rounded-none" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'external-links', link.id))}><Trash2 size={16} /></Button>
+                      <span className="text-[10px] font-black uppercase px-3 py-1 bg-secondary rounded-lg">{link.platform}</span>
+                      <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 rounded-md" onClick={() => deleteDoc(doc(firestore!, 'businesses', MAIN_BUSINESS_ID, 'external-links', link.id))}><Trash2 size={16} /></Button>
                     </div>
                   </div>
                 ))}
@@ -817,10 +817,10 @@ export default function AdminDashboard() {
           )}
 
           {activeSection === 'privacy' && (
-            <Card className="rounded-none border-border bg-card shadow-xl">
+            <Card className="rounded-lg border-border bg-card shadow-xl">
               <CardContent className="p-8">
                 <Label className="text-xs font-bold uppercase block mb-4">Kebijakan Privasi</Label>
-                <Textarea value={businessInfo.privacyPolicy} onChange={(e) => setBusinessInfo({...businessInfo, privacyPolicy: e.target.value})} className="rounded-none min-h-[400px]" />
+                <Textarea value={businessInfo.privacyPolicy} onChange={(e) => setBusinessInfo({...businessInfo, privacyPolicy: e.target.value})} className="rounded-md min-h-[400px]" />
               </CardContent>
             </Card>
           )}

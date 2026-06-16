@@ -34,15 +34,15 @@ export function AboutUs({ businessId }: AboutUsProps) {
             </div>
 
             <div className="grid sm:grid-cols-3 gap-6 pt-6">
-              <div className="text-center p-6 rounded-none bg-card border border-border">
+              <div className="text-center p-6 rounded-lg bg-card border border-border">
                 <div className="text-3xl font-bold text-primary mb-1">500+</div>
                 <div className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">Klien Puas</div>
               </div>
-              <div className="text-center p-6 rounded-none bg-card border border-border">
+              <div className="text-center p-6 rounded-lg bg-card border border-border">
                 <div className="text-3xl font-bold text-primary mb-1">5+ Thn</div>
                 <div className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">Pengalaman</div>
               </div>
-              <div className="text-center p-6 rounded-none bg-card border border-border">
+              <div className="text-center p-6 rounded-lg bg-card border border-border">
                 <div className="text-3xl font-bold text-primary mb-1">24/7</div>
                 <div className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">Support</div>
               </div>
@@ -51,12 +51,12 @@ export function AboutUs({ businessId }: AboutUsProps) {
 
           <div className="grid gap-6">
             <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
-              <div className="w-8 h-1 bg-primary rounded-none" /> Keunggulan Kami
+              <div className="w-8 h-1 bg-primary rounded-full" /> Keunggulan Kami
             </h3>
             {ADVANTAGES.map((adv, i) => (
-              <Card key={i} className="bg-background/40 border-border/50 hover:border-primary/30 transition-all rounded-none">
+              <Card key={i} className="bg-background/40 border-border/50 hover:border-primary/30 transition-all rounded-lg">
                 <CardContent className="p-6 flex gap-4">
-                  <div className="w-12 h-12 rounded-none bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
                     <adv.icon size={24} />
                   </div>
                   <div>

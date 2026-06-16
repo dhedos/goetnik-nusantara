@@ -23,7 +23,7 @@
     --border: 222 47% 25%;
     --input: 222 47% 25%;
     --ring: 217 91% 60%;
-    --radius: 0rem;
+    --radius: 0.5rem;
     
     --selected-font: 'Inter', sans-serif;
     --font-weight-display: 800;

@@ -113,7 +113,7 @@ _Dikirim melalui Sistem Pemesanan Website_`;
           </p>
         </div>
 
-        <Card className="border-border/50 bg-card/30 backdrop-blur-sm overflow-hidden shadow-2xl relative rounded-none">
+        <Card className="border-border/50 bg-card/30 backdrop-blur-sm overflow-hidden shadow-2xl relative rounded-lg">
           <div className="h-2 bg-gradient-to-r from-primary to-accent w-full" />
           <CardHeader className="px-5 md:px-8">
             <CardTitle>Rincian Pesanan</CardTitle>
@@ -130,7 +130,7 @@ _Dikirim melalui Sistem Pemesanan Website_`;
                       <FormItem>
                         <FormLabel>Nama Lengkap</FormLabel>
                         <FormControl>
-                          <Input className="rounded-none" placeholder="Contoh: Budi Santoso" {...field} />
+                          <Input className="rounded-md" placeholder="Contoh: Budi Santoso" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -143,7 +143,7 @@ _Dikirim melalui Sistem Pemesanan Website_`;
                       <FormItem>
                         <FormLabel>WhatsApp</FormLabel>
                         <FormControl>
-                          <Input className="rounded-none" placeholder="Contoh: 08123456789" type="tel" {...field} />
+                          <Input className="rounded-md" placeholder="Contoh: 08123456789" type="tel" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -159,11 +159,11 @@ _Dikirim melalui Sistem Pemesanan Website_`;
                       <FormLabel>Pilih Layanan</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
-                          <SelectTrigger className="rounded-none">
+                          <SelectTrigger className="rounded-md">
                             <SelectValue placeholder="Klik untuk memilih" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="rounded-none">
+                        <SelectContent className="rounded-md">
                           {services?.map((s: any) => (
                             <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
                           ))}
@@ -181,7 +181,7 @@ _Dikirim melalui Sistem Pemesanan Website_`;
                     <FormItem>
                       <FormLabel>Alamat Lengkap</FormLabel>
                       <FormControl>
-                        <Input className="rounded-none" placeholder="Jl. Merdeka No. 123..." {...field} />
+                        <Input className="rounded-md" placeholder="Jl. Merdeka No. 123..." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -197,7 +197,7 @@ _Dikirim melalui Sistem Pemesanan Website_`;
                       <FormControl>
                         <Textarea 
                           placeholder="Jelaskan kendala Anda..." 
-                          className="min-h-[100px] rounded-none"
+                          className="min-h-[100px] rounded-md"
                           {...field} 
                         />
                       </FormControl>
@@ -208,7 +208,7 @@ _Dikirim melalui Sistem Pemesanan Website_`;
 
                 <Button 
                   type="submit" 
-                  className="w-full py-6 md:py-8 text-sm sm:text-lg rounded-none font-bold flex items-center justify-center gap-2 md:gap-3 shadow-xl shadow-primary/20 hover:scale-[1.01] transition-all px-4"
+                  className="w-full py-6 md:py-8 text-sm sm:text-lg rounded-lg font-bold flex items-center justify-center gap-2 md:gap-3 shadow-xl shadow-primary/20 hover:scale-[1.01] transition-all px-4"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? "Sedang Memproses..." : "Kirim & Hubungi via WhatsApp"}

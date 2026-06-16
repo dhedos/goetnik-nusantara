@@ -65,7 +65,7 @@ export function Portfolio({ businessId }: PortfolioProps) {
               <Dialog key={item.id}>
                 <DialogTrigger asChild>
                   <div 
-                    className="relative group rounded-none overflow-hidden border border-border/10 shadow-xl bg-card/40 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 animate-fade-in break-inside-avoid cursor-pointer"
+                    className="relative group rounded-lg overflow-hidden border border-border/10 shadow-xl bg-card/40 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-1 animate-fade-in break-inside-avoid cursor-pointer"
                     style={{ animationDelay: `${i * 100}ms` }}
                   >
                     <div className="relative w-full h-auto">
@@ -89,7 +89,7 @@ export function Portfolio({ businessId }: PortfolioProps) {
                       
                       <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-8">
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-none bg-primary flex items-center justify-center text-primary-foreground shadow-lg">
+                          <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-lg">
                             <Maximize2 size={18} />
                           </div>
                           <span className="text-xs font-bold uppercase tracking-widest text-white drop-shadow-md">Lihat Full</span>
@@ -98,7 +98,7 @@ export function Portfolio({ businessId }: PortfolioProps) {
                     </div>
                   </div>
                 </DialogTrigger>
-                <DialogContent className="max-w-5xl w-[95vw] h-[90vh] p-0 border-none bg-black/95 overflow-hidden flex flex-col rounded-none z-[70]">
+                <DialogContent className="max-w-5xl w-[95vw] h-[90vh] p-0 border-none bg-black/95 overflow-hidden flex flex-col rounded-lg z-[70]">
                   <DialogTitle className="sr-only">Detail Portofolio</DialogTitle>
                   <DialogDescription className="sr-only">Tampilan penuh gambar portofolio</DialogDescription>
                   
@@ -114,7 +114,7 @@ export function Portfolio({ businessId }: PortfolioProps) {
                   
                   <div className="absolute top-4 right-4 z-[80]">
                     <DialogTrigger asChild>
-                      <button className="h-10 w-10 rounded-none bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors backdrop-blur-md">
+                      <button className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors backdrop-blur-md">
                         <X size={20} />
                       </button>
                     </DialogTrigger>
@@ -129,7 +129,7 @@ export function Portfolio({ businessId }: PortfolioProps) {
           <div className="mt-12 flex justify-center animate-fade-in">
             <Button 
               asChild
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 sm:px-8 py-4 sm:py-5 rounded-none text-[10px] sm:text-xs font-black uppercase tracking-widest shadow-xl hover:scale-[1.02] transition-all group h-auto"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 sm:px-8 py-4 sm:py-5 rounded-lg text-[10px] sm:text-xs font-black uppercase tracking-widest shadow-xl hover:scale-[1.02] transition-all group h-auto"
             >
               <a href={globalUrl.startsWith('http') ? globalUrl : `https://${globalUrl}`} target="_blank" className="flex items-center gap-3">
                 Portofolio Kami Selengkapnya 
