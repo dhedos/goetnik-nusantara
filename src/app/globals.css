@@ -60,12 +60,6 @@
   100% { background-position: 0% 50%; }
 }
 
-@keyframes loading-progress {
-  0% { transform: translateX(-100%); }
-  50% { transform: translateX(0%); }
-  100% { transform: translateX(100%); }
-}
-
 @keyframes subtle-zoom {
   from { transform: scale(1); }
   to { transform: scale(1.05); }
