@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
@@ -19,7 +18,7 @@ import {
   Loader2, Plus, Trash2, Save, LogOut, 
   Globe, Layout, Info, Phone, Shield, 
   Settings, ShoppingBag, ExternalLink as ExternalLinkIcon, MapPin, CheckCircle2, Grid3X3, UploadCloud, ImageIcon, X,
-  Menu, Palette, Link as LinkSimpleIcon, Images
+  Menu, Palette, Link as LinkSimpleIcon, Images, Instagram, Facebook, Youtube, Share2
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { errorEmitter } from '@/firebase/error-emitter';
@@ -618,21 +617,74 @@ export default function AdminDashboard() {
           )}
 
           {activeSection === 'contact' && (
-            <Card className="rounded-none border-border bg-card shadow-xl">
-              <CardContent className="p-8 space-y-8">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Nama Bisnis</Label><Input value={businessInfo.name} onChange={(e) => setBusinessInfo({...businessInfo, name: e.target.value})} className="rounded-none h-12 font-bold" /></div>
-                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">WhatsApp Admin</Label><Input value={businessInfo.whatsapp} onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})} className="rounded-none h-12 font-bold" /></div>
-                </div>
-                <div className="space-y-2 pt-4 border-t border-border">
-                  <Label className="text-xs font-bold uppercase">Teks Hak Cipta (Footer Copyright)</Label>
-                  <Input value={businessInfo.footerCopyright} onChange={(e) => setBusinessInfo({...businessInfo, footerCopyright: e.target.value})} placeholder="Contoh: © 2024 Goetnik Nusantara. Seluruh Hak Cipta Dilindungi." className="rounded-none h-12" />
-                  <p className="text-[10px] text-muted-foreground italic">Kosongkan untuk menggunakan format otomatis berdasarkan nama bisnis.</p>
-                </div>
-                <div className="space-y-2"><Label className="text-xs font-bold uppercase">Email Bisnis</Label><Input value={businessInfo.email} onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})} className="rounded-none h-12" /></div>
-                <div className="space-y-2"><Label className="text-xs font-bold uppercase">Alamat Kantor / Bisnis</Label><Textarea value={businessInfo.address} onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})} className="rounded-none min-h-[100px]" /></div>
-              </CardContent>
-            </Card>
+            <div className="space-y-8">
+              <Card className="rounded-none border-border bg-card shadow-xl">
+                <CardHeader><CardTitle className="flex items-center gap-2"><MapPin size={20} className="text-primary" /> Kontak Bisnis</CardTitle></CardHeader>
+                <CardContent className="p-8 space-y-8">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-2"><Label className="text-xs font-bold uppercase">Nama Bisnis</Label><Input value={businessInfo.name} onChange={(e) => setBusinessInfo({...businessInfo, name: e.target.value})} className="rounded-none h-12 font-bold" /></div>
+                    <div className="space-y-2"><Label className="text-xs font-bold uppercase">WhatsApp Admin</Label><Input value={businessInfo.whatsapp} onChange={(e) => setBusinessInfo({...businessInfo, whatsapp: e.target.value})} className="rounded-none h-12 font-bold" /></div>
+                  </div>
+                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Email Bisnis</Label><Input value={businessInfo.email} onChange={(e) => setBusinessInfo({...businessInfo, email: e.target.value})} className="rounded-none h-12" /></div>
+                  <div className="space-y-2"><Label className="text-xs font-bold uppercase">Alamat Kantor / Bisnis</Label><Textarea value={businessInfo.address} onChange={(e) => setBusinessInfo({...businessInfo, address: e.target.value})} className="rounded-none min-h-[100px]" /></div>
+                </CardContent>
+              </Card>
+
+              <Card className="rounded-none border-border bg-card shadow-xl">
+                <CardHeader><CardTitle className="flex items-center gap-2"><Share2 size={20} className="text-primary" /> Link Media Sosial</CardTitle></CardHeader>
+                <CardContent className="p-8 space-y-6">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label className="text-xs font-bold uppercase flex items-center gap-2"><Instagram size={14} /> Instagram</Label>
+                      <Input 
+                        placeholder="Contoh: instagram.com/username" 
+                        value={businessInfo.socialInstagram} 
+                        onChange={(e) => setBusinessInfo({...businessInfo, socialInstagram: e.target.value})} 
+                        className="rounded-none h-12"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs font-bold uppercase flex items-center gap-2"><Facebook size={14} /> Facebook</Label>
+                      <Input 
+                        placeholder="Contoh: facebook.com/page" 
+                        value={businessInfo.socialFacebook} 
+                        onChange={(e) => setBusinessInfo({...businessInfo, socialFacebook: e.target.value})} 
+                        className="rounded-none h-12"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs font-bold uppercase flex items-center gap-2"><Youtube size={14} /> YouTube</Label>
+                      <Input 
+                        placeholder="Contoh: youtube.com/@channel" 
+                        value={businessInfo.socialYoutube} 
+                        onChange={(e) => setBusinessInfo({...businessInfo, socialYoutube: e.target.value})} 
+                        className="rounded-none h-12"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs font-bold uppercase flex items-center gap-2">TikTok</Label>
+                      <Input 
+                        placeholder="Contoh: tiktok.com/@username" 
+                        value={businessInfo.socialTiktok} 
+                        onChange={(e) => setBusinessInfo({...businessInfo, socialTiktok: e.target.value})} 
+                        className="rounded-none h-12"
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="rounded-none border-border bg-card shadow-xl">
+                <CardHeader><CardTitle className="text-sm">Pengaturan Footer</CardTitle></CardHeader>
+                <CardContent className="p-8 space-y-4">
+                  <div className="space-y-2 pt-4 border-t border-border">
+                    <Label className="text-xs font-bold uppercase">Teks Hak Cipta (Footer Copyright)</Label>
+                    <Input value={businessInfo.footerCopyright} onChange={(e) => setBusinessInfo({...businessInfo, footerCopyright: e.target.value})} placeholder="Contoh: © 2024 Goetnik Nusantara. Seluruh Hak Cipta Dilindungi." className="rounded-none h-12" />
+                    <p className="text-[10px] text-muted-foreground italic">Kosongkan untuk menggunakan format otomatis berdasarkan nama bisnis.</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
 
           {activeSection === 'services' && (
